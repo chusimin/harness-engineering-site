@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harness Engineering · 驾驭工程</title>
+  <meta name="description" content="一份关于 Harness Engineering（驾驭工程）的最全参考资料。写给 AI 产品经理。">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #DEDBC8;
+      --cream-text: #E1E0CC;
+      --bg: #000000;
+      --bg-card: #0c0c0c;
+      --bg-card-alt: #161616;
+      --bg-card-hover: #1a1a1a;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --font-sans: 'Almarai', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Instrument Serif', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--cream-text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: rgba(222, 219, 200, 0.2); color: #fff; }
+    a { color: inherit; text-decoration: none; }
+    ul, ol { list-style: none; }
+    button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+
+    /* Noise texture */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 128px 128px;
+    }
+
+    /* ======== FLOATING NAV ======== */
+    .float-nav {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(222, 219, 200, 0.1);
+      border-radius: 60px;
+      padding: 10px 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      animation: navSlideIn 0.8s var(--ease-out) 1.5s forwards;
+    }
+    @keyframes navSlideIn {
+      to { transform: translateX(-50%) translateY(0); }
+    }
+    .float-nav a {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(225, 224, 204, 0.6);
+      border-radius: 40px;
+      transition: all 0.3s var(--ease-out);
+      white-space: nowrap;
+    }
+    .float-nav a:hover {
+      color: var(--cream-text);
+      background: rgba(222, 219, 200, 0.08);
+    }
+    .float-nav a.is-active {
+      color: #000;
+      background: var(--cream);
+      font-weight: 700;
+    }
+
+    /* ======== HERO ======== */
+    .hero {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      padding: 20px;
+    }
+    .hero-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 28px;
+      overflow: hidden;
+    }
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hero-video-noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.6;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 128px 128px;
+    }
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 30%, transparent 50%, rgba(0,0,0,0.7) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .hero-content {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: 7fr 4fr;
+      gap: 40px;
+      align-items: end;
+      padding: 56px;
+    }
+    .hero-title {
+      font-size: clamp(64px, 14vw, 180px);
+      font-weight: 800;
+      line-height: 0.85;
+      letter-spacing: -0.06em;
+      color: var(--cream-text);
+    }
+    .hero-title .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(40px);
+      animation: wordPull 1s var(--ease-out) forwards;
+    }
+    .hero-title .word:nth-child(1) { animation-delay: 0.2s; }
+    .hero-title .word:nth-child(2) { animation-delay: 0.35s; }
+    .hero-title sup {
+      font-size: 0.25em;
+      position: relative;
+      top: -0.7em;
+    }
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding-bottom: 12px;
+    }
+    .hero-desc {
+      font-size: 15px;
+      line-height: 1.6;
+      color: rgba(222, 219, 200, 0.65);
+      opacity: 0;
+      animation: fadeUp 1s var(--ease-out) 0.6s forwards;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cream);
+      color: #000;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 14px 14px 28px;
+      border-radius: 9999px;
+      width: fit-content;
+      transition: all 0.4s var(--ease-out);
+      opacity: 0;
+      animation: fadeUp 1s var(--ease-out) 0.8s forwards;
+    }
+    .hero-cta:hover { gap: 16px; box-shadow: 0 8px 40px rgba(222,219,200,0.2); transform: translateY(-2px); }
+    .hero-cta-arrow {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: #000;
+      display: grid;
+      place-items: center;
+      transition: transform 0.4s var(--ease-out);
+    }
+    .hero-cta:hover .hero-cta-arrow { transform: scale(1.15) rotate(-5deg); }
+
+    /* Scroll indicator */
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeUp 0.8s var(--ease-out) 1.8s forwards;
+    }
+    .hero-scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--cream), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+      50% { opacity: 1; transform: scaleY(1); }
+    }
+
+    @keyframes wordPull {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ======== CARD STACK SECTION ======== */
+    .stack-section {
+      position: relative;
+      padding: 0 20px;
+    }
+
+    /* Each stacked card */
+    .stack-card {
+      position: sticky;
+      top: 20px;
+      margin-bottom: 20px;
+      border-radius: 28px;
+      overflow: hidden;
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px;
+      transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+      will-change: transform;
+    }
+    .stack-card:hover {
+      transform: scale(1.003);
+    }
+
+    /* Card color variants */
+    .stack-card--dark { background: #0a0a0a; border: 1px solid rgba(222,219,200,0.06); }
+    .stack-card--charcoal { background: #0f0f0f; border: 1px solid rgba(222,219,200,0.05); }
+    .stack-card--deep { background: #080810; border: 1px solid rgba(94,106,210,0.1); }
+    .stack-card--warm { background: #0d0c08; border: 1px solid rgba(222,219,200,0.08); }
+    .stack-card--accent { background: linear-gradient(135deg, #0a0a0a 0%, #0f0d08 100%); border: 1px solid rgba(222,219,200,0.08); }
+
+    /* Card inner glow on hover */
+    .stack-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(800px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.03) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .stack-card:hover::before { opacity: 1; }
+
+    /* Card header */
+    .card-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-bottom: 28px;
+    }
+    .card-eyebrow-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--cream);
+      animation: dotPulse 3s ease-in-out infinite;
+    }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .card-title {
+      font-size: clamp(36px, 5vw, 72px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      color: var(--cream-text);
+      margin-bottom: 20px;
+      max-width: 14ch;
+    }
+    .card-title em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .card-subtitle {
+      font-size: 18px;
+      color: var(--gray-400);
+      max-width: 55ch;
+      line-height: 1.6;
+      margin-bottom: 56px;
+    }
+
+    /* ======== FORMULA (interactive) ======== */
+    .formula-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .formula-chip {
+      font-family: var(--font-mono);
+      font-size: clamp(18px, 2.5vw, 32px);
+      font-weight: 600;
+      color: var(--cream);
+      padding: 16px 32px;
+      background: rgba(222, 219, 200, 0.05);
+      border: 1px solid rgba(222, 219, 200, 0.12);
+      border-radius: 16px;
+      transition: all 0.4s var(--ease-out);
+      cursor: default;
+    }
+    .formula-chip:hover {
+      background: rgba(222, 219, 200, 0.1);
+      border-color: rgba(222, 219, 200, 0.25);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(222, 219, 200, 0.08);
+    }
+    .formula-op {
+      font-size: 28px;
+      color: var(--gray-600);
+      font-weight: 300;
+    }
+
+    /* ======== CONCEPT PILL (animated border) ======== */
+    .concept-pill {
+      position: relative;
+      background: rgba(222, 219, 200, 0.03);
+      border-radius: 20px;
+      padding: 32px 36px;
+      margin-bottom: 48px;
+      max-width: 720px;
+      overflow: hidden;
+    }
+    .concept-pill::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(222,219,200,0.3), transparent 50%, rgba(222,219,200,0.1));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    .concept-pill p {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--cream-text);
+    }
+    .concept-pill strong { color: #fff; }
+
+    /* ======== FEATURE GRID (3 levels) ======== */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .feature-tile {
+      background: rgba(222, 219, 200, 0.03);
+      border: 1px solid rgba(222, 219, 200, 0.06);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.4s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+    }
+    .feature-tile:hover {
+      background: rgba(222, 219, 200, 0.06);
+      border-color: rgba(222, 219, 200, 0.15);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .feature-tile::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cream), transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .feature-tile:hover::after { opacity: 0.5; }
+
+    .feature-tile-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(222, 219, 200, 0.08);
+      display: grid;
+      place-items: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+      transition: transform 0.4s var(--ease-out), background 0.4s;
+    }
+    .feature-tile:hover .feature-tile-icon {
+      transform: scale(1.1) rotate(-3deg);
+      background: rgba(222, 219, 200, 0.12);
+    }
+    .feature-tile-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--cream-text);
+      margin-bottom: 8px;
+    }
+    .feature-tile-desc {
+      font-size: 14px;
+      color: var(--gray-400);
+      line-height: 1.6;
+    }
+
+    /* ======== SCALE VISUALIZER (3 concentric circles) ======== */
+    .scale-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 0;
+      margin-bottom: 48px;
+    }
+    .scale-ring {
+      border-radius: 50%;
+      border: 1px solid rgba(222, 219, 200, 0.12);
+      display: grid;
+      place-items: center;
+      transition: all 0.5s var(--ease-out);
+      position: relative;
+    }
+    .scale-ring:hover {
+      border-color: rgba(222, 219, 200, 0.3);
+      box-shadow: 0 0 60px rgba(222, 219, 200, 0.05);
+    }
+    .scale-ring--org { width: 360px; height: 360px; }
+    .scale-ring--task { width: 240px; height: 240px; }
+    .scale-ring--comp { width: 120px; height: 120px; background: rgba(222,219,200,0.04); }
+    .scale-ring-label {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+    .scale-ring--org .scale-ring-label { top: -24px; }
+    .scale-ring--task .scale-ring-label { top: -24px; }
+    .scale-ring--comp .scale-ring-label { bottom: -24px; }
+
+    /* ======== TIMELINE (history) ======== */
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+      max-width: 680px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--cream), rgba(222,219,200,0.1));
+    }
+    .timeline-item {
+      position: relative;
+      padding: 0 0 48px 32px;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.6s var(--ease-out);
+    }
+    .timeline-item.is-visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -36px; top: 6px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--cream);
+      background: var(--bg);
+      transition: all 0.3s;
+    }
+    .timeline-item:hover::before {
+      background: var(--cream);
+      box-shadow: 0 0 20px rgba(222,219,200,0.3);
+    }
+    .timeline-year {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--cream);
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .timeline-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cream-text);
+      margin-bottom: 6px;
+    }
+    .timeline-desc {
+      font-size: 14px;
+      color: var(--gray-400);
+      line-height: 1.6;
+    }
+
+    /* ======== VENDOR CARDS (hover-rotate) ======== */
+    .vendor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .vendor-card {
+      background: rgba(222, 219, 200, 0.03);
+      border: 1px solid rgba(222, 219, 200, 0.06);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      transition: all 0.4s var(--ease-out);
+      cursor: default;
+    }
+    .vendor-card:hover {
+      background: rgba(222, 219, 200, 0.07);
+      border-color: rgba(222, 219, 200, 0.15);
+      transform: translateY(-8px) rotateX(2deg);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .vendor-card-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--cream-text);
+      margin-bottom: 6px;
+    }
+    .vendor-card-agent {
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+
+    /* ======== STATS (counter) ======== */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+    .stat-block {
+      text-align: center;
+      padding: 40px 20px;
+      border-radius: 20px;
+      background: rgba(222, 219, 200, 0.03);
+      border: 1px solid rgba(222, 219, 200, 0.06);
+      transition: all 0.4s var(--ease-out);
+    }
+    .stat-block:hover {
+      background: rgba(222, 219, 200, 0.06);
+      transform: translateY(-4px);
+      border-color: rgba(222, 219, 200, 0.12);
+    }
+    .stat-block-num {
+      font-size: 52px;
+      font-weight: 800;
+      color: var(--cream-text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-block-unit {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--gray-500);
+    }
+    .stat-block-label {
+      font-size: 13px;
+      color: var(--gray-400);
+    }
+
+    /* ======== SOURCES (marquee) ======== */
+    .sources-marquee {
+      overflow: hidden;
+      padding: 24px 0;
+      border-top: 1px solid rgba(222, 219, 200, 0.06);
+      border-bottom: 1px solid rgba(222, 219, 200, 0.06);
+    }
+    .sources-track {
+      display: flex;
+      gap: 64px;
+      animation: marqueeScroll 20s linear infinite;
+      width: max-content;
+    }
+    .sources-track a {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-500);
+      white-space: nowrap;
+      transition: color 0.3s;
+    }
+    .sources-track a:hover { color: var(--cream); }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ======== FOOTER ======== */
+    .footer {
+      padding: 80px;
+      text-align: center;
+    }
+    .footer-brand {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--cream-text);
+      margin-bottom: 12px;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+
+    /* ======== REVEAL ======== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+    }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 80ms; }
+    .reveal-d2 { transition-delay: 160ms; }
+    .reveal-d3 { transition-delay: 240ms; }
+    .reveal-d4 { transition-delay: 320ms; }
+    .reveal-d5 { transition-delay: 400ms; }
+
+    /* ======== RESPONSIVE ======== */
+    @media (max-width: 1024px) {
+      .stack-card { padding: 56px; min-height: 70vh; }
+      .hero-content { grid-template-columns: 1fr; gap: 24px; padding: 40px; }
+      .hero-right { max-width: 400px; }
+      .stats-strip { grid-template-columns: repeat(2, 1fr); }
+      .scale-visual { display: none; }
+      .float-nav { gap: 2px; padding: 8px 6px; }
+      .float-nav a { padding: 6px 12px; font-size: 12px; }
+    }
+    @media (max-width: 768px) {
+      .hero { padding: 12px; }
+      .hero-content { padding: 24px; }
+      .hero-right { display: none; }
+      .hero-title { font-size: clamp(44px, 13vw, 80px); }
+      .stack-card { padding: 32px; min-height: auto; border-radius: 20px; }
+      .card-title { font-size: clamp(28px, 7vw, 48px); }
+      .feature-grid { grid-template-columns: 1fr; }
+      .vendor-grid { grid-template-columns: 1fr 1fr; }
+      .stats-strip { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .stat-block { padding: 24px 16px; }
+      .stat-block-num { font-size: 36px; }
+      .float-nav { display: none; }
+      .footer { padding: 48px 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Noise overlay -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <!-- Floating nav -->
+  <nav class="float-nav" id="floatNav">
+    <a href="#hero">首页</a>
+    <a href="#card-what">定义</a>
+    <a href="#card-history">谱系</a>
+    <a href="#card-anatomy">解剖</a>
+    <a href="#card-vendors">全景</a>
+    <a href="#card-method">方法</a>
+    <a href="#card-stats">资源</a>
+  </nav>
+
+  <!-- ======== HERO ======== -->
+  <section class="hero" id="hero">
+    <div class="hero-container">
+      <video class="hero-video" autoplay loop muted playsinline
+             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4"></video>
+      <div class="hero-video-noise" aria-hidden="true"></div>
+      <div class="hero-gradient" aria-hidden="true"></div>
+
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="word">Harness</span><br>
+          <span class="word">Engineering<sup>*</sup></span>
+        </h1>
+        <div class="hero-right">
+          <p class="hero-desc">
+            包在模型外面的那一整圈代码 —— 一份关于驾驭工程的最全参考资料。10 个板块，写给 AI 产品经理。
+          </p>
+          <a href="#card-what" class="hero-cta">
+            开始阅读
+            <span class="hero-cta-arrow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E1E0CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-scroll">
+        <div class="hero-scroll-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== STACKED CARDS ======== -->
+  <div class="stack-section">
+
+    <!-- CARD 1: 它是什么 -->
+    <div class="stack-card stack-card--dark" id="card-what">
+      <div class="card-eyebrow reveal"><span class="card-eyebrow-dot"></span> 01 · IT IS WHAT</div>
+      <h2 class="card-title reveal reveal-d1">它是<em>什么</em></h2>
+      <p class="card-subtitle reveal reveal-d2">三个尺度下的统一定义。Agent = Model + Harness。</p>
+
+      <div class="formula-row reveal reveal-d3">
+        <span class="formula-chip">Agent</span>
+        <span class="formula-op">=</span>
+        <span class="formula-chip">Model</span>
+        <span class="formula-op">+</span>
+        <span class="formula-chip">Harness</span>
+      </div>
+
+      <div class="concept-pill reveal reveal-d4">
+        <p><strong>Harness（驾驭套件）</strong>= 包在模型外面、把被动模型变成能干活 Agent 的那一整圈代码与结构。</p>
+      </div>
+
+      <div class="scale-visual reveal reveal-d5">
+        <div class="scale-ring scale-ring--org">
+          <span class="scale-ring-label">组织级 ORGANIZATIONAL</span>
+          <div class="scale-ring scale-ring--task">
+            <span class="scale-ring-label">任务级 TASK</span>
+            <div class="scale-ring scale-ring--comp">
+              <span class="scale-ring-label">组件级</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-grid reveal">
+        <div class="feature-tile">
+          <div class="feature-tile-icon">⟳</div>
+          <div class="feature-tile-title">转 · 主循环</div>
+          <div class="feature-tile-desc">感知 → 推理 → 行动的循环引擎，Agent 的心跳。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">◉</div>
+          <div class="feature-tile-title">知 · 上下文</div>
+          <div class="feature-tile-desc">短期工作记忆与长期知识，Agent 的脑容量。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">⚡</div>
+          <div class="feature-tile-title">做 · 工具</div>
+          <div class="feature-tile-desc">可用工具集与安全围栏，Agent 的手和边界。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">◈</div>
+          <div class="feature-tile-title">检 · 评测</div>
+          <div class="feature-tile-desc">效果衡量与运行可见性，Agent 的仪表盘。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2: 谱系 -->
+    <div class="stack-card stack-card--charcoal" id="card-history">
+      <div class="card-eyebrow reveal"><span class="card-eyebrow-dot"></span> 02 · LINEAGE</div>
+      <h2 class="card-title reveal reveal-d1">它从<em>哪来</em></h2>
+      <p class="card-subtitle reveal reveal-d2">从 prompt engineering 到 harness engineering，每一次命名升级都是因为"控制面积"不够了。</p>
+
+      <div class="timeline reveal reveal-d3">
+        <div class="timeline-item">
+          <div class="timeline-year">2022</div>
+          <div class="timeline-title">Prompt Engineering</div>
+          <div class="timeline-desc">一切起点 —— 研究如何写好提示词，让模型给出更好的答案。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2023</div>
+          <div class="timeline-title">Agent 框架涌现</div>
+          <div class="timeline-desc">LangChain、AutoGPT、BabyAGI 等框架引入 Agent 概念，工具链爆发。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-title">Context Engineering</div>
+          <div class="timeline-desc">认识到"给模型什么上下文"比"怎么写提示词"更重要。控制面扩大。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2025 — NOW</div>
+          <div class="timeline-title">Harness Engineering</div>
+          <div class="timeline-desc">Anthropic、OpenAI 先后发文正式命名。最外层、最完整的实践框架。</div>
+        </div>
+      </div>
+
+      <div class="concept-pill reveal">
+        <p>提示词工程 ⊂ 上下文工程 ⊂ <strong>Harness 工程</strong> —— 嵌套关系，每一层比上一层管得更多。</p>
+      </div>
+    </div>
+
+    <!-- CARD 3: 解剖学 -->
+    <div class="stack-card stack-card--deep" id="card-anatomy">
+      <div class="card-eyebrow reveal"><span class="card-eyebrow-dot"></span> 03 · ANATOMY</div>
+      <h2 class="card-title reveal reveal-d1">解剖<em>学</em></h2>
+      <p class="card-subtitle reveal reveal-d2">拆开一个 Harness，看里面每个部件的职责与常见模式。</p>
+
+      <div class="feature-grid reveal reveal-d3">
+        <div class="feature-tile">
+          <div class="feature-tile-icon">⟳</div>
+          <div class="feature-tile-title">主循环 Loop</div>
+          <div class="feature-tile-desc">ReAct / Plan-and-Execute / 自适应策略选择。决定 Agent 每一步做什么。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">◉</div>
+          <div class="feature-tile-title">上下文管理</div>
+          <div class="feature-tile-desc">窗口裁剪、摘要压缩、RAG 注入、会话记忆。Agent 的注意力分配。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">⚡</div>
+          <div class="feature-tile-title">工具与执行</div>
+          <div class="feature-tile-desc">Tool Schema 定义、权限边界、沙箱隔离、重试与降级。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">◈</div>
+          <div class="feature-tile-title">评测与可观测</div>
+          <div class="feature-tile-desc">离线评测集、在线 A/B、trace 链路、token 成本监控。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">🛡</div>
+          <div class="feature-tile-title">安全围栏</div>
+          <div class="feature-tile-desc">输入过滤、输出审查、人机交接条件、权限升级流程。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">⚙</div>
+          <div class="feature-tile-title">编排层</div>
+          <div class="feature-tile-desc">多 Agent 协作、任务分解与分发、状态持久化、错误恢复。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 4: 厂商全景 -->
+    <div class="stack-card stack-card--warm" id="card-vendors">
+      <div class="card-eyebrow reveal"><span class="card-eyebrow-dot"></span> 04 · VENDORS</div>
+      <h2 class="card-title reveal reveal-d1">厂商<em>全景</em></h2>
+      <p class="card-subtitle reveal reveal-d2">五款主流 Agent 的 Harness 对照。同一个模型，不同的 harness 设计导致截然不同的能力。</p>
+
+      <div class="vendor-grid reveal reveal-d3">
+        <div class="vendor-card">
+          <div class="vendor-card-name">Claude Code</div>
+          <div class="vendor-card-agent">Anthropic</div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-card-name">Codex</div>
+          <div class="vendor-card-agent">OpenAI</div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-card-name">Cursor</div>
+          <div class="vendor-card-agent">Anysphere</div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-card-name">Windsurf</div>
+          <div class="vendor-card-agent">Codeium</div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-card-name">Devin</div>
+          <div class="vendor-card-agent">Cognition</div>
+        </div>
+      </div>
+
+      <div class="concept-pill reveal" style="margin-top:48px;">
+        <p>对比维度：<strong>主循环策略</strong> · <strong>工具集开放度</strong> · <strong>上下文管理</strong> · <strong>安全围栏</strong> · <strong>定价模型</strong></p>
+      </div>
+    </div>
+
+    <!-- CARD 5: 方法论 -->
+    <div class="stack-card stack-card--accent" id="card-method">
+      <div class="card-eyebrow reveal"><span class="card-eyebrow-dot"></span> 05 · METHODOLOGY</div>
+      <h2 class="card-title reveal reveal-d1">怎么<em>做</em></h2>
+      <p class="card-subtitle reveal reveal-d2">从 Anthropic 和 OpenAI 一手文档中提炼的实操指南 —— PM 能上手的事。</p>
+
+      <div class="feature-grid reveal reveal-d3">
+        <div class="feature-tile">
+          <div class="feature-tile-icon">1</div>
+          <div class="feature-tile-title">定义 Agent 边界</div>
+          <div class="feature-tile-desc">哪些任务交给 Agent、哪些留给人类、什么时候人机交接。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">2</div>
+          <div class="feature-tile-title">设计工具集</div>
+          <div class="feature-tile-desc">给 Agent 什么工具、工具 schema 怎么写、权限边界画在哪。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">3</div>
+          <div class="feature-tile-title">构建评测体系</div>
+          <div class="feature-tile-desc">离线评测集、关键指标、A/B 实验框架、回归检测。</div>
+        </div>
+        <div class="feature-tile">
+          <div class="feature-tile-icon">4</div>
+          <div class="feature-tile-title">实战模板仓库</div>
+          <div class="feature-tile-desc">BRD / MRD / PRD / Design Spec —— 可直接 fork 的 PM 文档模板。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 6: 资源总览 -->
+    <div class="stack-card stack-card--dark" id="card-stats">
+      <div class="card-eyebrow reveal"><span class="card-eyebrow-dot"></span> OVERVIEW · RESOURCES</div>
+      <h2 class="card-title reveal reveal-d1">这份资料里<br><em>有什么</em></h2>
+      <p class="card-subtitle reveal reveal-d2">每一个论断都挂一手来源。目标是行业权威。</p>
+
+      <div class="stats-strip reveal reveal-d3">
+        <div class="stat-block">
+          <div class="stat-block-num">10<span class="stat-block-unit">块</span></div>
+          <div class="stat-block-label">板块内容稿全部完稿</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-num">35<span class="stat-block-unit">条</span></div>
+          <div class="stat-block-label">术语表 · 一句话定义</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-num">6<span class="stat-block-unit">家</span></div>
+          <div class="stat-block-label">一手来源机构</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block-num">1<span class="stat-block-unit">套</span></div>
+          <div class="stat-block-label">PM 实战模板（可 fork）</div>
+        </div>
+      </div>
+
+      <div class="sources-marquee reveal reveal-d4">
+        <div class="sources-track">
+          <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+          <a href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+          <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+          <a href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler / Thoughtworks</a>
+          <a href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a>
+          <a href="https://agents.md/" target="_blank">AGENTS.md</a>
+          <!-- duplicate for seamless loop -->
+          <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+          <a href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+          <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+          <a href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler / Thoughtworks</a>
+          <a href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a>
+          <a href="https://agents.md/" target="_blank">AGENTS.md</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-brand">Harness Engineering · 驾驭工程</div>
+    <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
+  </footer>
+
+  <script>
+    // ======== SCROLL REVEAL ========
+    const revealEls = document.querySelectorAll('.reveal, .timeline-item');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          revealObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(el => revealObs.observe(el));
+
+    // ======== CARD MOUSE GLOW ========
+    document.querySelectorAll('.stack-card').forEach(card => {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+        card.style.setProperty('--my', `${e.clientY - r.top}px`);
+      });
+    });
+
+    // ======== NAV SCROLL SPY ========
+    const navLinks = document.querySelectorAll('.float-nav a');
+    const sections = document.querySelectorAll('.stack-card, .hero');
+    const navObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach(l => {
+            l.classList.toggle('is-active', l.getAttribute('href') === `#${id}`);
+          });
+        }
+      });
+    }, { rootMargin: '-30% 0px -50% 0px', threshold: 0 });
+    sections.forEach(s => { if (s.id) navObs.observe(s); });
+
+    // ======== PARALLAX DEPTH on cards (subtle) ========
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        document.querySelectorAll('.stack-card').forEach((card, i) => {
+          const rect = card.getBoundingClientRect();
+          const center = rect.top + rect.height / 2;
+          const vh = window.innerHeight;
+          const progress = (center - vh / 2) / vh;
+          const shadow = Math.max(0, 1 - Math.abs(progress)) * 40;
+          card.style.boxShadow = `0 ${shadow}px ${shadow * 2}px rgba(0,0,0,${0.3 + shadow * 0.005})`;
+        });
+        ticking = false;
+      });
+    }, { passive: true });
+
+    // ======== Marquee pause on hover ========
+    const marquee = document.querySelector('.sources-track');
+    if (marquee) {
+      marquee.addEventListener('mouseenter', () => { marquee.style.animationPlayState = 'paused'; });
+      marquee.addEventListener('mouseleave', () => { marquee.style.animationPlayState = 'running'; });
+    }
+  </script>
+
+</body>
+</html>
