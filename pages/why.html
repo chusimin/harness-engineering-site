@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>为什么 · Harness Engineering</title>
+  <meta name="description" content="为什么 2026 起，harness 这件事决定 AI 产品胜负 —— 行业拐点、5 个非做不可的理由、3 个反例。">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="../assets/page.css">
+
+  <style>
+    /* ==== why.html · 局部增强（不覆盖 shared/page 内已有定义） ==== */
+    .vs-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .vs-row-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--cream-dim);
+      line-height: 1.6;
+    }
+    .vs-row-item-bullet {
+      display: inline-block;
+      width: 18px;
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--cream);
+      padding-top: 2px;
+    }
+    .vs-row-item.is-neg .vs-row-item-bullet { color: #b66; }
+    .vs-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    .vs-tag.is-neg { background: rgba(180, 90, 90, 0.12); color: #d99; border: 1px solid rgba(180,90,90,0.2); }
+    .vs-tag.is-pos { background: rgba(222, 219, 200, 0.08); color: var(--cream); border: 1px solid rgba(222,219,200,0.15); }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 24px 0 32px;
+    }
+    @media (max-width: 1024px) { .stat-row { grid-template-columns: 1fr; } }
+    .stat-tile-before {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gray-500);
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .stat-tile-arrow {
+      color: var(--gray-600);
+      font-family: var(--font-mono);
+      margin: 0 6px;
+    }
+    .stat-tile-after {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--cream);
+      letter-spacing: 0.04em;
+    }
+    .stat-tile-metric {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--cream-text);
+      letter-spacing: -0.02em;
+      margin: 12px 0 4px;
+      font-family: var(--font-mono);
+    }
+    .stat-tile-desc {
+      font-size: 13px;
+      color: var(--cream-dim);
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+
+    .reason-num {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 48px;
+      line-height: 1;
+      color: var(--cream);
+      opacity: 0.5;
+      margin-bottom: 8px;
+    }
+    .reason-cite {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(222,219,200,0.08);
+      font-size: 12px;
+      color: var(--gray-500);
+    }
+
+    .anti-tile { border-color: rgba(180, 90, 90, 0.15); }
+    .anti-tile:hover { border-color: rgba(180, 90, 90, 0.3); }
+    .anti-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(180, 90, 90, 0.12);
+      color: #d99;
+      border: 1px solid rgba(180,90,90,0.2);
+      margin-bottom: 14px;
+    }
+
+    .cta-block {
+      margin-top: 32px;
+      padding: 24px 28px;
+      background: rgba(222, 219, 200, 0.04);
+      border: 1px solid rgba(222, 219, 200, 0.1);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .cta-block-text {
+      font-size: 14px;
+      color: var(--cream-dim);
+    }
+    .cta-block-link {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--cream);
+      padding: 10px 18px;
+      border: 1px solid rgba(222, 219, 200, 0.2);
+      border-radius: 8px;
+      transition: all 0.3s var(--ease-out);
+      white-space: nowrap;
+    }
+    .cta-block-link:hover {
+      background: var(--cream);
+      color: #000;
+      border-color: var(--cream);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="noise-bg" aria-hidden="true"></div>
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a href="../index.html" class="topnav-brand">
+      <span class="topnav-brand-mark">H</span>
+      <span class="topnav-brand-text">驾驭工程</span>
+    </a>
+    <a href="what.html" class="topnav-link">是什么</a>
+    <a href="why.html" class="topnav-link">为什么</a>
+    <a href="anatomy.html" class="topnav-link">解剖</a>
+    <a href="vendors.html" class="topnav-link">厂商</a>
+    <a href="method.html" class="topnav-link">方法</a>
+    <a href="history.html" class="topnav-link">谱系</a>
+    <a href="resources.html" class="topnav-link">资源</a>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- LEFT TOC -->
+    <aside class="toc">
+      <div class="toc-inner">
+        <div class="toc-label">02 · BOARD</div>
+        <div class="toc-board">为<em>什么</em></div>
+        <nav class="toc-list">
+          <a href="#contrast" class="toc-link">
+            <span class="toc-num">01</span>
+            <span>裸模型 vs 被驾驭 Agent</span>
+          </a>
+          <a href="#turning-point" class="toc-link">
+            <span class="toc-num">02</span>
+            <span>行业拐点：2026</span>
+          </a>
+          <a href="#five-reasons" class="toc-link">
+            <span class="toc-num">03</span>
+            <span>5 个非做不可的理由</span>
+          </a>
+          <a href="#three-failures" class="toc-link">
+            <span class="toc-num">04</span>
+            <span>3 个反例</span>
+          </a>
+          <a href="#pm-stake" class="toc-link">
+            <span class="toc-num">05</span>
+            <span>为什么 PM 必须懂</span>
+          </a>
+        </nav>
+        <div class="toc-bottom">
+          <a href="anatomy.html" class="toc-nav-link">
+            <span>下一个板块</span>
+            <span class="toc-nav-link-arrow">03 · 解剖 →</span>
+          </a>
+          <a href="../index.html" class="toc-nav-link">
+            <span>← 返回首页</span>
+            <span class="toc-nav-link-arrow"></span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN -->
+    <main class="page-main">
+
+      <header class="page-header reveal">
+        <div class="page-header-num">02 · WHY IT MATTERS</div>
+        <h1 class="page-title">为<em>什么</em></h1>
+        <p class="page-lead">
+          为什么 2026 起，harness 这件事决定 AI 产品胜负。
+        </p>
+      </header>
+
+      <!-- ==== SEC 1: 对比 ==== -->
+      <section class="sec" id="contrast">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · NAKED vs HARNESSED</div>
+        <h2 class="sec-title reveal">裸模型 vs 被<em>驾驭</em>的 Agent</h2>
+        <p class="sec-lead reveal reveal-d1">
+          同一个 Claude / GPT，套不套 harness 是两种产品。差距不在模型分数，差在<strong style="color:var(--cream-text);">"能干完一件事"</strong>。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2">
+          <div class="tile" data-glow>
+            <span class="vs-tag is-neg">NAKED MODEL · 裸模型</span>
+            <div class="tile-title">只能"想",不能"干"</div>
+            <div class="vs-row">
+              <div class="vs-row-item is-neg"><span class="vs-row-item-bullet">×</span><span>无状态:每次调用从零开始,记不住上一轮。</span></div>
+              <div class="vs-row-item is-neg"><span class="vs-row-item-bullet">×</span><span>不能调工具:只能输出文字,改不了文件、发不了请求。</span></div>
+              <div class="vs-row-item is-neg"><span class="vs-row-item-bullet">×</span><span>没有围栏:可能输出违规、泄密、删错文件,无人兜底。</span></div>
+              <div class="vs-row-item is-neg"><span class="vs-row-item-bullet">×</span><span>不可观测:出错了不知道哪一步坏的,没法定位。</span></div>
+              <div class="vs-row-item is-neg"><span class="vs-row-item-bullet">×</span><span>不能迭代:没评测集,改了 prompt 不知道是变好还是变差。</span></div>
+            </div>
+          </div>
+          <div class="tile" data-glow>
+            <span class="vs-tag is-pos">HARNESSED AGENT · 被驾驭的 Agent</span>
+            <div class="tile-title">能"干完",能"管住"</div>
+            <div class="vs-row">
+              <div class="vs-row-item"><span class="vs-row-item-bullet">✓</span><span>有记忆层:工作记忆 + 长期知识,跨轮、跨会话连续。</span></div>
+              <div class="vs-row-item"><span class="vs-row-item-bullet">✓</span><span>有工具集:文件、Shell、HTTP、子 agent,真能动手做事。</span></div>
+              <div class="vs-row-item"><span class="vs-row-item-bullet">✓</span><span>有沙箱与权限:危险动作必经审批,可回滚、可审计。</span></div>
+              <div class="vs-row-item"><span class="vs-row-item-bullet">✓</span><span>全链路 trace:每一步推理、工具调用、token 成本都被记下来。</span></div>
+              <div class="vs-row-item"><span class="vs-row-item-bullet">✓</span><span>有评测集 + A/B:每次改动都可量化,迭代有方向。</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="concept-pill reveal reveal-d3" style="margin-top: 28px;">
+          <p>
+            <strong>差距不在"模型多聪明",而在"被包裹了多少层工程"。</strong>
+            2026 年,各家旗舰模型在 benchmark 上已经接近,但<a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic 的 Claude Code</a>跑长任务的成功率仍能拉开 30%+ 的差距 —— 拉开它的不是模型,是 harness。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 2: 行业拐点 ==== -->
+      <section class="sec" id="turning-point">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · INFLECTION POINT</div>
+        <h2 class="sec-title reveal">行业拐点:<em>2026</em> 这一年</h2>
+        <p class="sec-lead reveal reveal-d1">
+          模型能力曲线在 2025 末刚刚跨过一道阈值,工程难度从 "调好 prompt" 跳到了 "撑起 8 小时长任务"。
+        </p>
+
+        <div class="stat-row reveal reveal-d2">
+          <div class="tile" data-glow>
+            <div class="stat-tile-before">~2024 · 短任务</div>
+            <div class="stat-tile-metric">≈ 40%</div>
+            <div class="stat-tile-after">long-task → <span class="stat-tile-arrow">→</span> 2026 · ≈ 71%</div>
+            <div class="stat-tile-desc">
+              基于 <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a> 长时任务评测,旗舰模型连续完成 50+ 步工程任务的成功率,从 2024 到 2026 翻了近一倍。
+            </div>
+          </div>
+          <div class="tile" data-glow>
+            <div class="stat-tile-before">~2024 · 工具调用准确度</div>
+            <div class="stat-tile-metric">≈ 65%</div>
+            <div class="stat-tile-after">tool-use → <span class="stat-tile-arrow">→</span> 2026 · ≈ 92%</div>
+            <div class="stat-tile-desc">
+              <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI Codex</a> 在 2026 报告中,工具调用一次命中率(无重试)突破 90%,工具编排正式可工程化。
+            </div>
+          </div>
+          <div class="tile" data-glow>
+            <div class="stat-tile-before">~2024 · 单任务上下文</div>
+            <div class="stat-tile-metric">128k</div>
+            <div class="stat-tile-after">context → <span class="stat-tile-arrow">→</span> 2026 · 1M+</div>
+            <div class="stat-tile-desc">
+              长上下文从 128k 跃升到 1M+,催生了 "整个 repo 喂进去" 的工作流;但<strong>上下文越长,harness 的成本和噪音控制越关键</strong>。
+            </div>
+          </div>
+        </div>
+
+        <div class="prose reveal reveal-d3">
+          <p>
+            2026 年 2 月,<a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI 在《Harness engineering》</a>一文中第一次正式命名这件事;一个月后,<a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic 发布《Harness design for long-running application development》</a>,把 Claude Code 的 8 小时长任务工程公开。<strong>"harness" 一词,在两家头部实验室同一季度被独立提出</strong> —— 这不是偶然命名,是模型能力溢出后,必须有的工程层。
+          </p>
+          <p>
+            过去三年,谁的 prompt 写得好,谁就赢;<strong>未来三年,谁的 harness 包得好,谁就赢</strong>。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 3: 5 个理由 ==== -->
+      <section class="sec" id="five-reasons">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · FIVE REASONS</div>
+        <h2 class="sec-title reveal">5 个<em>非做不可</em>的理由</h2>
+        <p class="sec-lead reveal reveal-d1">
+          为什么 PM、工程师、组织,在 2026 起都必须把 harness 当一等公民。
+        </p>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile" data-glow>
+            <div class="reason-num">01</div>
+            <div class="tile-title">模型能力溢出,需要 harness 装载</div>
+            <p class="tile-desc">
+              模型已经会"想",但用户要的是"做"。不套 harness,GPT-5 / Claude 4.6 也只是个聊天框 —— 装不进真实工作流。
+            </p>
+            <p class="reason-cite">
+              参见 <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI 2026</a>:"模型能力的瓶颈,正从能力本身转到 harness 上"。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="reason-num">02</div>
+            <div class="tile-title">长任务成功率由 harness 决定</div>
+            <p class="tile-desc">
+              50 步以上的任务,模型每步独立误差 5%,累计成功率不到 8%。靠 harness 的重试、check、回滚,才能拉到可商用水位。
+            </p>
+            <p class="reason-cite">
+              <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic harness design</a> 是这一点的实证案例。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="reason-num">03</div>
+            <div class="tile-title">成本治理需要 harness</div>
+            <p class="tile-desc">
+              一个失控的 agent,一晚上能烧掉一个团队一个月预算。token 配额、模型路由、缓存策略,都属于 harness 的"成本面"。
+            </p>
+            <p class="reason-cite">
+              参见 <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain anatomy</a> 中关于 budget guard 的部分。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="reason-num">04</div>
+            <div class="tile-title">安全合规需要 harness</div>
+            <p class="tile-desc">
+              prompt injection、越权操作、PII 泄露 —— 这些靠 "model 自己注意" 是兜不住的。围栏、沙箱、审批流,必须在 harness 层强制。
+            </p>
+            <p class="reason-cite">
+              参见 <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Thoughtworks · Birgitta Böckeler</a> 的 trust boundary 论述。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="reason-num">05</div>
+            <div class="tile-title">评测可观测决定迭代速度</div>
+            <p class="tile-desc">
+              没有 trace、没有评测集,改 prompt 就是赌博。harness 的"检"那一层,决定团队每周能迭代几次、敢不敢上线。
+            </p>
+            <p class="reason-cite">
+              参见 <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a> 关于 eval-driven development 的约定。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== SEC 4: 3 个反例 ==== -->
+      <section class="sec" id="three-failures">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · ANTI-PATTERNS</div>
+        <h2 class="sec-title reveal">3 个<em>反例</em>:没有 harness 的代价</h2>
+        <p class="sec-lead reveal reveal-d1">
+          见过太多团队"接了模型 = 做了 AI 产品",上线一个月就被用户骂下架。原因往往就这三类。
+        </p>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile anti-tile" data-glow>
+            <span class="anti-tag">ANTI-PATTERN · 01</span>
+            <div class="tile-title">没工具调用的 agent</div>
+            <p class="tile-desc">
+              用户:"帮我把这个 bug 修了。" Agent:"以下是建议步骤:1. ……" —— 然后就没了。
+            </p>
+            <p class="tile-desc" style="margin-top: 10px;">
+              <strong style="color:var(--cream-text);">代价:</strong>用户要复制粘贴 5 次才能让事情发生,体验等同于 ChatGPT,凭什么收钱。
+            </p>
+          </div>
+          <div class="tile anti-tile" data-glow>
+            <span class="anti-tag">ANTI-PATTERN · 02</span>
+            <div class="tile-title">没评测的 agent</div>
+            <p class="tile-desc">
+              改了一版 prompt,产品经理在 Slack 里贴一句"感觉好多了!"就上线。三天后用户投诉:回答变啰嗦了。
+            </p>
+            <p class="tile-desc" style="margin-top: 10px;">
+              <strong style="color:var(--cream-text);">代价:</strong>每次上线都是黑盒赌博,团队没法回答"它现在到底比上周好还是坏"。
+            </p>
+          </div>
+          <div class="tile anti-tile" data-glow>
+            <span class="anti-tag">ANTI-PATTERN · 03</span>
+            <div class="tile-title">没记忆的 agent</div>
+            <p class="tile-desc">
+              用户第 7 次告诉同一个 agent "我用 Python 不用 Java",每次对话都得从头解释,像金鱼。
+            </p>
+            <p class="tile-desc" style="margin-top: 10px;">
+              <strong style="color:var(--cream-text);">代价:</strong>留存惨淡。用户感受到的不是"AI",是"PA 系统"(每次都要重填问卷)。
+            </p>
+          </div>
+        </div>
+
+        <p class="prose reveal reveal-d3" style="margin-top: 28px; font-size: 14px; color: var(--gray-500);">
+          这三个反例的共同特征:<strong style="color:var(--cream-text);">把 AI 产品的工程缺陷,当成"模型还不够好"</strong>。事实上,它们都是 harness 缺位的问题,不是模型问题。
+        </p>
+      </section>
+
+      <!-- ==== SEC 5: PM 必须懂 ==== -->
+      <section class="sec" id="pm-stake">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · WHY PM</div>
+        <h2 class="sec-title reveal">为什么 <em>PM</em> 必须懂这个</h2>
+        <p class="sec-lead reveal reveal-d1">
+          这不是工程黑话,这是 PM 的新 baseline。
+        </p>
+
+        <div class="prose reveal reveal-d2">
+          <p>
+            AI 产品经理过去三年的能力栈是: <strong>用户洞察 + 产品定义 + 写 PRD</strong>。这套已经不够了。原因很简单 —— 当你的产品由一个 agent 提供主要价值,而你完全不懂这个 agent 是怎么被"包出来"的,你就<strong>没法做任何有意义的产品决策</strong>:工具该开几个、记忆多深、评测怎么设、什么动作必须人审、出错往哪兜……这些每一条都是产品决策,不是工程决策。
+          </p>
+          <p>
+            <strong>把 harness 纳入工程认知,意味着 PM 把"模型层"和"产品层"中间那一截 —— harness 层 —— 当成自己的设计对象。</strong>不是去写代码,而是能看懂 trace、能读 evals 报告、能跟工程师讨论"这个 retry 策略合不合理"、能在面试里讲清"我们家 agent 的 harness 设计"。
+          </p>
+          <p>
+            这是 2026 起,头部公司面 AI PM 时,实际会拷打的东西。<a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>、<a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a> 自己的招聘 JD 里,已经在 PM 岗写"familiar with agent harness design"。
+          </p>
+        </div>
+
+        <div class="concept-pill reveal reveal-d3" style="margin-top: 24px;">
+          <p>
+            <strong>不懂 harness 的 AI PM,就像 2010 年不懂 RESTful API 的移动 PM。</strong>不是不能干,而是没法跟工程师"对等地讨论产品"。
+          </p>
+        </div>
+
+        <div class="cta-block reveal reveal-d3">
+          <div class="cta-block-text">
+            想看 PM 该怎么把 harness "做出来"?
+          </div>
+          <a href="method.html" class="cta-block-link">看板块 05 · 方法论 →</a>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-brand">HARNESS ENGINEERING · 驾驭工程</div>
+    <div class="footer-links">
+      <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+      <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+      <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+      <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler</a>
+      <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a>
+      <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a>
+    </div>
+    <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
+  </footer>
+
+  <script src="../assets/shared.js"></script>
+  <script src="../assets/page.js"></script>
+</body>
+</html>

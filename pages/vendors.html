@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>厂商全景 · Harness Engineering</title>
+  <meta name="description" content="Harness Engineering 厂商全景 — 五款主流 Agent 的 harness 对照拆解：Claude Code、Codex、Cursor、Windsurf、Devin。">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="../assets/page.css">
+
+  <style>
+    /* Page-specific additions */
+    .vendor-mark {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(222,219,200,0.08);
+      display: grid;
+      place-items: center;
+      margin-bottom: 16px;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+    }
+    .vendor-facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px dashed rgba(222,219,200,0.12);
+    }
+    .vendor-fact {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--cream);
+      padding: 4px 10px;
+      background: rgba(222,219,200,0.06);
+      border: 1px solid rgba(222,219,200,0.12);
+      border-radius: 6px;
+    }
+    .vendor-fact-label {
+      color: var(--gray-500);
+      margin-right: 6px;
+    }
+    .scenario-tile h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cream);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      font-family: var(--font-mono);
+    }
+    .scenario-tile ul {
+      list-style: none;
+      margin: 0;
+    }
+    .scenario-tile li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: var(--cream-dim);
+      line-height: 1.6;
+    }
+    .scenario-tile li::before {
+      content: '→';
+      position: absolute;
+      left: 0; top: 0;
+      color: var(--cream);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    /* Comparison table */
+    .compare-wrap {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(222,219,200,0.08);
+      background: var(--bg-card);
+    }
+    table.compare {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      min-width: 720px;
+    }
+    table.compare th, table.compare td {
+      padding: 16px 18px;
+      text-align: left;
+      border-bottom: 1px solid rgba(222,219,200,0.06);
+    }
+    table.compare th {
+      background: rgba(222,219,200,0.04);
+      color: var(--cream);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    table.compare td {
+      color: var(--cream-dim);
+      vertical-align: top;
+    }
+    table.compare tr:last-child td { border-bottom: none; }
+    table.compare tr:hover td {
+      background: rgba(222,219,200,0.03);
+      color: var(--cream-text);
+    }
+    table.compare td:first-child {
+      color: var(--cream-text);
+      font-weight: 700;
+      font-family: var(--font-sans);
+    }
+    .tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      padding: 3px 8px;
+      background: rgba(222,219,200,0.06);
+      border: 1px solid rgba(222,219,200,0.12);
+      border-radius: 5px;
+      color: var(--cream);
+      margin: 2px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="noise-bg" aria-hidden="true"></div>
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a href="../index.html" class="topnav-brand">
+      <span class="topnav-brand-mark">H</span>
+      <span class="topnav-brand-text">驾驭工程</span>
+    </a>
+    <a href="what.html" class="topnav-link">是什么</a>
+    <a href="why.html" class="topnav-link">为什么</a>
+    <a href="anatomy.html" class="topnav-link">解剖</a>
+    <a href="vendors.html" class="topnav-link is-active">厂商</a>
+    <a href="method.html" class="topnav-link">方法</a>
+    <a href="history.html" class="topnav-link">谱系</a>
+    <a href="resources.html" class="topnav-link">资源</a>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- LEFT TOC -->
+    <aside class="toc">
+      <div class="toc-inner">
+        <div class="toc-label">04 · BOARD</div>
+        <div class="toc-board">厂商<em>全景</em></div>
+        <nav class="toc-list">
+          <a href="#overview" class="toc-link">
+            <span class="toc-num">01</span>
+            <span>5 款 Agent 一览</span>
+          </a>
+          <a href="#claude-code" class="toc-link">
+            <span class="toc-num">02</span>
+            <span>Claude Code</span>
+          </a>
+          <a href="#codex" class="toc-link">
+            <span class="toc-num">03</span>
+            <span>Codex</span>
+          </a>
+          <a href="#cursor" class="toc-link">
+            <span class="toc-num">04</span>
+            <span>Cursor</span>
+          </a>
+          <a href="#windsurf" class="toc-link">
+            <span class="toc-num">05</span>
+            <span>Windsurf</span>
+          </a>
+          <a href="#devin" class="toc-link">
+            <span class="toc-num">06</span>
+            <span>Devin</span>
+          </a>
+          <a href="#matrix" class="toc-link">
+            <span class="toc-num">07</span>
+            <span>5 维度对照表</span>
+          </a>
+        </nav>
+        <div class="toc-bottom">
+          <a href="method.html" class="toc-nav-link">
+            <span>下一个板块</span>
+            <span class="toc-nav-link-arrow">05 · 方法 →</span>
+          </a>
+          <a href="../index.html" class="toc-nav-link">
+            <span>← 返回首页</span>
+            <span class="toc-nav-link-arrow"></span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN -->
+    <main class="page-main">
+
+      <header class="page-header reveal">
+        <div class="page-header-num">04 · VENDORS</div>
+        <h1 class="page-title">厂商<em>全景</em></h1>
+        <p class="page-lead">
+          五款主流 Agent 的 harness 对照拆解。
+        </p>
+      </header>
+
+      <!-- ==== SEC 1: 5 款 Agent 一览 ==== -->
+      <section class="sec" id="overview">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · OVERVIEW</div>
+        <h2 class="sec-title reveal">五款主流 <em>Coding Agent</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          截至 2026 年初，开发者圈子里被频繁讨论的 5 款"能真干活"的 coding agent。<strong style="color:var(--cream-text);">同样的目标，五种 harness 答卷。</strong>
+        </p>
+
+        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 16px;">
+          <div class="tile" data-glow>
+            <div class="vendor-mark">CC</div>
+            <div class="tile-num">ANTHROPIC</div>
+            <div class="tile-title">Claude Code</div>
+            <p class="tile-desc">终端原生的长程编码 Agent。以"sub-agent + plan mode + 长时任务"为最大特色。</p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="vendor-mark">CX</div>
+            <div class="tile-num">OPENAI</div>
+            <div class="tile-title">Codex</div>
+            <p class="tile-desc">云端隔离沙箱里的 PR 风格 Agent。并行多任务，每个任务给你一个 pull request。</p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="vendor-mark">CR</div>
+            <div class="tile-num">ANYSPHERE</div>
+            <div class="tile-title">Cursor</div>
+            <p class="tile-desc">VS Code fork，IDE 原生 Agent。以"Composer + 代码库索引"打出差异化。</p>
+          </div>
+        </div>
+        <div class="grid-2 reveal reveal-d3">
+          <div class="tile" data-glow>
+            <div class="vendor-mark">WS</div>
+            <div class="tile-num">CODEIUM</div>
+            <div class="tile-title">Windsurf</div>
+            <p class="tile-desc">同为 VS Code fork。以 Cascade（链式工作流）+ "flow state" 多步记忆见长。</p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="vendor-mark">DV</div>
+            <div class="tile-num">COGNITION</div>
+            <div class="tile-title">Devin</div>
+            <p class="tile-desc">自称"AI 软件工程师"。给 Agent 完整 stack：shell + 浏览器 + 编辑器 + planning。</p>
+          </div>
+        </div>
+
+        <div class="concept-pill reveal" style="margin-top:32px;">
+          <p>
+            <strong>读法：</strong>每一节先看"Harness 设计特色"（这家的差异化在哪里），再看"选型场景"（什么团队该挑它），最后用底部 mono 标签快速 grep 关键事实。完整对比表见
+            <a class="cite" href="#matrix">板块末尾的 5 维度对照表 →</a>
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 2: Claude Code ==== -->
+      <section class="sec" id="claude-code">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · VENDOR 01</div>
+        <h2 class="sec-title reveal">Claude <em>Code</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          Anthropic 官方的 CLI 编码 Agent。把"在你 repo 里干活"做到极致 —— 终端跑、长任务、可中断、可恢复。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
+          <div class="prose">
+            <h3>Harness 设计特色</h3>
+            <ul>
+              <li><strong>长程任务 harness</strong> —— 单次任务可跑数十分钟到数小时，靠 checkpoint 和压缩上下文撑住长循环。</li>
+              <li><strong>Sub-agent 派工</strong> —— 主 Agent 把子任务派给独立 sub-agent，各自带干净 context，结果回主线。</li>
+              <li><strong>Plan mode</strong> —— 先和你对齐计划再开干，避免一上来就乱改文件。</li>
+              <li><strong>Skill / 命令体系</strong> —— 用 SKILL.md 写"专家模块"，按需触发，等于把领域知识注成 sidecar。</li>
+            </ul>
+          </div>
+          <div class="tile scenario-tile" data-glow>
+            <h4>选型场景</h4>
+            <ul>
+              <li>项目级重构、跨文件大改</li>
+              <li>需要在终端/服务器里跑、不接 IDE</li>
+              <li>对 PR 形态结果不感兴趣，希望"直接改我本地 repo"</li>
+              <li>团队已经吃 Anthropic 模型生态（API、Bedrock）</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="vendor-facts reveal reveal-d3">
+          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> CLI / Terminal</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> Claude Sonnet / Opus</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> Adaptive + Plan</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> Anthropic · 2021</span>
+        </div>
+
+        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
+          原文：
+          <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Harness design for long-running application development</a>
+          ·
+          <a class="cite" href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank">Claude Code 文档</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 3: Codex ==== -->
+      <section class="sec" id="codex">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · VENDOR 02</div>
+        <h2 class="sec-title reveal">Co<em>dex</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          OpenAI 的云端 coding agent。一句话给任务，云上沙箱开容器干活，结果以 PR 形态回到你 GitHub。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
+          <div class="prose">
+            <h3>Harness 设计特色</h3>
+            <ul>
+              <li><strong>云端隔离沙箱</strong> —— 每个任务跑在干净的容器里，Agent 在沙箱内有 root 权限、随便折腾。</li>
+              <li><strong>并行 fan-out</strong> —— 同一个需求可以同时派给多个 Agent，每个出一个候选 PR，你选最好的。</li>
+              <li><strong>PR-style 输出</strong> —— 不直接改你本地，而是输出 diff / branch / PR，强制走 code review 流程。</li>
+              <li><strong>"agent-first" 默认</strong> —— 设计上预设"由 Agent 主驱"，人参与的是 review 不是 driver。</li>
+            </ul>
+          </div>
+          <div class="tile scenario-tile" data-glow>
+            <h4>选型场景</h4>
+            <ul>
+              <li>有 GitHub workflow、习惯走 PR review</li>
+              <li>不放心让 Agent 直接动本地，要隔离</li>
+              <li>想同时跑多个候选方案做对比</li>
+              <li>愿意按 cloud GPU/CPU 付费换隔离</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="vendor-facts reveal reveal-d3">
+          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> Cloud + IDE/CLI</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> GPT-5 / Codex series</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> Plan-and-Execute</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> OpenAI · 2015</span>
+        </div>
+
+        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
+          原文：
+          <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">Harness engineering: leveraging Codex in an agent-first world</a>
+          ·
+          <a class="cite" href="https://openai.com/index/introducing-codex/" target="_blank">Introducing Codex</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 4: Cursor ==== -->
+      <section class="sec" id="cursor">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · VENDOR 03</div>
+        <h2 class="sec-title reveal">Cur<em>sor</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          Anysphere 出品的 VS Code fork。把 AI 从"右下角侧边栏"做进 IDE 主舞台 —— inline edit、Composer、多模型可选。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
+          <div class="prose">
+            <h3>Harness 设计特色</h3>
+            <ul>
+              <li><strong>Composer / Agent 模式</strong> —— 多文件改写的"作曲模式"，一段需求横扫整个 repo。</li>
+              <li><strong>代码库索引</strong> —— 后台把整库 embed 入向量库，回答前先 RAG。</li>
+              <li><strong>多模型路由</strong> —— Claude、GPT、Gemini 任选；不同任务可挂不同模型。</li>
+              <li><strong>Tab autocomplete</strong> —— 极低延迟的预测式补全，IDE 体验主线。</li>
+            </ul>
+          </div>
+          <div class="tile scenario-tile" data-glow>
+            <h4>选型场景</h4>
+            <ul>
+              <li>已经用 VS Code、不想换工作台</li>
+              <li>需要在 IDE 里"边看边改"，不是把活全甩给 Agent</li>
+              <li>想自由切换模型供应商，避免单一锁定</li>
+              <li>个人开发者 / 小团队，按月订阅可承受</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="vendor-facts reveal reveal-d3">
+          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> IDE (VS Code fork)</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> Claude / GPT / Gemini</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> ReAct + Composer</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> Anysphere · 2022</span>
+        </div>
+
+        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
+          产品：
+          <a class="cite" href="https://www.cursor.com/" target="_blank">Cursor 官网</a>
+          ·
+          <a class="cite" href="https://docs.cursor.com/agent/overview" target="_blank">Agent 文档</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 5: Windsurf ==== -->
+      <section class="sec" id="windsurf">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · VENDOR 04</div>
+        <h2 class="sec-title reveal">Wind<em>surf</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          Codeium 推出的 IDE Agent（也是 VS Code fork）。差异点是 Cascade：链式工作流 + 跨步骤的"flow state"记忆。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
+          <div class="prose">
+            <h3>Harness 设计特色</h3>
+            <ul>
+              <li><strong>Cascade（级联工作流）</strong> —— 把多步改动串成一条链路，AI 主动接管下一步，不需要每步点确认。</li>
+              <li><strong>Flow state 记忆</strong> —— 跨步骤维持上下文与意图，包括"为什么改这里"。</li>
+              <li><strong>Agent / Chat 双模</strong> —— 想全自动选 Agent，想保持手动选 Chat。</li>
+              <li><strong>企业版自托管</strong> —— Codeium 历来强调企业自部署、本地不出网。</li>
+            </ul>
+          </div>
+          <div class="tile scenario-tile" data-glow>
+            <h4>选型场景</h4>
+            <ul>
+              <li>长 session 编辑，希望少点确认按钮</li>
+              <li>需要 Agent 接住"上一步是什么、为什么"</li>
+              <li>对企业部署、数据不出网有硬要求</li>
+              <li>从 Codeium 老用户升级</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="vendor-facts reveal reveal-d3">
+          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> IDE (VS Code fork)</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> 多模型 + 自研</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> Cascade chain</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> Codeium · 2021</span>
+        </div>
+
+        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
+          产品：
+          <a class="cite" href="https://windsurf.com/" target="_blank">Windsurf 官网</a>
+          ·
+          <a class="cite" href="https://docs.windsurf.com/windsurf/cascade" target="_blank">Cascade 文档</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 6: Devin ==== -->
+      <section class="sec" id="devin">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>06 · VENDOR 05</div>
+        <h2 class="sec-title reveal">De<em>vin</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          Cognition AI 发布的"自主软件工程师"。给 Agent 一整套虚拟工位 —— shell + 浏览器 + 编辑器 + 长程规划。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
+          <div class="prose">
+            <h3>Harness 设计特色</h3>
+            <ul>
+              <li><strong>Full virtual workstation</strong> —— shell + 浏览器 + 文件管理 + 编辑器，Agent 像真实工程师那样开网页查文档。</li>
+              <li><strong>长程 plan + 重规划</strong> —— 自动拆任务、跑得不顺会主动改 plan。</li>
+              <li><strong>Slack / Linear 接入</strong> —— 不只在 IDE 里，可以被你在协作工具里 @ 出来。</li>
+              <li><strong>Session 录屏</strong> —— 任务可回看像视频；可暂停、修正、续跑。</li>
+            </ul>
+          </div>
+          <div class="tile scenario-tile" data-glow>
+            <h4>选型场景</h4>
+            <ul>
+              <li>想用 "AI 同事" 范式，不只是 IDE 助手</li>
+              <li>任务要查外部资料 / 调外部服务</li>
+              <li>团队接 Slack / Linear，希望工具内 @ Agent</li>
+              <li>容忍高单价、换"端到端自主"</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="vendor-facts reveal reveal-d3">
+          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> Cloud workstation</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> 多模型组合</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> Plan + Replan</span>
+          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> Cognition · 2023</span>
+        </div>
+
+        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
+          原文：
+          <a class="cite" href="https://www.cognition.ai/blog/introducing-devin" target="_blank">Introducing Devin, the first AI software engineer</a>
+          ·
+          <a class="cite" href="https://devin.ai/" target="_blank">Devin 官网</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 7: 5 维度对照表 ==== -->
+      <section class="sec" id="matrix">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>07 · COMPARISON MATRIX</div>
+        <h2 class="sec-title reveal">5 维度<em>对照表</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          把上面五家放在同一张表里，按 harness 工程的 5 个关键维度横切。<strong style="color:var(--cream-text);">字段越短，越能 grep 到差异。</strong>
+        </p>
+
+        <div class="compare-wrap reveal reveal-d2">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th>Vendor</th>
+                <th>主循环</th>
+                <th>工具集</th>
+                <th>上下文管理</th>
+                <th>安全围栏</th>
+                <th>定价模型</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Claude Code</td>
+                <td><span class="tag">Adaptive</span><span class="tag">Plan</span></td>
+                <td><span class="tag">Shell</span><span class="tag">File</span><span class="tag">MCP</span></td>
+                <td><span class="tag">压缩</span><span class="tag">sub-agent</span></td>
+                <td><span class="tag">本地</span><span class="tag">permission</span></td>
+                <td><span class="tag">API</span><span class="tag">Plan</span></td>
+              </tr>
+              <tr>
+                <td>Codex</td>
+                <td><span class="tag">Plan-Exec</span><span class="tag">Fan-out</span></td>
+                <td><span class="tag">Sandbox</span><span class="tag">Git</span><span class="tag">Shell</span></td>
+                <td><span class="tag">PR diff</span><span class="tag">summary</span></td>
+                <td><span class="tag">云沙箱</span><span class="tag">review</span></td>
+                <td><span class="tag">Cloud</span><span class="tag">Sub</span></td>
+              </tr>
+              <tr>
+                <td>Cursor</td>
+                <td><span class="tag">ReAct</span><span class="tag">Composer</span></td>
+                <td><span class="tag">IDE</span><span class="tag">RAG</span><span class="tag">MCP</span></td>
+                <td><span class="tag">embedding</span><span class="tag">file</span></td>
+                <td><span class="tag">本地</span><span class="tag">diff 审</span></td>
+                <td><span class="tag">Sub</span><span class="tag">月付</span></td>
+              </tr>
+              <tr>
+                <td>Windsurf</td>
+                <td><span class="tag">Cascade</span><span class="tag">chain</span></td>
+                <td><span class="tag">IDE</span><span class="tag">MCP</span><span class="tag">Term</span></td>
+                <td><span class="tag">flow</span><span class="tag">step memo</span></td>
+                <td><span class="tag">本地</span><span class="tag">企业自托管</span></td>
+                <td><span class="tag">Sub</span><span class="tag">企业版</span></td>
+              </tr>
+              <tr>
+                <td>Devin</td>
+                <td><span class="tag">Plan</span><span class="tag">Replan</span></td>
+                <td><span class="tag">Shell</span><span class="tag">浏览器</span><span class="tag">Editor</span></td>
+                <td><span class="tag">session</span><span class="tag">scratchpad</span></td>
+                <td><span class="tag">云隔离</span><span class="tag">回放</span></td>
+                <td><span class="tag">ACU</span><span class="tag">高单价</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="prose reveal reveal-d3" style="margin-top:32px;">
+          这五家在<strong>主循环</strong>形态、<strong>沙箱位置</strong>（本地 vs 云端）、<strong>输出形态</strong>（直接改 repo vs PR）上选择不同 —— 这些选择决定了它适合什么团队。
+          想看到这些 harness 共同遵守的设计原则，去
+          <a class="cite" href="method.html">板块 05 · 怎么做 →</a>
+          ；想看每个组件级特性的术语表，去
+          <a class="cite" href="anatomy.html">板块 03 · 解剖学 →</a>
+          ；一手原始资料汇总在
+          <a class="cite" href="resources.html">资源 →</a>
+          。
+        </p>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-brand">HARNESS ENGINEERING · 驾驭工程</div>
+    <div class="footer-links">
+      <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+      <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+      <a class="cite" href="https://www.cursor.com/" target="_blank">Cursor</a>
+      <a class="cite" href="https://windsurf.com/" target="_blank">Windsurf</a>
+      <a class="cite" href="https://www.cognition.ai/blog/introducing-devin" target="_blank">Cognition</a>
+      <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+    </div>
+    <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
+  </footer>
+
+  <script src="../assets/shared.js"></script>
+  <script src="../assets/page.js"></script>
+</body>
+</html>

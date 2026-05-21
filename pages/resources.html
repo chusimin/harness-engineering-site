@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>资源 · Harness Engineering</title>
+  <meta name="description" content="Harness Engineering 资源库 — 一手来源、术语速查、面试题、就业地图、延伸阅读。">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="../assets/page.css">
+
+  <style>
+    /* Page-local styles for resources */
+    .source-tile {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .source-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 4px;
+    }
+    .source-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(222, 219, 200, 0.08);
+      border: 1px solid rgba(222, 219, 200, 0.15);
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--cream);
+      flex-shrink: 0;
+    }
+    .source-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--cream-text);
+      letter-spacing: -0.01em;
+    }
+    .source-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--gray-500);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .source-body {
+      font-size: 14px;
+      color: var(--cream-dim);
+      line-height: 1.6;
+      flex: 1;
+    }
+    .source-link {
+      font-size: 13px;
+      padding-top: 8px;
+    }
+
+    /* Glossary */
+    .glossary-dl {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .glossary-dl > div {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px dashed rgba(222, 219, 200, 0.06);
+      align-items: baseline;
+    }
+    .glossary-dl > div:last-child { border-bottom: none; }
+    .glossary-dl dt {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--cream);
+      letter-spacing: 0.02em;
+    }
+    .glossary-dl dd {
+      font-size: 13px;
+      color: var(--cream-dim);
+      line-height: 1.5;
+    }
+
+    /* Interview tile */
+    .iq {
+      background: var(--bg-card);
+      border: 1px solid rgba(222, 219, 200, 0.06);
+      border-radius: 14px;
+      padding: 20px 22px;
+      transition: all 0.4s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .iq::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.10) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .iq:hover::before { opacity: 1; }
+    .iq:hover {
+      background: var(--bg-card-alt);
+      border-color: rgba(222, 219, 200, 0.15);
+      transform: translateY(-2px);
+    }
+    .iq-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cream);
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .iq-q {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--cream-text);
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    .iq-hint {
+      font-size: 12px;
+      color: var(--gray-500);
+      line-height: 1.6;
+      border-top: 1px dashed rgba(222, 219, 200, 0.08);
+      padding-top: 10px;
+    }
+    .iq-hint strong { color: var(--cream); font-weight: 600; }
+
+    /* Further reading row */
+    .read-row {
+      display: flex;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px dashed rgba(222, 219, 200, 0.06);
+      align-items: baseline;
+    }
+    .read-row:last-child { border-bottom: none; }
+    .read-row-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gray-600);
+      flex-shrink: 0;
+      width: 24px;
+    }
+    .read-row-content { flex: 1; }
+    .read-row-title { display: inline; }
+    .read-row-summary {
+      font-size: 13px;
+      color: var(--cream-dim);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* Career tile */
+    .career-tile { padding-bottom: 24px; }
+    .career-tile-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gray-500);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 14px;
+      margin-bottom: 4px;
+    }
+    .career-tile-body {
+      font-size: 13px;
+      color: var(--cream-dim);
+      line-height: 1.6;
+    }
+    .career-tile-salary {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--cream);
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .glossary-dl > div { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="noise-bg" aria-hidden="true"></div>
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a href="../index.html" class="topnav-brand">
+      <span class="topnav-brand-mark">H</span>
+      <span class="topnav-brand-text">驾驭工程</span>
+    </a>
+    <a href="what.html" class="topnav-link">是什么</a>
+    <a href="why.html" class="topnav-link">为什么</a>
+    <a href="anatomy.html" class="topnav-link">解剖</a>
+    <a href="vendors.html" class="topnav-link">厂商</a>
+    <a href="method.html" class="topnav-link">方法</a>
+    <a href="history.html" class="topnav-link">谱系</a>
+    <a href="resources.html" class="topnav-link is-active">资源</a>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- LEFT TOC -->
+    <aside class="toc">
+      <div class="toc-inner">
+        <div class="toc-label">07 · BOARD</div>
+        <div class="toc-board">资<em>源</em></div>
+        <nav class="toc-list">
+          <a href="#sources" class="toc-link">
+            <span class="toc-num">01</span>
+            <span>一手来源</span>
+          </a>
+          <a href="#glossary" class="toc-link">
+            <span class="toc-num">02</span>
+            <span>术语速查</span>
+          </a>
+          <a href="#interview" class="toc-link">
+            <span class="toc-num">03</span>
+            <span>面试题</span>
+          </a>
+          <a href="#career" class="toc-link">
+            <span class="toc-num">04</span>
+            <span>就业地图</span>
+          </a>
+          <a href="#further" class="toc-link">
+            <span class="toc-num">05</span>
+            <span>延伸阅读</span>
+          </a>
+        </nav>
+        <div class="toc-bottom">
+          <a href="../index.html" class="toc-nav-link">
+            <span>← 返回首页</span>
+            <span class="toc-nav-link-arrow"></span>
+          </a>
+          <a href="what.html" class="toc-nav-link">
+            <span>从第一板块开始</span>
+            <span class="toc-nav-link-arrow">01 · 是什么 →</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN -->
+    <main class="page-main">
+
+      <header class="page-header reveal">
+        <div class="page-header-num">07 · RESOURCES</div>
+        <h1 class="page-title">资<em>源</em></h1>
+        <p class="page-lead">
+          一手来源 · 术语速查 · 职业面试 · PM 模板。所有论断都挂得上一手出处。
+        </p>
+      </header>
+
+      <!-- ==== SEC 1: 一手来源 ==== -->
+      <section class="sec" id="sources">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · PRIMARY SOURCES</div>
+        <h2 class="sec-title reveal">6 家<em>一手来源</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          全站每个论断的出处。这六家是 harness engineering 这个概念的<strong style="color:var(--cream-text);">原始定义者与权威观察者</strong>。
+        </p>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile source-tile" data-glow>
+            <div class="source-head">
+              <div class="source-logo">A</div>
+              <div>
+                <div class="source-name">Anthropic</div>
+                <div class="source-meta">2026 · CLAUDE TEAM</div>
+              </div>
+            </div>
+            <div class="source-body">
+              提出"<strong style="color:var(--cream-text);">harness design for long-running apps</strong>"框架，强调持续运营、人机交接与失败恢复。是 harness 工程的"<strong style="color:var(--cream-text);">组织级</strong>"定义最完整的一家。
+            </div>
+            <div class="source-link">
+              <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">阅读原文</a>
+            </div>
+          </div>
+
+          <div class="tile source-tile" data-glow>
+            <div class="source-head">
+              <div class="source-logo">O</div>
+              <div>
+                <div class="source-name">OpenAI</div>
+                <div class="source-meta">2026 · CODEX TEAM</div>
+              </div>
+            </div>
+            <div class="source-body">
+              在 Codex agent-first 工程实践中正式启用"<strong style="color:var(--cream-text);">harness engineering</strong>"这个术语。强调工具集、loop 设计、与模型协同进化。
+            </div>
+            <div class="source-link">
+              <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">阅读原文</a>
+            </div>
+          </div>
+
+          <div class="tile source-tile" data-glow>
+            <div class="source-head">
+              <div class="source-logo">L</div>
+              <div>
+                <div class="source-name">LangChain</div>
+                <div class="source-meta">2025 · ENGINEERING BLOG</div>
+              </div>
+            </div>
+            <div class="source-body">
+              《<strong style="color:var(--cream-text);">The Anatomy of an Agent Harness</strong>》系统拆解 harness 的四大组件 —— loop、memory、tools、eval。开源世界对 harness 的"<strong style="color:var(--cream-text);">解剖学</strong>"定义。
+            </div>
+            <div class="source-link">
+              <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">阅读原文</a>
+            </div>
+          </div>
+
+          <div class="tile source-tile" data-glow>
+            <div class="source-head">
+              <div class="source-logo">T</div>
+              <div>
+                <div class="source-name">Thoughtworks</div>
+                <div class="source-meta">MARTIN FOWLER · INDUSTRY</div>
+              </div>
+            </div>
+            <div class="source-body">
+              Birgitta Böckeler 在 martinfowler.com 撰写的<strong style="color:var(--cream-text);">行业视角</strong>。提出 harness engineering 是新一代软件工程的子学科，强调"<strong style="color:var(--cream-text);">任务级</strong>"编排。
+            </div>
+            <div class="source-link">
+              <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">阅读原文</a>
+            </div>
+          </div>
+
+          <div class="tile source-tile" data-glow>
+            <div class="source-head">
+              <div class="source-logo">M</div>
+              <div>
+                <div class="source-name">METR</div>
+                <div class="source-meta">2024 · EVAL RESEARCH</div>
+              </div>
+            </div>
+            <div class="source-body">
+              第三方<strong style="color:var(--cream-text);">评测方法论权威</strong>。Capability Elicitation Guidelines 提出如何科学地评测 agent 的能力上限。被 Anthropic、OpenAI 引用。
+            </div>
+            <div class="source-link">
+              <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">阅读原文</a>
+            </div>
+          </div>
+
+          <div class="tile source-tile" data-glow>
+            <div class="source-head">
+              <div class="source-logo">·</div>
+              <div>
+                <div class="source-name">AGENTS.md</div>
+                <div class="source-meta">COMMUNITY · OPEN STANDARD</div>
+              </div>
+            </div>
+            <div class="source-body">
+              <strong style="color:var(--cream-text);">社区共识规范</strong>。提出 AGENTS.md 文件作为 agent 项目的统一说明书 —— 指令集、工具集、运行约束的事实标准。
+            </div>
+            <div class="source-link">
+              <a class="cite" href="https://agents.md/" target="_blank">阅读原文</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== SEC 2: 术语速查 ==== -->
+      <section class="sec" id="glossary">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · GLOSSARY</div>
+        <h2 class="sec-title reveal">35 个<em>术语速查</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          PM 跟工程师讨论 harness 前，把这张表过一遍。<strong style="color:var(--cream-text);">同一套术语，才能同一张图。</strong>
+        </p>
+
+        <div class="grid-2 reveal reveal-d2">
+
+          <!-- COL 1 -->
+          <dl class="glossary-dl">
+            <div>
+              <dt>Agent</dt>
+              <dd>Model + Harness 的总和；能感知、推理、行动、自我修正的程序。</dd>
+            </div>
+            <div>
+              <dt>Harness</dt>
+              <dd>包在模型外面让它能干活的那一整圈代码与结构。</dd>
+            </div>
+            <div>
+              <dt>Loop</dt>
+              <dd>Agent 的主循环：感知 → 推理 → 行动 → 观察 → 再决策。</dd>
+            </div>
+            <div>
+              <dt>Tool</dt>
+              <dd>Agent 可调用的外部能力（搜索、写文件、调 API 等）。</dd>
+            </div>
+            <div>
+              <dt>Tool Schema</dt>
+              <dd>工具的"说明书"，含名字、描述、参数类型、返回结构。</dd>
+            </div>
+            <div>
+              <dt>Context Window</dt>
+              <dd>模型一次能看到的 token 上限；超过要截断或压缩。</dd>
+            </div>
+            <div>
+              <dt>Memory</dt>
+              <dd>跨 turn / 跨 session 的信息存储；分短期 / 长期 / 情景。</dd>
+            </div>
+            <div>
+              <dt>RAG</dt>
+              <dd>Retrieval-Augmented Generation；先检索再生成的范式。</dd>
+            </div>
+            <div>
+              <dt>Embedding</dt>
+              <dd>把文本/图像压缩成定长向量，便于相似度检索。</dd>
+            </div>
+            <div>
+              <dt>Vector Store</dt>
+              <dd>存 embedding 的数据库，支持近邻检索（如 FAISS、Pinecone）。</dd>
+            </div>
+            <div>
+              <dt>ReAct</dt>
+              <dd>Reasoning + Acting 范式，让模型边推理边调工具。</dd>
+            </div>
+            <div>
+              <dt>Plan-and-Execute</dt>
+              <dd>先一次性产出完整计划，再分步执行的范式。</dd>
+            </div>
+            <div>
+              <dt>Reflection</dt>
+              <dd>让模型回顾自己的输出并打分、改进的机制。</dd>
+            </div>
+            <div>
+              <dt>Self-Critique</dt>
+              <dd>模型对自己回答打分并指出问题，再修正的子模式。</dd>
+            </div>
+            <div>
+              <dt>Eval Set</dt>
+              <dd>评测集；用来衡量 agent 能力的标注样本集合。</dd>
+            </div>
+            <div>
+              <dt>A/B Test</dt>
+              <dd>在线流量分两组对比新旧版本，看核心指标差异。</dd>
+            </div>
+            <div>
+              <dt>Trace</dt>
+              <dd>一次完整调用的链路记录；含所有 span 与中间状态。</dd>
+            </div>
+            <div>
+              <dt>Span</dt>
+              <dd>trace 的单个步骤，比如一次模型调用或一次工具执行。</dd>
+            </div>
+          </dl>
+
+          <!-- COL 2 -->
+          <dl class="glossary-dl">
+            <div>
+              <dt>Token</dt>
+              <dd>模型输入/输出的最小计费单位，约等于 0.7 个英文词。</dd>
+            </div>
+            <div>
+              <dt>Budget</dt>
+              <dd>单任务/单租户的 token 或 $ 上限，超出熔断或叫人。</dd>
+            </div>
+            <div>
+              <dt>Sandbox</dt>
+              <dd>隔离的执行环境（容器/VM），限制 agent 能动的资源。</dd>
+            </div>
+            <div>
+              <dt>Permission Boundary</dt>
+              <dd>权限边界；agent 能读/写/执行的资源白名单。</dd>
+            </div>
+            <div>
+              <dt>Human-in-the-Loop</dt>
+              <dd>关键节点让人确认或接管的设计模式。</dd>
+            </div>
+            <div>
+              <dt>Handoff</dt>
+              <dd>Agent 到人、或 agent 到 agent 的任务交接。</dd>
+            </div>
+            <div>
+              <dt>Checkpoint</dt>
+              <dd>把中间状态持久化，失败时可从此点重启。</dd>
+            </div>
+            <div>
+              <dt>Sub-Agent</dt>
+              <dd>主 agent 启动的子任务专员；用完即销毁。</dd>
+            </div>
+            <div>
+              <dt>Orchestration</dt>
+              <dd>编排；决定多 agent / 多工具的协作流程。</dd>
+            </div>
+            <div>
+              <dt>Workflow</dt>
+              <dd>结构化的多步流程；可固定也可动态。</dd>
+            </div>
+            <div>
+              <dt>State Machine</dt>
+              <dd>状态机；agent 当前在哪个状态、能转到哪些状态。</dd>
+            </div>
+            <div>
+              <dt>MCP</dt>
+              <dd>Model Context Protocol；Anthropic 提出的工具/上下文标准协议。</dd>
+            </div>
+            <div>
+              <dt>Tool Use</dt>
+              <dd>模型决定何时调哪个工具、传什么参数的能力。</dd>
+            </div>
+            <div>
+              <dt>Function Calling</dt>
+              <dd>OpenAI 的 tool use 实现；模型输出 JSON 调用函数。</dd>
+            </div>
+            <div>
+              <dt>Structured Output</dt>
+              <dd>强制模型按 JSON Schema 输出，便于下游解析。</dd>
+            </div>
+            <div>
+              <dt>Streaming</dt>
+              <dd>边生成边返回 token；改善延迟感与可中断性。</dd>
+            </div>
+            <div>
+              <dt>Caching</dt>
+              <dd>prompt prefix / response 缓存；省 token、降延迟。</dd>
+            </div>
+            <div>
+              <dt>Prompt Engineering</dt>
+              <dd>研究怎么写一条 prompt；harness 的最内层。</dd>
+            </div>
+            <div>
+              <dt>Context Engineering</dt>
+              <dd>研究"给模型什么"；含 RAG、记忆、工具描述。</dd>
+            </div>
+          </dl>
+
+        </div>
+
+        <p class="prose reveal reveal-d3" style="margin-top: 32px; font-size: 14px; color: var(--gray-500);">
+          → 想看每个术语的工程实现？看
+          <a class="cite" href="anatomy.html">板块 03 · 解剖学 →</a>。术语补充与争议讨论详见
+          <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md 社区</a>。
+        </p>
+      </section>
+
+      <!-- ==== SEC 3: 面试题 ==== -->
+      <section class="sec" id="interview">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · INTERVIEW</div>
+        <h2 class="sec-title reveal">AIPM 面试题 · <em>10 道</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          来自一线 AI 公司的真实题库 —— 概念题、设计题、案例题混搭。<strong style="color:var(--cream-text);">看的不是答案，是思考路径。</strong>
+        </p>
+
+        <div class="grid-2 reveal reveal-d2">
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 01</div>
+            <div class="iq-q">prompt engineering 和 harness engineering 有什么区别？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>嵌套关系认知。是否能说出"prompt ⊂ context ⊂ harness"以及为什么外扩。
+            </div>
+          </div>
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 02</div>
+            <div class="iq-q">给一个 coding agent 设计评测指标，你会选哪 5 个？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>评测体系完整性。任务完成率 + 成本 + 轮次 + 介入率 + 安全事件率。
+            </div>
+          </div>
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 03</div>
+            <div class="iq-q">你的 agent 在线指标突然下降 10%，怎么排查？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>事故响应流程。看 trace 共性 → 看是否近期变更 → 灰度回滚 → 加入回归集。
+            </div>
+          </div>
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 04</div>
+            <div class="iq-q">怎么决定一个 Agent 该用 ReAct 还是 Plan-and-Execute？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>架构选型。任务可预测 → Plan；环境动态 → ReAct；通常混合。
+            </div>
+          </div>
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 05</div>
+            <div class="iq-q">设计一个工具的 schema，PM 要审查哪些项？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>工程素养。输入输出/错误/幂等/权限/可观测 五项 checklist。
+            </div>
+          </div>
+
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 06</div>
+            <div class="iq-q">长任务 agent 跑到一半失败了，你的恢复策略是什么？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>checkpoint 设计。状态序列化 → 断点续跑 → 失败原因分类 → 重试 vs 升级人工。
+            </div>
+          </div>
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 07</div>
+            <div class="iq-q">什么场景下你会建议"这个不要做成 agent"？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>边界判断。强主观、不可逆、高合规、低样本、要求人际信任 五大反信号。
+            </div>
+          </div>
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 08</div>
+            <div class="iq-q">怎么平衡 agent 自主性与安全性？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>权限边界设计。最小权限默认 + 高风险动作显式 opt-in + 审计日志 + 人机交接条件。
+            </div>
+          </div>
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 09</div>
+            <div class="iq-q">prompt caching 能省成本，PM 决策时怎么权衡？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>工程经济学。命中率 / TTL / prompt 结构 → 缓存命中 → 单任务成本下降百分比。
+            </div>
+          </div>
+          <div class="iq" data-glow>
+            <div class="iq-num">QUESTION · 10</div>
+            <div class="iq-q">MCP 协议出现后，你的产品要不要适配？为什么？</div>
+            <div class="iq-hint">
+              <strong>考察点：</strong>趋势判断。MCP 是工具/上下文统一协议 → 长期降低集成成本 → 现状成熟度 → 投入产出比。
+            </div>
+          </div>
+        </div>
+
+        <p class="prose reveal reveal-d3" style="margin-top: 32px; font-size: 14px; color: var(--gray-500);">
+          → 更多面试准备见
+          <a class="cite" href="career.html">板块 07 · 职业 & 面试 →</a>。面试方法论参考
+          <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic Harness 文献</a>。
+        </p>
+      </section>
+
+      <!-- ==== SEC 4: 就业地图 ==== -->
+      <section class="sec" id="career">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · CAREER MAP</div>
+        <h2 class="sec-title reveal">AIPM <em>就业地图</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          2026 年 AI PM 三条主路径，<strong style="color:var(--cream-text);">薪资范围参考一线市场（北京/上海/深圳/硅谷）</strong>。
+        </p>
+
+        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 32px;">
+          <div class="tile career-tile" data-glow>
+            <div class="tile-num">TRACK · 01</div>
+            <div class="tile-title">Vertical AI PM · 行业纵深</div>
+            <p class="tile-desc">
+              做特定领域的 agent —— 法律、医疗、金融、电商、客服、教育。深耕一个垂直，懂业务比懂技术更值钱。
+            </p>
+            <div class="career-tile-label">典型岗位</div>
+            <div class="career-tile-body">Legal AI PM / Medical AI PM / EC AI PM</div>
+            <div class="career-tile-label">需要技能</div>
+            <div class="career-tile-body">行业 know-how、用户画像、合规、评测体系搭建</div>
+            <div class="career-tile-label">薪资范围</div>
+            <div class="career-tile-salary">25 - 60k · 月</div>
+          </div>
+
+          <div class="tile career-tile" data-glow>
+            <div class="tile-num">TRACK · 02</div>
+            <div class="tile-title">Platform AI PM · Harness / 基建</div>
+            <p class="tile-desc">
+              做 agent 平台、工具链、可观测设施。给一线业务 PM 提供"<strong style="color:var(--cream-text);">乐高积木</strong>"，是真正的 harness engineer。
+            </p>
+            <div class="career-tile-label">典型岗位</div>
+            <div class="career-tile-body">Agent Platform PM / MLOps PM / Infra PM</div>
+            <div class="career-tile-label">需要技能</div>
+            <div class="career-tile-body">工程深度、API 设计、SDK 抽象、平台经济学</div>
+            <div class="career-tile-label">薪资范围</div>
+            <div class="career-tile-salary">35 - 80k · 月</div>
+          </div>
+
+          <div class="tile career-tile" data-glow>
+            <div class="tile-num">TRACK · 03</div>
+            <div class="tile-title">Eval & Safety PM · 评测与安全</div>
+            <p class="tile-desc">
+              做评测集、红队测试、安全围栏、合规审查。<strong style="color:var(--cream-text);">监管收紧后的稀缺岗位</strong>，跟法务/政策深度协作。
+            </p>
+            <div class="career-tile-label">典型岗位</div>
+            <div class="career-tile-body">Eval PM / Trust & Safety PM / AI Policy PM</div>
+            <div class="career-tile-label">需要技能</div>
+            <div class="career-tile-body">统计学、对抗性测试、监管理解、跨职能沟通</div>
+            <div class="career-tile-label">薪资范围</div>
+            <div class="career-tile-salary">30 - 70k · 月</div>
+          </div>
+        </div>
+
+        <div class="prose reveal reveal-d3">
+          <h3>招聘经理看什么信号</h3>
+          <p>
+            一线 AI 公司面 AIPM 时，下面 3 个信号<strong>胜过任何头衔</strong>：
+          </p>
+          <ul>
+            <li><strong>具备工程语言</strong>：能跟工程师讨论上下文窗口、tool schema、retry 策略 —— 不是写代码，是用同一套术语</li>
+            <li><strong>能读懂 trace</strong>：给你一段 trace 日志，能从中读出"agent 在第几轮卡住、为什么卡、该改 prompt 还是改工具"</li>
+            <li><strong>能定义评测</strong>：给一个新场景，能在 30 分钟内写出 10 条评测样本 + 3 个量化指标 + 1 个 baseline</li>
+          </ul>
+          <p style="font-size: 14px; color: var(--gray-500);">
+            参考：
+            <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI Codex 招聘文章</a>
+            明确说出 PM 候选人要有"<strong>工程同理心</strong>"和"<strong>评测思维</strong>"，比传统 PRD 撰写能力优先级更高。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 5: 延伸阅读 ==== -->
+      <section class="sec" id="further">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · FURTHER READING</div>
+        <h2 class="sec-title reveal">延伸<em>阅读</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          10 篇深度文章/论文 —— 学术 + 工业混搭。<strong style="color:var(--cream-text);">想吃透 harness 工程，从这 10 篇开始。</strong>
+        </p>
+
+        <div class="reveal reveal-d2" style="max-width: 820px;">
+
+          <div class="read-row">
+            <div class="read-row-num">01</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct: Synergizing Reasoning and Acting in Language Models</a>
+              </div>
+              <div class="read-row-summary">Yao et al., 2022 · 提出 reasoning + acting 范式，是现代 agent loop 的鼻祖论文。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">02</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://arxiv.org/abs/2305.18323" target="_blank">ReWOO: Decoupling Reasoning from Observations</a>
+              </div>
+              <div class="read-row-summary">Xu et al., 2023 · Plan-and-Execute 路线代表作；省 token、可并行。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">03</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://arxiv.org/abs/2203.11171" target="_blank">Self-Consistency Improves Chain of Thought</a>
+              </div>
+              <div class="read-row-summary">Wang et al., 2022 · 多路径推理 + 投票，agent 自我修正的理论基础。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">04</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://arxiv.org/abs/2303.11366" target="_blank">Reflexion: Language Agents with Verbal Reinforcement Learning</a>
+              </div>
+              <div class="read-row-summary">Shinn et al., 2023 · 用语言反馈替代梯度更新，奠定 reflection 机制。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">05</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Harness Design for Long-Running Apps</a>
+              </div>
+              <div class="read-row-summary">Anthropic, 2026 · 把"持续运营"列为 harness 设计的第一性约束，必读。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">06</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">Harness Engineering: Codex in an Agent-First World</a>
+              </div>
+              <div class="read-row-summary">OpenAI, 2026 · 正式提出 harness engineering 术语；案例丰富、工程导向。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">07</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">The Anatomy of an Agent Harness</a>
+              </div>
+              <div class="read-row-summary">LangChain, 2025 · 拆解 loop / memory / tools / eval 四大组件，最全面的"解剖学"。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">08</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Harness Engineering · Martin Fowler</a>
+              </div>
+              <div class="read-row-summary">Böckeler, 2026 · 行业视角；把 harness 工程定义为软件工程的子学科。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">09</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR · Guidelines for Capability Elicitation</a>
+              </div>
+              <div class="read-row-summary">METR, 2024 · 第三方评测方法论权威；从测试集设计到能力上限的探测。</div>
+            </div>
+          </div>
+
+          <div class="read-row">
+            <div class="read-row-num">10</div>
+            <div class="read-row-content">
+              <div class="read-row-title">
+                <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md · Community Standard</a>
+              </div>
+              <div class="read-row-summary">社区共识，2025+ · 提出 agent 项目的统一规范文件；正在成为事实标准。</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="concept-pill reveal reveal-d3" style="margin-top: 48px;">
+          <p>
+            <strong>读完这 10 篇 + 走完本站 7 个板块，你就具备了和 OpenAI / Anthropic 工程师同台讨论 harness 的语言基础。</strong>
+            接下来要的是案例 —— 看完整的一天 AIPM 课程，跟着思敏跑 3 个真实 agent 项目。
+          </p>
+          <div style="margin-top: 20px;">
+            <a class="btn btn-primary" href="../index.html">
+              查看课程大纲
+              <span class="btn-primary-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-brand">HARNESS ENGINEERING · 驾驭工程</div>
+    <div class="footer-links">
+      <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+      <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+      <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+      <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler</a>
+      <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a>
+      <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a>
+    </div>
+    <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
+  </footer>
+
+  <script src="../assets/shared.js"></script>
+  <script src="../assets/page.js"></script>
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>方法论 · Harness Engineering</title>
+  <meta name="description" content="PM 怎么参与 harness 工程 — 4 个步骤 + 可 fork 的模板仓库。">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="../assets/page.css">
+</head>
+<body>
+
+  <div class="noise-bg" aria-hidden="true"></div>
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a href="../index.html" class="topnav-brand">
+      <span class="topnav-brand-mark">H</span>
+      <span class="topnav-brand-text">驾驭工程</span>
+    </a>
+    <a href="what.html" class="topnav-link">是什么</a>
+    <a href="why.html" class="topnav-link">为什么</a>
+    <a href="anatomy.html" class="topnav-link">解剖</a>
+    <a href="vendors.html" class="topnav-link">厂商</a>
+    <a href="method.html" class="topnav-link is-active">方法</a>
+    <a href="history.html" class="topnav-link">谱系</a>
+    <a href="resources.html" class="topnav-link">资源</a>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- LEFT TOC -->
+    <aside class="toc">
+      <div class="toc-inner">
+        <div class="toc-label">05 · BOARD</div>
+        <div class="toc-board">方<em>法论</em></div>
+        <nav class="toc-list">
+          <a href="#mindset" class="toc-link">
+            <span class="toc-num">01</span>
+            <span>PM 心智</span>
+          </a>
+          <a href="#step1" class="toc-link">
+            <span class="toc-num">02</span>
+            <span>定义 Agent 边界</span>
+          </a>
+          <a href="#step2" class="toc-link">
+            <span class="toc-num">03</span>
+            <span>设计工具集</span>
+          </a>
+          <a href="#step3" class="toc-link">
+            <span class="toc-num">04</span>
+            <span>构建评测体系</span>
+          </a>
+          <a href="#step4" class="toc-link">
+            <span class="toc-num">05</span>
+            <span>治理与可观测</span>
+          </a>
+          <a href="#templates" class="toc-link">
+            <span class="toc-num">06</span>
+            <span>模板仓库</span>
+          </a>
+        </nav>
+        <div class="toc-bottom">
+          <a href="history.html" class="toc-nav-link">
+            <span>下一个板块</span>
+            <span class="toc-nav-link-arrow">06 · 谱系 →</span>
+          </a>
+          <a href="../index.html" class="toc-nav-link">
+            <span>← 返回首页</span>
+            <span class="toc-nav-link-arrow"></span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN -->
+    <main class="page-main">
+
+      <header class="page-header reveal">
+        <div class="page-header-num">05 · METHODOLOGY</div>
+        <h1 class="page-title">方<em>法论</em></h1>
+        <p class="page-lead">
+          PM 怎么参与 harness 工程：4 个步骤 + 可 fork 的模板仓库。
+        </p>
+      </header>
+
+      <!-- ==== SEC 1: PM 心智 ==== -->
+      <section class="sec" id="mindset">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · PM MINDSET</div>
+        <h2 class="sec-title reveal">harness 不只是<em>工程师的事</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          PM 不是写代码的人，但 harness 决定产品成败 —— PM 必须能<strong style="color:var(--cream-text);">读懂、能评审、能驱动</strong>。
+        </p>
+
+        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 32px;">
+          <div class="tile" data-glow>
+            <div class="tile-num">01 · KNOW</div>
+            <div class="tile-title">PM 该懂什么</div>
+            <p class="tile-desc">
+              · 主循环（Loop）如何决定步数与停止条件<br>
+              · 上下文窗口、记忆、RAG 的边界<br>
+              · 工具 schema、权限、沙箱模型<br>
+              · trace / span / 评测集是什么<br>
+              · 成本 = Token × 轮次 × 调用量
+            </p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              一手参考：
+              <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">02 · ASK</div>
+            <div class="tile-title">PM 该提什么问题</div>
+            <p class="tile-desc">
+              · 这个 Agent 在什么条件下应该停？<br>
+              · 失败时是回滚、重试、还是叫人？<br>
+              · 上线后我看什么指标判断"还能跑"？<br>
+              · 边界外的输入怎么拒绝？<br>
+              · 每次调用大概花多少 token？
+            </p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              一手参考：
+              <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">03 · DECIDE</div>
+            <div class="tile-title">PM 该决策什么</div>
+            <p class="tile-desc">
+              · 哪些任务交给 Agent、哪些留给人<br>
+              · 工具集的"必有 / 可选 / 禁用"<br>
+              · 评测标准（什么算"通过"）<br>
+              · 人机交接的触发条件<br>
+              · 上线灰度策略与回滚阈值
+            </p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              一手参考：
+              <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Thoughtworks</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="concept-pill reveal reveal-d3">
+          <p>
+            <strong>PM 工程素养 = AI 时代的核心能力。</strong>
+            不写代码 ≠ 不懂代码。在 harness 工程里，PM 要能跟工程师 <strong>用同一套术语</strong> 讨论上下文构造、工具边界、评测指标 —— 否则你定的 PRD 工程师没法落地，工程师写的 trace 你也看不懂。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 2: 定义 Agent 边界 ==== -->
+      <section class="sec" id="step1">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · STEP ONE</div>
+        <h2 class="sec-title reveal">第一步：定义 <em>Agent 边界</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          哪些任务交给 Agent，哪些留给人 —— 这是 harness 设计的第一刀。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 32px;">
+          <div class="tile" data-glow>
+            <div class="tile-num">✓ FIT</div>
+            <div class="tile-title">适合给 Agent 的任务</div>
+            <p class="tile-desc" style="margin-bottom: 0;">
+              · <strong style="color:var(--cream-text);">高度结构化</strong> —— 流程清晰、输入输出可形式化<br>
+              · <strong style="color:var(--cream-text);">有明确成功标准</strong> —— 跑完后能判断对错<br>
+              · <strong style="color:var(--cream-text);">容错空间大</strong> —— 错了能改、不致命<br>
+              · <strong style="color:var(--cream-text);">可拆分</strong> —— 大任务能拆成可验证的子步<br>
+              · <strong style="color:var(--cream-text);">单步可验证</strong> —— 每一步都有信号判断进度
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">✗ MISFIT</div>
+            <div class="tile-title">不适合的任务</div>
+            <p class="tile-desc" style="margin-bottom: 0;">
+              · <strong style="color:var(--cream-text);">强主观判断</strong> —— 需要审美、价值观、共情<br>
+              · <strong style="color:var(--cream-text);">不可逆动作</strong> —— 删库、转账、发邮件<br>
+              · <strong style="color:var(--cream-text);">高合规风险</strong> —— 医疗、法律、金融决策<br>
+              · <strong style="color:var(--cream-text);">低样本量</strong> —— 没数据训练、没数据评测<br>
+              · <strong style="color:var(--cream-text);">要求人际信任</strong> —— 谈判、安慰、敏感对话
+            </p>
+          </div>
+        </div>
+
+        <div class="prose reveal reveal-d3">
+          <h3>人机交接条件（Handoff Criteria）</h3>
+          <p>
+            Agent 能跑不等于该跑到底。当下面任何一个触发，应该<strong>停下来叫人</strong>：
+          </p>
+          <ul>
+            <li><strong>不确定性超阈值</strong>：模型自评 confidence 低于 0.6，或多次尝试结果不一致</li>
+            <li><strong>动作进入高风险区</strong>：涉及金额、用户隐私、外部 API 写操作、不可撤销动作</li>
+            <li><strong>预算/时间超限</strong>：单任务 token 超预算、循环超过最大轮次、单步耗时过长</li>
+            <li><strong>用户明确要求</strong>：用户说"我自己来"、"先停"、"等我确认"</li>
+            <li><strong>评测信号变化</strong>：在线指标突降、错误率上升，应触发降级到人工</li>
+          </ul>
+          <p style="font-size: 14px; color: var(--gray-500);">
+            参考：
+            <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic Harness Design</a>
+            把"何时叫人"列为 long-running agent 设计的核心约束之一。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 3: 设计工具集 ==== -->
+      <section class="sec" id="step2">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · STEP TWO</div>
+        <h2 class="sec-title reveal">第二步：设计<em>工具集</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          工具是 Agent 的手脚，schema 是它的说明书。<strong style="color:var(--cream-text);">工具选不好，模型再聪明也干不成事。</strong>
+        </p>
+
+        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 32px;">
+          <div class="tile" data-glow>
+            <div class="tile-icon">⚒</div>
+            <div class="tile-title">工具选型清单</div>
+            <p class="tile-desc">
+              · 这个动作非工具不可吗？<br>
+              · 有没有更小粒度的工具能替代？<br>
+              · 工具是否原子化、可组合？<br>
+              · 同一类工具是否有 N 个重复？合并<br>
+              · 高频工具是否已缓存？低频是否懒加载？
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-icon">{ }</div>
+            <div class="tile-title">Schema 规范</div>
+            <p class="tile-desc">
+              · 工具名是动词 + 名词，不超过 3 词<br>
+              · description 写"什么时候用 / 不该用"<br>
+              · 参数严格类型化，必填/可选明确<br>
+              · 返回值结构稳定，error 单独通道<br>
+              · 给一个 example 调用 + 一个反例
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-icon">⌬</div>
+            <div class="tile-title">权限边界</div>
+            <p class="tile-desc">
+              · 读 / 写 / 执行 分级<br>
+              · 单次调用预算（rows、tokens、$）<br>
+              · 黑名单（哪些资源永远不能碰）<br>
+              · 沙箱隔离（容器、网络、文件系统）<br>
+              · 审计日志（谁、何时、调用了什么）
+            </p>
+          </div>
+        </div>
+
+        <div class="prose reveal reveal-d3">
+          <h3>PM 审 tool spec 的 checklist</h3>
+          <p>每一个工具上线前，PM 应该问工程师：</p>
+          <ul>
+            <li><strong>输入输出明确？</strong> 入参类型、必填项、输出 schema、错误码 —— 都有文档</li>
+            <li><strong>错误处理？</strong> 失败时返回什么？模型能从错误信息里读出怎么修正吗？</li>
+            <li><strong>幂等性？</strong> 同一输入调多次结果是否一样？写操作有没有去重 key？</li>
+            <li><strong>权限范围？</strong> 默认最小权限，需要写权限的工具必须显式 opt-in</li>
+            <li><strong>可观测？</strong> 每次调用是否能打 trace？延迟、错误率能不能聚合看？</li>
+          </ul>
+          <p style="font-size: 14px; color: var(--gray-500);">
+            参考：
+            <a class="cite" href="https://platform.openai.com/docs/guides/function-calling" target="_blank">OpenAI Function Calling Docs</a>
+            对 schema 写法有详细约束 —— 一个糟糕的工具描述，会让模型反复试错、烧 token。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 4: 构建评测体系 ==== -->
+      <section class="sec" id="step3">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · STEP THREE</div>
+        <h2 class="sec-title reveal">第三步：构建<em>评测体系</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          没评测就没迭代。<strong style="color:var(--cream-text);">不能数字化的能力，就不能持续优化。</strong>
+        </p>
+
+        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 32px;">
+          <div class="tile" data-glow>
+            <div class="tile-num">OFFLINE · 离线评测</div>
+            <div class="tile-title">在数据集上验证</div>
+            <p class="tile-desc" style="margin-bottom: 0;">
+              · <strong style="color:var(--cream-text);">评测集构建</strong>：典型样本 + 长尾 + 反例。100-1000 条够用<br>
+              · <strong style="color:var(--cream-text);">Benchmark 选择</strong>：SWE-bench、GAIA、TAU-bench 等公开集做参考<br>
+              · <strong style="color:var(--cream-text);">回归测试</strong>：每次改 prompt / 工具，先跑回归集再上线<br>
+              · <strong style="color:var(--cream-text);">人工标注</strong>：争议样本走双盲打分
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">ONLINE · 在线评测</div>
+            <div class="tile-title">在真实流量里验证</div>
+            <p class="tile-desc" style="margin-bottom: 0;">
+              · <strong style="color:var(--cream-text);">A/B 实验</strong>：新版本 vs 旧版本 分流，看核心指标<br>
+              · <strong style="color:var(--cream-text);">用户反馈</strong>：👍/👎、修改率、放弃率、复访率<br>
+              · <strong style="color:var(--cream-text);">自动监控</strong>：异常请求、长尾延迟、错误聚类<br>
+              · <strong style="color:var(--cream-text);">影子模式</strong>：新版本在线跑但不出结果，对比差异
+            </p>
+          </div>
+        </div>
+
+        <div class="grid-4 reveal reveal-d3" style="margin-bottom: 32px;">
+          <div class="tile" data-glow>
+            <div class="tile-num">METRIC · 01</div>
+            <div class="tile-title">任务完成率</div>
+            <p class="tile-desc">
+              <strong style="color:var(--cream-text);">为什么重要：</strong>北极星指标，业务价值的最终衡量。<br><br>
+              <strong style="color:var(--cream-text);">怎么读：</strong>分场景看（简单/复杂任务分桶），看绝对值和环比。突降 5% 是事故。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">METRIC · 02</div>
+            <div class="tile-title">Token 成本</div>
+            <p class="tile-desc">
+              <strong style="color:var(--cream-text);">为什么重要：</strong>决定毛利。Token 浪费 = 钱包漏水。<br><br>
+              <strong style="color:var(--cream-text);">怎么读：</strong>看 P50/P95，看每任务成本而非总成本。成本上升要看是任务变难还是有 bug。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">METRIC · 03</div>
+            <div class="tile-title">平均轮次</div>
+            <p class="tile-desc">
+              <strong style="color:var(--cream-text);">为什么重要：</strong>反映 Agent 效率。轮次越多越烧 token、越慢。<br><br>
+              <strong style="color:var(--cream-text);">怎么读：</strong>不是越少越好。看分布。长尾任务卡满 max_turns 是设计问题。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">METRIC · 04</div>
+            <div class="tile-title">人工介入率</div>
+            <p class="tile-desc">
+              <strong style="color:var(--cream-text);">为什么重要：</strong>衡量 Agent 自主性。介入率越低，规模化越省人。<br><br>
+              <strong style="color:var(--cream-text);">怎么读：</strong>不是越低越好。该叫人时不叫是事故。看"介入后用户修改率"判断是否过度自动化。
+            </p>
+          </div>
+        </div>
+
+        <div class="prose reveal reveal-d4">
+          <p style="font-size: 14px; color: var(--gray-500);">
+            参考：
+            <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR Capability Elicitation</a>
+            提供了一套行业级的 agent 评测方法论 —— 从评测集设计到能力上限的探测。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 5: 治理与可观测 ==== -->
+      <section class="sec" id="step4">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · STEP FOUR</div>
+        <h2 class="sec-title reveal">第四步：治理与<em>可观测</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          长期运行 = 持续治理。<strong style="color:var(--cream-text);">不能盯着、不能改、不能止损的系统不是产品，是定时炸弹。</strong>
+        </p>
+
+        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 32px;">
+          <div class="tile" data-glow>
+            <div class="tile-icon">◎</div>
+            <div class="tile-title">可观测</div>
+            <p class="tile-desc">
+              <strong style="color:var(--cream-text);">trace 链路</strong>：每次调用一条 trace，含 prompt、工具调用、结果、token 数<br><br>
+              <strong style="color:var(--cream-text);">分级日志</strong>：DEBUG / INFO / WARN / ERROR，结构化输出<br><br>
+              <strong style="color:var(--cream-text);">指标看板</strong>：实时 QPS、错误率、P95 延迟、成本流速
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-icon">◆</div>
+            <div class="tile-title">安全</div>
+            <p class="tile-desc">
+              <strong style="color:var(--cream-text);">围栏</strong>：输入过滤（prompt injection）+ 输出过滤（PII、违规内容）<br><br>
+              <strong style="color:var(--cream-text);">审计</strong>：高风险动作留痕，可追溯到具体调用<br><br>
+              <strong style="color:var(--cream-text);">沙箱</strong>：代码执行隔离、网络白名单、文件系统只读
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-icon">$</div>
+            <div class="tile-title">成本</div>
+            <p class="tile-desc">
+              <strong style="color:var(--cream-text);">预算</strong>：按租户、任务、工具分账，硬上限熔断<br><br>
+              <strong style="color:var(--cream-text);">限流</strong>：QPS 限流、并发限制、token 速率限制<br><br>
+              <strong style="color:var(--cream-text);">优化</strong>：prompt 缓存、模型分级（贵的留给硬骨头）
+            </p>
+          </div>
+        </div>
+
+        <div class="prose reveal reveal-d3">
+          <h3>Agent 失败的事故响应</h3>
+          <p>
+            AI Agent 不像传统软件 —— 它的失败常常是<strong>渐进式、概率性、跨任务相关</strong>的。一次事故响应流程应该包括：
+          </p>
+          <ul>
+            <li><strong>检测</strong>：监控指标（成功率、延迟、成本）触发告警阈值</li>
+            <li><strong>降级</strong>：自动切换到更简单的模型或工作流，必要时全部降级到人工</li>
+            <li><strong>定位</strong>：通过 trace 还原最近 N 次失败调用的共性 —— 是 prompt 变了、工具坏了、数据偏移了？</li>
+            <li><strong>回滚</strong>：保留至少 2-3 个历史版本（prompt / 工具 schema / 模型版本），可一键回滚</li>
+            <li><strong>复盘</strong>：事后总结，加入回归集，防止下次再犯</li>
+          </ul>
+          <p style="font-size: 14px; color: var(--gray-500);">
+            参考：
+            <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain · The Anatomy of an Agent Harness</a>
+            把"持续运营"列为 harness 三大支柱之一，与 loop、tool 并列。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 6: 模板仓库 ==== -->
+      <section class="sec" id="templates">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>06 · TEMPLATES</div>
+        <h2 class="sec-title reveal">实战<em>模板仓库</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          4 个可 fork 的 PM 模板 —— 从想法到上线，每一阶段都有结构化产出。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 32px;">
+          <div class="tile" data-glow>
+            <div class="tile-num">TEMPLATE · 01</div>
+            <div class="tile-title">BRD 模板 · Business Requirement</div>
+            <p class="tile-desc">
+              判断"这个 AI 方向值不值得做"的前置文档。<br>
+              · 市场容量、竞品矩阵、差异化卖点<br>
+              · ROI 估算、风险评估、Go/No-Go 决策
+            </p>
+            <p style="margin-top: 16px; font-size: 13px;">
+              <a class="cite" href="https://github.com/" target="_blank">→ GitHub fork</a>
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">TEMPLATE · 02</div>
+            <div class="tile-title">MRD 模板 · Market Requirement</div>
+            <p class="tile-desc">
+              用户研究 + 需求收敛产物，BRD 通过后做。<br>
+              · 用户分层、JTBD 拆解、需求池打分<br>
+              · 用户旅程、痛点矩阵、需求优先级
+            </p>
+            <p style="margin-top: 16px; font-size: 13px;">
+              <a class="cite" href="https://github.com/" target="_blank">→ GitHub fork</a>
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">TEMPLATE · 03</div>
+            <div class="tile-title">PRD 模板 · Product Requirement</div>
+            <p class="tile-desc">
+              给工程师可执行的产品定义，AI 版本含 harness 章节。<br>
+              · Agent 边界、工具列表、评测指标<br>
+              · 上下文构造、人机交接、降级方案
+            </p>
+            <p style="margin-top: 16px; font-size: 13px;">
+              <a class="cite" href="https://github.com/" target="_blank">→ GitHub fork</a>
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">TEMPLATE · 04</div>
+            <div class="tile-title">Design Spec · 设计规范</div>
+            <p class="tile-desc">
+              交付给设计的视觉与交互定义，AI 产品专项。<br>
+              · 不确定性 UI、思考过程展示、错误状态<br>
+              · 流式输出、可控/可停、引用与可信度
+            </p>
+            <p style="margin-top: 16px; font-size: 13px;">
+              <a class="cite" href="https://github.com/" target="_blank">→ GitHub fork</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="concept-pill reveal reveal-d3" style="margin-bottom: 24px;">
+          <p>
+            <strong>想看完整方法论课程？</strong>
+            从 BRD 到上线后治理，一天的 AIPM「Harness Engineering」课程把这 4 步走完一遍，含 5 个真实案例拆解 + 实战模板使用演练。
+          </p>
+          <div style="margin-top: 20px;">
+            <a class="btn btn-primary" href="../index.html">
+              查看课程大纲
+              <span class="btn-primary-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <p class="prose reveal reveal-d4" style="font-size: 14px; color: var(--gray-500);">
+          → 想看每个组件的工程细节？看
+          <a class="cite" href="anatomy.html">板块 03 · 解剖学 →</a>
+          想看现有厂商怎么实现？看
+          <a class="cite" href="vendors.html">板块 04 · 厂商全景 →</a>
+        </p>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-brand">HARNESS ENGINEERING · 驾驭工程</div>
+    <div class="footer-links">
+      <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+      <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+      <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+      <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler</a>
+      <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a>
+      <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a>
+    </div>
+    <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
+  </footer>
+
+  <script src="../assets/shared.js"></script>
+  <script src="../assets/page.js"></script>
+</body>
+</html>

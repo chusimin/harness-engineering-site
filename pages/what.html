@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>是什么 · Harness Engineering</title>
+  <meta name="description" content="Harness Engineering 是什么 — 三个尺度下的统一定义，含 3 个生成式 UI 模拟器。">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/shared.css">
+  <link rel="stylesheet" href="../assets/page.css">
+  <link rel="stylesheet" href="../assets/simulator.css">
+</head>
+<body>
+
+  <div class="noise-bg" aria-hidden="true"></div>
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a href="../index.html" class="topnav-brand">
+      <span class="topnav-brand-mark">H</span>
+      <span class="topnav-brand-text">驾驭工程</span>
+    </a>
+    <a href="what.html" class="topnav-link">是什么</a>
+    <a href="why.html" class="topnav-link">为什么</a>
+    <a href="anatomy.html" class="topnav-link">解剖</a>
+    <a href="vendors.html" class="topnav-link">厂商</a>
+    <a href="method.html" class="topnav-link">方法</a>
+    <a href="history.html" class="topnav-link">谱系</a>
+    <a href="resources.html" class="topnav-link">资源</a>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- LEFT TOC -->
+    <aside class="toc">
+      <div class="toc-inner">
+        <div class="toc-label">01 · BOARD</div>
+        <div class="toc-board">是<em>什么</em></div>
+        <nav class="toc-list">
+          <a href="#def" class="toc-link">
+            <span class="toc-num">01</span>
+            <span>一句话定义</span>
+          </a>
+          <a href="#scale" class="toc-link">
+            <span class="toc-num">02</span>
+            <span>三个尺度</span>
+          </a>
+          <a href="#sim" class="toc-link">
+            <span class="toc-num">03</span>
+            <span>3 个生成式模拟</span>
+          </a>
+          <a href="#anatomy-preview" class="toc-link">
+            <span class="toc-num">04</span>
+            <span>四大组件预览</span>
+          </a>
+          <a href="#nesting" class="toc-link">
+            <span class="toc-num">05</span>
+            <span>嵌套关系</span>
+          </a>
+        </nav>
+        <div class="toc-bottom">
+          <a href="why.html" class="toc-nav-link">
+            <span>下一个板块</span>
+            <span class="toc-nav-link-arrow">02 · 为什么 →</span>
+          </a>
+          <a href="../index.html" class="toc-nav-link">
+            <span>← 返回首页</span>
+            <span class="toc-nav-link-arrow"></span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN -->
+    <main class="page-main">
+
+      <header class="page-header reveal">
+        <div class="page-header-num">01 · WHAT IS IT</div>
+        <h1 class="page-title">是<em>什么</em></h1>
+        <p class="page-lead">
+          Harness Engineering（驾驭工程）= 包在模型外面、把被动模型变成能干活 Agent 的那一整圈代码与结构。
+        </p>
+      </header>
+
+      <!-- ==== SEC 1: 一句话定义 ==== -->
+      <section class="sec" id="def">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · DEFINITION</div>
+        <h2 class="sec-title reveal">一句话<em>讲清楚</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          Agent = Model + Harness。<strong style="color:var(--cream-text);">模型负责"想"，harness 负责让它"能干活"。</strong>
+        </p>
+
+        <div class="reveal reveal-d2" style="margin: 24px 0 32px;">
+          <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 22px;">
+            <span style="padding: 14px 24px; background: rgba(222,219,200,0.05); border: 1px solid rgba(222,219,200,0.12); border-radius: 14px; color: var(--cream);" class="tile" data-glow>Agent</span>
+            <span style="color: var(--gray-500);">=</span>
+            <span style="padding: 14px 24px; background: rgba(222,219,200,0.05); border: 1px solid rgba(222,219,200,0.12); border-radius: 14px; color: var(--cream);" class="tile" data-glow>Model</span>
+            <span style="color: var(--gray-500);">+</span>
+            <span style="padding: 14px 24px; background: rgba(222,219,200,0.05); border: 1px solid rgba(222,219,200,0.12); border-radius: 14px; color: var(--cream);" class="tile" data-glow>Harness</span>
+          </div>
+        </div>
+
+        <div class="prose reveal reveal-d3">
+          <p>
+            这个公式的两位作者 ——
+            <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+            <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+            —— 在 2026 年初先后撰文，正式定义了这个工程领域。
+          </p>
+          <p>
+            模型本身是<strong>无状态的、被动的、不能调用工具的</strong>。而一个能干活的 Agent，需要状态管理、工具调用、安全围栏、可观测性、评测体系 …… 这些"<strong>包在模型外面的代码与结构</strong>"，就是 harness。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 2: 三个尺度 ==== -->
+      <section class="sec" id="scale">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · THREE SCALES</div>
+        <h2 class="sec-title reveal">三个<em>尺度</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          同心圆模型 —— 各家定义不冲突，只是站在"尺度尺"的不同刻度。
+        </p>
+
+        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 32px;">
+          <div class="tile" data-glow>
+            <div class="tile-num">COMPONENT · 组件级</div>
+            <div class="tile-title">裹一次模型调用</div>
+            <p class="tile-desc">最小单位。包括上下文构造、工具调用、输出解析、重试、单条 trace。一个 harness 组件 = "一次有围栏的模型调用"。</p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              代表观点：
+              <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">TASK · 任务级</div>
+            <div class="tile-title">编排多 Agent 干成一件事</div>
+            <p class="tile-desc">中等粒度。多个组件协作完成一个有终点的任务。包括分工、状态机、人机交接、最终交付物。</p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              代表观点：
+              <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Thoughtworks</a>
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-num">ORG · 组织级</div>
+            <div class="tile-title">罩一支 Agent 队伍</div>
+            <p class="tile-desc">最大粒度。一个长期运行的产品 + 一群 Agent。包括灰度发布、A/B 实验、评测集、成本治理、安全合规。</p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              代表观点：
+              <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="concept-pill reveal reveal-d3">
+          <p>
+            <strong>组件级 ⊂ 任务级 ⊂ 组织级。</strong>
+            外层包裹内层 —— 你做一个组织级 harness，必然也在做任务级、组件级。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 3: 3 个生成式模拟 ==== -->
+      <section class="sec" id="sim">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · LIVE SIMULATION</div>
+        <h2 class="sec-title reveal">点一下，<em>跑一遍</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          三个生成式 UI 模拟器，让你"看见" harness 在不同尺度下到底在干什么。<br>
+          <span style="font-size: 14px; color: var(--gray-500);">所有数据为示意性演示。</span>
+        </p>
+
+        <div class="reveal reveal-d2">
+          <!-- Tabs -->
+          <div class="sim-tabs">
+            <button class="sim-tab">
+              组件级 · 一次调用
+              <span class="sim-tab-meta">COMPONENT</span>
+            </button>
+            <button class="sim-tab">
+              任务级 · 多 Agent 协作
+              <span class="sim-tab-meta">TASK</span>
+            </button>
+            <button class="sim-tab">
+              组织级 · Agent 队伍
+              <span class="sim-tab-meta">ORGANIZATIONAL</span>
+            </button>
+          </div>
+
+          <!-- ==== SIM 1: COMPONENT ==== -->
+          <div class="sim">
+            <div class="sim-head">
+              <div class="sim-head-left">
+                <div class="sim-dots">
+                  <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
+                </div>
+                <span class="sim-tag">component_harness.py · 一次有围栏的模型调用</span>
+              </div>
+              <button class="sim-btn" id="sim-comp-btn">▶ 启动模拟</button>
+            </div>
+            <div class="sim-body">
+              <div class="sim-comp">
+                <div>
+                  <div class="sim-comp-prompt">
+                    <div class="sim-comp-prompt-label">USER PROMPT</div>
+                    <div class="sim-comp-prompt-text">写一段 Python 代码，读取 sales.csv 并算月度总和。</div>
+                  </div>
+                  <div class="sim-comp-tools">
+                    <div class="sim-comp-tools-label">TOOL REGISTRY</div>
+                    <div id="sim-comp-tools"></div>
+                  </div>
+                </div>
+                <div class="sim-log" id="sim-comp-log"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==== SIM 2: TASK ==== -->
+          <div class="sim">
+            <div class="sim-head">
+              <div class="sim-head-left">
+                <div class="sim-dots">
+                  <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
+                </div>
+                <span class="sim-tag">task_harness.py · 5 个 Agent 协作完成任务</span>
+              </div>
+              <button class="sim-btn" id="sim-task-btn">▶ 启动模拟</button>
+            </div>
+            <div class="sim-body">
+              <div class="sim-task">
+                <div class="sim-task-input">
+                  <span class="sim-task-input-label">TASK</span>
+                  <span>分析 Q1 用户反馈数据，生成洞察报告。</span>
+                </div>
+                <div class="sim-flow" id="sim-task-flow"></div>
+                <div class="sim-task-output" id="sim-task-output">
+                  <div class="sim-task-output-label">FINAL REPORT</div>
+                  <div class="sim-task-output-text"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==== SIM 3: ORG ==== -->
+          <div class="sim">
+            <div class="sim-head">
+              <div class="sim-head-left">
+                <div class="sim-dots">
+                  <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
+                </div>
+                <span class="sim-tag">org_dashboard.live · 一支 Agent 队伍 · 长期运行</span>
+              </div>
+              <button class="sim-btn" id="sim-org-btn">▶ 启动模拟</button>
+            </div>
+            <div class="sim-body">
+              <div class="sim-org">
+                <div class="sim-org-left">
+                  <div class="sim-metric">
+                    <div class="sim-metric-label">ACTIVE AGENTS</div>
+                    <div class="sim-metric-value" id="m-active">0</div>
+                    <div class="sim-metric-delta">+12% vs 1h ago</div>
+                  </div>
+                  <div class="sim-metric">
+                    <div class="sim-metric-label">QPS</div>
+                    <div class="sim-metric-value" id="m-qps">0</div>
+                    <div class="sim-metric-delta">+3 / sec</div>
+                  </div>
+                  <div class="sim-metric">
+                    <div class="sim-metric-label">SUCCESS RATE</div>
+                    <div class="sim-metric-value" id="m-success">—</div>
+                    <div class="sim-metric-delta">+1.4% vs baseline</div>
+                  </div>
+                  <div class="sim-metric">
+                    <div class="sim-metric-label">TOKENS / HR</div>
+                    <div class="sim-metric-value" id="m-tokens">0</div>
+                    <div class="sim-metric-delta is-down">−4% (优化)</div>
+                  </div>
+                  <div class="sim-bars">
+                    <div class="sim-bars-label">QPS · 过去 1 分钟</div>
+                    <div class="sim-bars-row" id="sim-org-bars"></div>
+                  </div>
+                </div>
+                <div class="sim-feed" id="sim-org-feed">
+                  <div class="sim-feed-label">LIVE AGENT FEED · 等待启动…</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prose reveal" style="margin-top: 40px;">
+          <p style="font-size: 14px; color: var(--gray-500);">
+            ↑ 这三个模拟器对应的真实工程，分别引用自
+            <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic harness design</a>、
+            <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI Codex harness</a>、
+            <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain anatomy</a>
+            的核心机制。
+          </p>
+        </div>
+      </section>
+
+      <!-- ==== SEC 4: 四大组件预览 ==== -->
+      <section class="sec" id="anatomy-preview">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · CORE COMPONENTS</div>
+        <h2 class="sec-title reveal">四大<em>组件</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          一个 harness 不管多大，都可拆成这四个部件：<strong style="color:var(--cream-text);">转 · 知 · 做 · 检</strong>。
+        </p>
+
+        <div class="grid-4 reveal reveal-d2">
+          <div class="tile" data-glow>
+            <div class="tile-icon">⟳</div>
+            <div class="tile-title">转 · LOOP</div>
+            <p class="tile-desc">主循环：感知 → 推理 → 行动。Agent 的心跳。决定下一步做什么、何时停。</p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-icon">◉</div>
+            <div class="tile-title">知 · MEMORY</div>
+            <p class="tile-desc">上下文管理：短期工作记忆 + 长期知识库。决定 Agent 知道什么、记得什么。</p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-icon">⚡</div>
+            <div class="tile-title">做 · TOOLS</div>
+            <p class="tile-desc">工具与执行：可调用的工具集 + 沙箱与权限。决定 Agent 能动什么、不能动什么。</p>
+          </div>
+          <div class="tile" data-glow>
+            <div class="tile-icon">◈</div>
+            <div class="tile-title">检 · EVAL</div>
+            <p class="tile-desc">评测与可观测：trace 链路、离线评测、在线 A/B。决定 Agent 跑得好不好。</p>
+          </div>
+        </div>
+
+        <p class="prose reveal reveal-d3" style="margin-top: 24px; font-size: 14px; color: var(--gray-500);">
+          → 想深入每一个组件的设计模式？看
+          <a class="cite" href="anatomy.html">板块 03 · 解剖学 →</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 5: 嵌套关系 ==== -->
+      <section class="sec" id="nesting">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · NESTED LAYERS</div>
+        <h2 class="sec-title reveal">嵌套<em>关系</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          Harness 工程不是凭空出现的，它是从更小的实践一层层包出来的。
+        </p>
+
+        <div class="reveal reveal-d2" style="display: flex; flex-direction: column; gap: 12px; max-width: 720px;">
+          <div class="tile" data-glow style="padding: 20px 28px; display: flex; align-items: center; gap: 16px;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cream); padding: 4px 10px; background: rgba(222,219,200,0.08); border-radius: 6px; min-width: 80px; text-align: center;">最内层</span>
+            <div style="flex: 1;">
+              <div style="font-size: 17px; font-weight: 700; color: var(--cream-text);">提示词工程 · Prompt Engineering</div>
+              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究"怎么写好一条 prompt"</div>
+            </div>
+          </div>
+          <div style="text-align: center; color: var(--gray-600); font-family: var(--font-mono); font-size: 18px;">⊂</div>
+          <div class="tile" data-glow style="padding: 20px 28px; display: flex; align-items: center; gap: 16px;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cream); padding: 4px 10px; background: rgba(222,219,200,0.08); border-radius: 6px; min-width: 80px; text-align: center;">中间层</span>
+            <div style="flex: 1;">
+              <div style="font-size: 17px; font-weight: 700; color: var(--cream-text);">上下文工程 · Context Engineering</div>
+              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究"给模型什么上下文"（含 RAG、记忆、工具）</div>
+            </div>
+          </div>
+          <div style="text-align: center; color: var(--gray-600); font-family: var(--font-mono); font-size: 18px;">⊂</div>
+          <div class="tile" data-glow style="padding: 20px 28px; display: flex; align-items: center; gap: 16px; border-color: var(--cream); background: rgba(222,219,200,0.04);">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: #000; padding: 4px 10px; background: var(--cream); border-radius: 6px; min-width: 80px; text-align: center; font-weight: 700;">最外层</span>
+            <div style="flex: 1;">
+              <div style="font-size: 17px; font-weight: 700; color: var(--cream-text);">Harness 工程 · Harness Engineering</div>
+              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究"包出一个能跑、能管、能评的 Agent 产品"</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="prose reveal reveal-d3" style="margin-top: 32px; font-size: 14px; color: var(--gray-500);">
+          每一次外扩，都是因为前一层"控制面积"不够了。
+          <a class="cite" href="history.html">看完整谱系演化 →</a>
+        </p>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-brand">HARNESS ENGINEERING · 驾驭工程</div>
+    <div class="footer-links">
+      <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
+      <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
+      <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+      <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler</a>
+      <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a>
+      <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a>
+    </div>
+    <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
+  </footer>
+
+  <script src="../assets/shared.js"></script>
+  <script src="../assets/page.js"></script>
+  <script src="../assets/simulator.js"></script>
+</body>
+</html>
