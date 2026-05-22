@@ -113,8 +113,8 @@
   color: var(--cream);
 }
 .sim-btn.is-done {
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ade80;
+  background: rgba(222, 219, 200, 0.15);
+  color: var(--cream);
 }
 
 /* Scenario header */
@@ -239,8 +239,8 @@
   50%      { box-shadow: 0 0 0 8px rgba(222, 219, 200, 0); }
 }
 .step.is-done .step-badge {
-  background: rgba(74, 222, 128, 0.2);
-  color: #4ade80;
+  background: rgba(222, 219, 200, 0.12);
+  color: var(--cream-dim);
 }
 .step.is-done .step-badge::before {
   content: '✓';
@@ -371,9 +371,9 @@
 .fs-line.is-current { color: var(--cream-text); font-weight: 700; }
 .fs-line.is-comment { color: var(--gray-500); font-style: italic; }
 .fs-line.is-edit { color: #fbbf24; font-weight: 700; margin-bottom: 4px; }
-.fs-line.is-removed { color: #f87171; }
-.fs-line.is-added { color: #4ade80; }
-.fs-line.is-ok { color: #4ade80; }
+.fs-line.is-removed { color: var(--gray-400); text-decoration: line-through; }
+.fs-line.is-added { color: var(--cream); }
+.fs-line.is-ok { color: var(--cream); }
 
 /* Sim 3 org-level aside */
 .org-aside-h {
@@ -391,7 +391,7 @@
 .org-aside-h-pulse {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: #4ade80;
+  background: var(--cream);
   animation: blink 1s infinite;
 }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -418,7 +418,7 @@
   box-shadow: 0 0 24px rgba(222, 219, 200, 0.12);
 }
 .org-agent.is-done {
-  border-color: rgba(74, 222, 128, 0.3);
+  border-color: rgba(222, 219, 200, 0.25);
 }
 .org-agent-name {
   font-size: 12px;
@@ -446,7 +446,7 @@
   margin-right: 4px;
   animation: blink 1s infinite;
 }
-.org-agent.is-done .org-agent-state { color: #4ade80; }
+.org-agent.is-done .org-agent-state { color: var(--cream); }
 .org-agent.is-done .org-agent-state::before {
   content: '✓';
   margin-right: 4px;
@@ -537,17 +537,17 @@
   border: 1px solid rgba(222, 219, 200, 0.06);
 }
 .evo-bubble.is-success {
-  border-color: rgba(74, 222, 128, 0.3);
-  background: rgba(74, 222, 128, 0.06);
+  border-color: rgba(222, 219, 200, 0.25);
+  background: rgba(222, 219, 200, 0.04);
 }
 .evo-gap {
   padding: 10px 14px;
   margin-left: 60px;
-  background: rgba(248, 113, 113, 0.08);
-  border-left: 2px solid #f87171;
+  background: rgba(222, 219, 200, 0.04);
+  border-left: 2px solid var(--gray-500);
   border-radius: 0 8px 8px 0;
   font-size: 12px;
-  color: #fca5a5;
+  color: var(--gray-400);
   animation: evoFadeIn 0.4s var(--ease-out);
 }
 
@@ -583,7 +583,7 @@
 }
 .vsim-btn:hover { transform: scale(1.05); }
 .vsim-btn.is-running { background: rgba(222,219,200,0.15); color: var(--cream); }
-.vsim-btn.is-done { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+.vsim-btn.is-done { background: rgba(222, 219, 200, 0.15); color: var(--cream); }
 
 .vsim-log {
   background: #050505;
@@ -625,8 +625,8 @@
   padding-top: 8px;
   border-top: 1px dashed rgba(222, 219, 200, 0.1);
 }
-.vsim-line.is-result .vsim-text { color: #4ade80; font-weight: 700; }
-.vsim-line.is-result .vsim-num { color: #4ade80; }
+.vsim-line.is-result .vsim-text { color: var(--cream); font-weight: 700; }
+.vsim-line.is-result .vsim-num { color: var(--cream); }
 
 /* ======== SCENARIO FEATURE TAG (bottom of each sim) ======== */
 .sim-feature {

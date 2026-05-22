@@ -73,8 +73,8 @@
       border: 1px solid rgba(222, 219, 200, 0.08);
       border-radius: 12px;
     }
-    .can-cant-card.is-can { border-left: 3px solid #4ade80; }
-    .can-cant-card.is-cant { border-left: 3px solid #f87171; }
+    .can-cant-card.is-can { border-left: 3px solid var(--cream); }
+    .can-cant-card.is-cant { border-left: 3px solid var(--gray-500); }
     .can-cant-h {
       font-family: var(--font-mono);
       font-size: 10px;
@@ -82,8 +82,8 @@
       font-weight: 700;
       margin-bottom: 10px;
     }
-    .can-cant-card.is-can .can-cant-h { color: #4ade80; }
-    .can-cant-card.is-cant .can-cant-h { color: #f87171; }
+    .can-cant-card.is-can .can-cant-h { color: var(--cream); }
+    .can-cant-card.is-cant .can-cant-h { color: var(--gray-400); }
     .can-cant-list {
       list-style: none;
       padding: 0;
@@ -99,8 +99,8 @@
     .gap-explain {
       margin: 20px 0;
       padding: 16px 20px;
-      background: rgba(248, 113, 113, 0.04);
-      border-left: 3px solid #f87171;
+      background: rgba(222, 219, 200, 0.03);
+      border-left: 3px solid var(--gray-500);
       border-radius: 0 12px 12px 0;
     }
     .gap-explain-h {
@@ -108,7 +108,7 @@
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.1em;
-      color: #f87171;
+      color: var(--gray-400);
       margin-bottom: 6px;
     }
     .gap-explain-text {
@@ -117,10 +117,10 @@
       line-height: 1.6;
     }
     .gap-explain.is-success {
-      background: rgba(74, 222, 128, 0.05);
-      border-left-color: #4ade80;
+      background: rgba(222, 219, 200, 0.04);
+      border-left-color: var(--cream);
     }
-    .gap-explain.is-success .gap-explain-h { color: #4ade80; }
+    .gap-explain.is-success .gap-explain-h { color: var(--cream); }
 
     .speculation-grid {
       display: grid;
@@ -592,7 +592,7 @@
 
         <div class="concept-pill reveal reveal-d2" style="margin: 24px 0;">
           <p>
-            <strong style="color: #f87171;">推测，非定论。</strong>
+            <strong style="color: var(--gray-400);">推测，非定论。</strong>
             下面三个名字都是社区讨论中出现过的候选概念，没有任何一个是"已被锁定的下一层"。把它们列出来，是为了帮你<b>提前感受 harness 工程的下一个边界在哪</b>。
           </p>
         </div>

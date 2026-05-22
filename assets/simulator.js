@@ -171,7 +171,7 @@
   // ============== RENDER HELPERS ==============
 
   const COMP_COLORS = {
-    1: '#a5acea', 2: '#fbbf24', 3: '#DEDBC8', 4: '#f87171', 5: '#4ade80', 6: '#94a3b8'
+    1: '#a5acea', 2: '#fbbf24', 3: '#DEDBC8', 4: '#e2a07a', 5: '#a8c4a0', 6: '#94a3b8'
   };
 
   function renderStep(step, idx, isActive) {
@@ -240,8 +240,12 @@
       }
       stepEl.classList.add('is-active');
 
-      // Scroll into view
-      stepEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Scroll step into view within its container only (don't scroll the page)
+      const scrollParent = stepEl.closest('.sim-body-steps') || stepEl.closest('.evo-steps');
+      if (scrollParent) {
+        const top = stepEl.offsetTop - scrollParent.offsetTop - scrollParent.clientHeight / 2 + stepEl.clientHeight / 2;
+        scrollParent.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
 
       // Update progress
       if (progress) {

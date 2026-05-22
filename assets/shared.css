@@ -42,6 +42,7 @@ body {
 }
 
 ::selection { background: rgba(222, 219, 200, 0.2); color: #fff; }
+mark { background: none; color: var(--cream); font-weight: 700; border-bottom: 1px solid rgba(222, 219, 200, 0.35); }
 a { color: inherit; text-decoration: none; }
 ul, ol { list-style: none; }
 button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
