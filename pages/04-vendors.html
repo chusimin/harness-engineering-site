@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>④ 厂商全景 · Harness Engineering</title>
+  <meta name="description" content="三家旗手、三条赛道、三种哲学 —— OpenAI / Anthropic / Cursor 各自把 harness 做成了什么样">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/page.css">
+
+  <style>
+    /* ============================================
+       本页可视化专用样式（仅 ④ 厂商全景 用）
+       ============================================ */
+
+    /* ---- 厂商色系 ---- */
+    :root {
+      --v-openai:       #10a37f;
+      --v-openai-soft:  rgba(16, 163, 127, 0.10);
+      --v-openai-mid:   rgba(16, 163, 127, 0.20);
+      --v-anthropic:    #d97706;
+      --v-anthropic-soft: rgba(217, 119, 6, 0.10);
+      --v-anthropic-mid: rgba(217, 119, 6, 0.20);
+      --v-cursor:       #8b5cf6;
+      --v-cursor-soft:  rgba(139, 92, 246, 0.10);
+      --v-cursor-mid:   rgba(139, 92, 246, 0.20);
+    }
+
+    /* ---- Viz 1: 三条赛道 ---- */
+    .v-tracks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-4);
+    }
+    .v-track {
+      position: relative;
+      border-radius: var(--he-radius-lg);
+      padding: var(--sp-6) var(--sp-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      overflow: hidden;
+    }
+    .v-track::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      border-radius: var(--he-radius-lg) var(--he-radius-lg) 0 0;
+    }
+    .v-track:hover { transform: translateY(-3px); }
+
+    .v-track.is-openai {
+      background: var(--v-openai-soft);
+      border: 1px solid rgba(16, 163, 127, 0.25);
+    }
+    .v-track.is-openai::before { background: var(--v-openai); }
+    .v-track.is-openai:hover { border-color: var(--v-openai); box-shadow: 0 8px 32px rgba(16, 163, 127, 0.15); }
+
+    .v-track.is-anthropic {
+      background: var(--v-anthropic-soft);
+      border: 1px solid rgba(217, 119, 6, 0.25);
+    }
+    .v-track.is-anthropic::before { background: var(--v-anthropic); }
+    .v-track.is-anthropic:hover { border-color: var(--v-anthropic); box-shadow: 0 8px 32px rgba(217, 119, 6, 0.15); }
+
+    .v-track.is-cursor {
+      background: var(--v-cursor-soft);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+    }
+    .v-track.is-cursor::before { background: var(--v-cursor); }
+    .v-track.is-cursor:hover { border-color: var(--v-cursor); box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15); }
+
+    .v-track-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-track.is-openai .v-track-badge { color: var(--v-openai); }
+    .v-track.is-anthropic .v-track-badge { color: var(--v-anthropic); }
+    .v-track.is-cursor .v-track-badge { color: var(--v-cursor); }
+
+    .v-track-badge-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      animation: v-dot-pulse 2.5s ease-in-out infinite;
+    }
+    .v-track.is-openai .v-track-badge-dot { background: var(--v-openai); }
+    .v-track.is-anthropic .v-track-badge-dot { background: var(--v-anthropic); }
+    .v-track.is-cursor .v-track-badge-dot { background: var(--v-cursor); }
+    @keyframes v-dot-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .v-track-name {
+      font-size: var(--he-text-h3);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .v-track-scale {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-bg);
+      border-radius: var(--he-radius-sm);
+      display: inline-block;
+      width: fit-content;
+    }
+    .v-track-quote {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+      font-style: italic;
+      border-left: 2px solid;
+      padding-left: var(--sp-3);
+    }
+    .v-track.is-openai .v-track-quote { border-color: var(--v-openai); }
+    .v-track.is-anthropic .v-track-quote { border-color: var(--v-anthropic); }
+    .v-track.is-cursor .v-track-quote { border-color: var(--v-cursor); }
+
+    /* ---- Viz 2: OpenAI 实验仪表盘 ---- */
+    .v-dashboard {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-stat {
+      text-align: center;
+      padding: var(--sp-5) var(--sp-3);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-stat:hover {
+      border-color: var(--v-openai);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(16, 163, 127, 0.12);
+    }
+    .v-stat-num {
+      font-family: var(--he-font-mono);
+      font-size: 28px;
+      font-weight: var(--he-weight-bold);
+      color: var(--v-openai);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .v-stat-label {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      margin-top: var(--sp-2);
+      line-height: 1.4;
+    }
+    .v-stat.is-highlight {
+      border-color: var(--v-openai);
+      background: var(--v-openai-soft);
+    }
+
+    .v-optim-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+      margin-top: var(--sp-6);
+    }
+    .v-optim {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      position: relative;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-optim:hover {
+      border-color: var(--v-openai);
+      transform: translateY(-2px);
+    }
+    .v-optim-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--v-openai-soft);
+      display: grid; place-items: center;
+      font-size: 18px;
+      margin-bottom: var(--sp-3);
+    }
+    .v-optim-title {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-2);
+    }
+    .v-optim-problem {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-bg-subtle);
+      border-radius: var(--he-radius-sm);
+      margin-bottom: var(--sp-3);
+      line-height: 1.5;
+    }
+    .v-optim-problem::before {
+      content: 'PROBLEM';
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: #ef4444;
+      margin-bottom: 2px;
+    }
+    .v-optim-fix {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+    }
+    .v-optim-fix::before {
+      content: 'FIX';
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--v-openai);
+      margin-bottom: 2px;
+      font-weight: var(--he-weight-semibold);
+    }
+
+    /* ---- Viz 3: Anthropic P/G/E 流程 ---- */
+    .v-pge {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      align-items: center;
+    }
+    .v-pge-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      width: 100%;
+      justify-content: center;
+    }
+    .v-pge-node {
+      padding: var(--sp-4) var(--sp-6);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      min-width: 160px;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-pge-node:hover {
+      transform: scale(1.04);
+    }
+    .v-pge-node.is-planner {
+      background: var(--v-anthropic-soft);
+      border: 1.5px solid var(--v-anthropic);
+    }
+    .v-pge-node.is-generator {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1.5px solid #3b82f6;
+    }
+    .v-pge-node.is-evaluator {
+      background: rgba(168, 85, 247, 0.08);
+      border: 1.5px solid #a855f7;
+    }
+    .v-pge-node-label {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .v-pge-node.is-planner .v-pge-node-label { color: var(--v-anthropic); }
+    .v-pge-node.is-generator .v-pge-node-label { color: #3b82f6; }
+    .v-pge-node.is-evaluator .v-pge-node-label { color: #a855f7; }
+    .v-pge-node-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+    }
+    .v-pge-node-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      margin-top: 4px;
+    }
+
+    .v-pge-arrow {
+      font-family: var(--he-font-mono);
+      font-size: 20px;
+      color: var(--he-text-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .v-pge-arrow-label {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-muted);
+    }
+
+    .v-pge-loop-indicator {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding: var(--sp-3) var(--sp-5);
+      background: rgba(168, 85, 247, 0.06);
+      border: 1px dashed rgba(168, 85, 247, 0.3);
+      border-radius: var(--he-radius-md);
+      font-size: var(--he-text-sm);
+      color: #a855f7;
+      font-weight: var(--he-weight-medium);
+    }
+    .v-pge-loop-indicator svg {
+      animation: v-pge-spin 3s linear infinite;
+    }
+    @keyframes v-pge-spin { to { transform: rotate(360deg); } }
+
+    /* Solo vs Full 对比 */
+    .v-solo-vs {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--sp-4);
+      align-items: stretch;
+    }
+    .v-solo-card {
+      padding: var(--sp-6);
+      border-radius: var(--he-radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-solo-card:hover { transform: translateY(-2px); }
+    .v-solo-card.is-solo {
+      background: var(--he-bg-subtle);
+      border: 1px solid var(--he-border);
+    }
+    .v-solo-card.is-full {
+      background: var(--v-anthropic-soft);
+      border: 1.5px solid var(--v-anthropic);
+      box-shadow: 0 4px 20px rgba(217, 119, 6, 0.1);
+    }
+    .v-solo-tag {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-solo-card.is-solo .v-solo-tag { color: var(--he-text-muted); }
+    .v-solo-card.is-full .v-solo-tag { color: var(--v-anthropic); }
+    .v-solo-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-2);
+    }
+    .v-solo-metric {
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-bg);
+      border-radius: var(--he-radius-sm);
+    }
+    .v-solo-metric-num {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+    }
+    .v-solo-metric-label {
+      font-size: 10px;
+      color: var(--he-text-muted);
+    }
+    .v-solo-verdict {
+      font-size: var(--he-text-sm);
+      line-height: 1.5;
+      padding: var(--sp-3);
+      border-radius: var(--he-radius-sm);
+    }
+    .v-solo-card.is-solo .v-solo-verdict {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.06);
+    }
+    .v-solo-card.is-full .v-solo-verdict {
+      color: var(--v-openai);
+      background: rgba(16, 163, 127, 0.06);
+    }
+    .v-solo-vs-divider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+    }
+    .v-solo-vs-badge {
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-muted);
+      writing-mode: vertical-rl;
+      letter-spacing: 0.1em;
+    }
+
+    /* ---- Viz 4: Cursor 功能栈 ---- */
+    .v-stack {
+      display: grid;
+      gap: var(--sp-2);
+    }
+    .v-stack-layer {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      align-items: center;
+      gap: var(--sp-4);
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .v-stack-layer::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--v-cursor);
+      opacity: 0;
+      transition: opacity var(--he-dur-base);
+    }
+    .v-stack-layer:hover {
+      border-color: var(--v-cursor);
+      transform: translateX(4px);
+    }
+    .v-stack-layer:hover::before { opacity: 1; }
+    .v-stack-name {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--v-cursor);
+    }
+    .v-stack-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.4;
+    }
+    .v-stack-trait {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      padding: var(--sp-1) var(--sp-3);
+      background: var(--v-cursor-soft);
+      border-radius: var(--he-radius-pill);
+      white-space: nowrap;
+    }
+
+    /* 模型路由分支图 */
+    .v-routing {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--sp-4);
+      align-items: center;
+      margin-top: var(--sp-6);
+    }
+    .v-routing-source {
+      text-align: center;
+      padding: var(--sp-5);
+      background: var(--v-cursor-soft);
+      border: 1.5px solid var(--v-cursor);
+      border-radius: var(--he-radius-md);
+    }
+    .v-routing-source-label {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--v-cursor);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-routing-source-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      margin-top: 4px;
+    }
+    .v-routing-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-1);
+      font-family: var(--he-font-mono);
+      font-size: 18px;
+      color: var(--he-text-subtle);
+    }
+    .v-routing-targets {
+      display: grid;
+      gap: var(--sp-3);
+    }
+    .v-routing-target {
+      padding: var(--sp-3) var(--sp-4);
+      border-radius: var(--he-radius-md);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-routing-target:hover { transform: translateX(4px); }
+    .v-routing-target.is-cheap {
+      background: rgba(16, 163, 127, 0.06);
+      border: 1px solid rgba(16, 163, 127, 0.2);
+    }
+    .v-routing-target.is-premium {
+      background: rgba(239, 68, 68, 0.04);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+    .v-routing-target-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 14px;
+    }
+    .v-routing-target.is-cheap .v-routing-target-icon {
+      background: rgba(16, 163, 127, 0.12);
+    }
+    .v-routing-target.is-premium .v-routing-target-icon {
+      background: rgba(239, 68, 68, 0.08);
+    }
+    .v-routing-target-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+    }
+    .v-routing-target-model {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-xs);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+    }
+
+    /* ---- Viz 5: 三方对比网格 ---- */
+    .v-grid {
+      display: grid;
+      grid-template-columns: 140px repeat(3, 1fr);
+      gap: 1px;
+      background: var(--he-border);
+      border-radius: var(--he-radius-md);
+      overflow: hidden;
+    }
+    .v-grid-cell {
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--he-bg);
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.5;
+      transition: background var(--he-dur-base);
+    }
+    .v-grid-cell.is-head {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: var(--he-weight-semibold);
+      background: var(--he-bg-subtle);
+      color: var(--he-text-muted);
+    }
+    .v-grid-cell.is-label {
+      font-size: var(--he-text-xs);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+      background: var(--he-bg-subtle);
+    }
+    .v-grid-cell.is-openai-head {
+      background: var(--v-openai-soft);
+      color: var(--v-openai);
+    }
+    .v-grid-cell.is-anthropic-head {
+      background: var(--v-anthropic-soft);
+      color: var(--v-anthropic);
+    }
+    .v-grid-cell.is-cursor-head {
+      background: var(--v-cursor-soft);
+      color: var(--v-cursor);
+    }
+    .v-grid-cell:hover {
+      background: var(--he-bg-subtle);
+    }
+    .v-grid-highlight {
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+    }
+    .v-grid-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--he-radius-pill);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-grid-tag.is-openai { background: var(--v-openai-soft); color: var(--v-openai); }
+    .v-grid-tag.is-anthropic { background: var(--v-anthropic-soft); color: var(--v-anthropic); }
+    .v-grid-tag.is-cursor { background: var(--v-cursor-soft); color: var(--v-cursor); }
+
+    /* ---- Viz 6: 选型地图 ---- */
+    .v-select {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-4);
+    }
+    .v-select-card {
+      padding: var(--sp-6);
+      border-radius: var(--he-radius-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .v-select-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      opacity: 0;
+      transition: opacity var(--he-dur-base);
+    }
+    .v-select-card:hover { transform: translateY(-4px); }
+    .v-select-card:hover::after { opacity: 1; }
+
+    .v-select-card.is-cursor-pick {
+      background: var(--v-cursor-soft);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    .v-select-card.is-cursor-pick::after { background: var(--v-cursor); }
+    .v-select-card.is-cursor-pick:hover { border-color: var(--v-cursor); box-shadow: 0 8px 32px rgba(139, 92, 246, 0.12); }
+
+    .v-select-card.is-anthropic-pick {
+      background: var(--v-anthropic-soft);
+      border: 1px solid rgba(217, 119, 6, 0.2);
+    }
+    .v-select-card.is-anthropic-pick::after { background: var(--v-anthropic); }
+    .v-select-card.is-anthropic-pick:hover { border-color: var(--v-anthropic); box-shadow: 0 8px 32px rgba(217, 119, 6, 0.12); }
+
+    .v-select-card.is-openai-pick {
+      background: var(--v-openai-soft);
+      border: 1px solid rgba(16, 163, 127, 0.2);
+    }
+    .v-select-card.is-openai-pick::after { background: var(--v-openai); }
+    .v-select-card.is-openai-pick:hover { border-color: var(--v-openai); box-shadow: 0 8px 32px rgba(16, 163, 127, 0.12); }
+
+    .v-select-scenario {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+      padding: var(--sp-3);
+      background: var(--he-bg);
+      border-radius: var(--he-radius-sm);
+      position: relative;
+    }
+    .v-select-scenario::before {
+      content: 'YOUR PRODUCT';
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--he-text-subtle);
+      margin-bottom: 4px;
+    }
+    .v-select-arrow {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-xs);
+      color: var(--he-text-subtle);
+      text-align: center;
+    }
+    .v-select-rec {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+    .v-select-rec-badge {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      font-weight: var(--he-weight-bold);
+    }
+    .v-select-card.is-cursor-pick .v-select-rec-badge { color: var(--v-cursor); }
+    .v-select-card.is-anthropic-pick .v-select-rec-badge { color: var(--v-anthropic); }
+    .v-select-card.is-openai-pick .v-select-rec-badge { color: var(--v-openai); }
+    .v-select-rec-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-strong);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-select-detail {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.6;
+    }
+
+    /* ---- 通用 callout ---- */
+    .callout {
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border-left: 3px solid var(--he-accent);
+      border-radius: 0 var(--he-radius-md) var(--he-radius-md) 0;
+      margin: var(--sp-6) 0;
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .callout strong { color: var(--he-text-display); }
+    .callout.is-openai { background: var(--v-openai-soft); border-left-color: var(--v-openai); }
+    .callout.is-anthropic { background: var(--v-anthropic-soft); border-left-color: var(--v-anthropic); }
+    .callout.is-cursor { background: var(--v-cursor-soft); border-left-color: var(--v-cursor); }
+
+    /* ---- PM 落点卡片 ---- */
+    .v-pm-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-pm-card {
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-pm-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-pm-card-n {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--sp-2);
+    }
+    .v-pm-card-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.6;
+    }
+    .v-pm-card-text strong { color: var(--he-text-display); }
+
+    /* ---- 响应式 ---- */
+    @media (max-width: 1024px) {
+      .v-tracks { grid-template-columns: 1fr; }
+      .v-dashboard { grid-template-columns: repeat(3, 1fr); }
+      .v-optim-cards { grid-template-columns: 1fr; }
+      .v-solo-vs { grid-template-columns: 1fr; }
+      .v-solo-vs-divider { flex-direction: row; padding: var(--sp-2) 0; }
+      .v-solo-vs-badge { writing-mode: horizontal-tb; }
+      .v-grid { grid-template-columns: 100px repeat(3, 1fr); }
+      .v-select { grid-template-columns: 1fr; }
+      .v-routing { grid-template-columns: 1fr; gap: var(--sp-3); }
+      .v-routing-branch { flex-direction: row; }
+    }
+    @media (max-width: 640px) {
+      .v-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .v-pge-row { flex-direction: column; }
+      .v-pge-arrow { transform: rotate(90deg); }
+      .v-stack-layer { grid-template-columns: 1fr; gap: var(--sp-2); }
+      .v-stack-name { order: -1; }
+      .v-grid { grid-template-columns: 80px repeat(3, 1fr); font-size: 11px; }
+      .v-pm-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ Page Hero ============ -->
+  <header class="page-hero">
+    <div class="page-hero-inner">
+      <a class="page-back" href="survey.html">← 全景</a>
+      <div class="page-eyebrow">
+        <span class="page-eyebrow-num">板块 04</span>
+        <span class="page-eyebrow-group">全景 · SURVEY</span>
+      </div>
+      <h1 class="he-h1 page-title">厂商<span class="he-text-accent">全景</span>。</h1>
+      <p class="he-lead page-lead">
+        三家旗手、三条赛道、三种哲学 ——
+        <span class="he-term" data-tip="OpenAI(组织级)、Anthropic(任务级)、Cursor(组件级)各自代表一个不同的 harness 尺度。">不是谁更强,是赛道根本不止一条</span>。
+      </p>
+      <div class="page-meta">
+        <span class="page-meta-item">20 分钟阅读</span>
+        <span class="page-meta-item">7 个小节</span>
+        <span class="page-meta-item">6 个可视化</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Page Layout ============ -->
+  <div class="page-layout">
+    <main class="page-main">
+
+
+      <!-- ===== S1 三条赛道概览 ===== -->
+      <section class="page-section he-reveal" id="sec-1" data-toc="三条赛道">
+        <div class="page-section-eyebrow">S1 · 三家、三条赛道</div>
+        <h2>三家不在同一根赛道上竞速。</h2>
+
+        <p>
+          板块② 讲过这个词怎么火起来的,板块③ 解剖了组件级 harness 的器官。
+          这一板块,把镜头拉远 ——
+          <strong>看真实世界三家头部公司,各自把 harness 做成了什么样</strong>。
+        </p>
+
+        <!-- Viz #1: 三条赛道 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 01 · three tracks</div>
+            <h3 class="viz-title">三家公司、三个尺度、三种哲学</h3>
+            <p class="viz-sub">不是"谁更强"—— 是各占了一条完全不同的赛道。</p>
+          </div>
+
+          <div class="viz-stage v-tracks">
+            <!-- OpenAI -->
+            <div class="v-track is-openai">
+              <div class="v-track-badge">
+                <span class="v-track-badge-dot"></span>
+                OpenAI
+              </div>
+              <div class="v-track-name">组织级</div>
+              <div class="v-track-scale">org-scale harness</div>
+              <div class="v-track-quote">
+                人定方向,agent 经营产品。<br>一支队伍 + 一个长期产品。
+              </div>
+            </div>
+            <!-- Anthropic -->
+            <div class="v-track is-anthropic">
+              <div class="v-track-badge">
+                <span class="v-track-badge-dot"></span>
+                Anthropic
+              </div>
+              <div class="v-track-name">任务级</div>
+              <div class="v-track-scale">task-scale harness</div>
+              <div class="v-track-quote">
+                多个 agent 合力,干成一件大事。<br>Planner + Generator + Evaluator。
+              </div>
+            </div>
+            <!-- Cursor -->
+            <div class="v-track is-cursor">
+              <div class="v-track-badge">
+                <span class="v-track-badge-dot"></span>
+                Cursor
+              </div>
+              <div class="v-track-name">组件级</div>
+              <div class="v-track-scale">component-scale harness</div>
+              <div class="v-track-quote">
+                把工程师 IDE 这一格做到极致。<br>没有自家模型,也能赢。
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            看完这一板块,你能给<strong>任何</strong>一个 agent 产品场景<strong>对号入座</strong>到其中一家。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== S2 OpenAI ===== -->
+      <section class="page-section he-reveal" id="sec-2" data-toc="OpenAI · 组织级">
+        <div class="page-section-eyebrow">S2 · OpenAI</div>
+        <h2>五个月、零行手写代码<br>的<span class="he-text-accent">疯狂实验</span>。</h2>
+
+        <p>
+          OpenAI 内部启动了一个实验:
+          <strong>用 AI 从零写一个真实的软件产品,全程不允许工程师手写一行代码</strong>。
+          但一开始进展很不顺利 —— 问题不是"模型不够聪明",
+          而是 agent 经常走错方向、重复犯同样的错误。
+          他们意识到:<strong>真正的功夫,在于把 Harness 设计好</strong>。
+        </p>
+
+        <!-- Viz #2: 实验仪表盘 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02 · experiment dashboard</div>
+            <h3 class="viz-title">OpenAI 实验:关键数字一览</h3>
+            <p class="viz-sub">这不是玩具 —— 真正在线上跑、有真实用户的生产系统。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-dashboard">
+              <div class="v-stat">
+                <div class="v-stat-num">7</div>
+                <div class="v-stat-label">工程师<br>(从 3 人起步)</div>
+              </div>
+              <div class="v-stat">
+                <div class="v-stat-num">5</div>
+                <div class="v-stat-label">个月<br>实验周期</div>
+              </div>
+              <div class="v-stat is-highlight">
+                <div class="v-stat-num">0</div>
+                <div class="v-stat-label">行手写代码<br>全部 AI 生成</div>
+              </div>
+              <div class="v-stat">
+                <div class="v-stat-num">~1M</div>
+                <div class="v-stat-label">行代码<br>产出规模</div>
+              </div>
+              <div class="v-stat">
+                <div class="v-stat-num">~1500</div>
+                <div class="v-stat-label">个 PR<br>合并记录</div>
+              </div>
+            </div>
+
+            <!-- 三类优化 -->
+            <div class="v-optim-cards">
+              <div class="v-optim">
+                <div class="v-optim-icon">&#128218;</div>
+                <div class="v-optim-title">上下文管理</div>
+                <div class="v-optim-problem">
+                  Agent 跟新员工一样 —— 把所有规范全塞进一个超大 AGENTS.md,内容太多反而迷失,文件还会"腐化"。
+                </div>
+                <div class="v-optim-fix">
+                  AGENTS.md 压缩到 ~100 行,变成目录 —— 指向分类好的文档。仓库 = 唯一事实来源。
+                </div>
+              </div>
+              <div class="v-optim">
+                <div class="v-optim-icon">&#9989;</div>
+                <div class="v-optim-title">验证与反馈</div>
+                <div class="v-optim-problem">
+                  Agent 写完代码不自己验证,准确率上不去。
+                </div>
+                <div class="v-optim-fix">
+                  配齐"自验证工具栈" —— Chrome DevTools 自动截图、可观测性工具、linter + 测试自动闭环,全程不用人介入。
+                </div>
+              </div>
+              <div class="v-optim">
+                <div class="v-optim-icon">&#128465;</div>
+                <div class="v-optim-title">技术债清理</div>
+                <div class="v-optim-problem">
+                  大规模 AI 生成代码,必然引入重复、命名不一致、偏离架构。
+                </div>
+                <div class="v-optim-fix">
+                  后台 Codex 任务定期扫整个代码库 + 文档,找出偏离规范处,自动修改并提交。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>核心理念:</strong>Humans steer, Agents execute. ——
+            人定方向、给上下文、定规则;Agent 负责具体实现工作。
+          </p>
+          <div class="viz-source">SOURCE · OpenAI《Harness engineering: leveraging Codex in an agent-first world》</div>
+        </figure>
+
+        <div class="callout is-openai">
+          <strong>PM 落点</strong> ——
+          &#10102; 环境比模型更重要:实验一开始失败不是模型问题,是环境没搭好。
+          &#10103; 仓库 / 唯一事实来源是基础设施。
+          &#10104; 自验证闭环 = 准确率的真正杠杆。
+          &#10105; 预防 + 清扫两手都要。
+        </div>
+      </section>
+
+
+      <!-- ===== S3 Anthropic ===== -->
+      <section class="page-section he-reveal" id="sec-3" data-toc="Anthropic · 任务级">
+        <div class="page-section-eyebrow">S3 · Anthropic</div>
+        <h2>Planner / Generator / Evaluator<br>—— <span class="he-text-accent">多 agent 合力</span>。</h2>
+
+        <p>
+          Anthropic 做了个实验:让 agent 去克隆 claude.ai。
+          最初只用一个 agent,结果惨败 ——
+          想一口气做完所有功能,上下文满了,抛下烂摊子,下一个 agent 接手完全不知道发生了啥。
+          <strong>一个 agent 撑不了那么长的任务。</strong>
+        </p>
+
+        <!-- Viz #3: P/G/E 架构 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03 · P/G/E architecture</div>
+            <h3 class="viz-title">Full Harness:三个 Agent 的编排</h3>
+            <p class="viz-sub">Planner 拆需求 → Generator 写代码 ↔ Evaluator 判对错 —— 循环往复直到通过。</p>
+          </div>
+
+          <div class="viz-stage v-pge">
+            <!-- Planner -->
+            <div class="v-pge-row">
+              <div class="v-pge-node is-planner">
+                <div class="v-pge-node-label">PLANNER</div>
+                <div class="v-pge-node-name">规划者</div>
+                <div class="v-pge-node-desc">模糊需求 → 具体功能列表</div>
+              </div>
+            </div>
+
+            <div class="v-pge-arrow">
+              <span>&#8595;</span>
+              <span class="v-pge-arrow-label">功能列表</span>
+            </div>
+
+            <!-- Generator + Evaluator -->
+            <div class="v-pge-row">
+              <div class="v-pge-node is-generator">
+                <div class="v-pge-node-label">GENERATOR</div>
+                <div class="v-pge-node-name">执行者</div>
+                <div class="v-pge-node-desc">一个功能点一个功能点地做</div>
+              </div>
+
+              <div class="v-pge-arrow" style="flex-direction: row; gap: var(--sp-2);">
+                <span>&#8644;</span>
+                <span class="v-pge-arrow-label">商讨标准 / 提交 / 反馈</span>
+              </div>
+
+              <div class="v-pge-node is-evaluator">
+                <div class="v-pge-node-label">EVALUATOR</div>
+                <div class="v-pge-node-name">评判者</div>
+                <div class="v-pge-node-desc">独立第三方,只判分</div>
+              </div>
+            </div>
+
+            <div class="v-pge-loop-indicator">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              不合格 → 发回意见 → 修改 → 再评 → 直到通过 → 下一个功能点
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>关键洞见:</strong>永远别让做的人当判官。
+            Evaluator 必须独立 —— 跟 Generator 没关系,没理由"护短"。
+          </p>
+          <div class="viz-source">SOURCE · Anthropic《Harness design for long-running application development》</div>
+        </figure>
+
+        <!-- Solo vs Full Harness 对比 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03b · Solo vs Full</div>
+            <h3 class="viz-title">决定性实验:Solo vs Full Harness</h3>
+            <p class="viz-sub">同一个任务 —— 做一个游戏制作工具。Full Harness 贵 20 倍、慢 18 倍,但把"做不出来"变成了"做得出来"。</p>
+          </div>
+
+          <div class="viz-stage v-solo-vs">
+            <div class="v-solo-card is-solo">
+              <div class="v-solo-tag">Solo</div>
+              <div class="v-solo-metrics">
+                <div class="v-solo-metric">
+                  <div class="v-solo-metric-num">20 min</div>
+                  <div class="v-solo-metric-label">耗时</div>
+                </div>
+                <div class="v-solo-metric">
+                  <div class="v-solo-metric-num">$9</div>
+                  <div class="v-solo-metric-label">花费</div>
+                </div>
+              </div>
+              <div class="v-solo-verdict">
+                布局乱、逻辑难懂、bug 一堆 —— 基本没法用。
+              </div>
+            </div>
+
+            <div class="v-solo-vs-divider">
+              <div class="v-solo-vs-badge">VS</div>
+            </div>
+
+            <div class="v-solo-card is-full">
+              <div class="v-solo-tag">Full Harness</div>
+              <div class="v-solo-metrics">
+                <div class="v-solo-metric">
+                  <div class="v-solo-metric-num">6 hrs</div>
+                  <div class="v-solo-metric-label">耗时</div>
+                </div>
+                <div class="v-solo-metric">
+                  <div class="v-solo-metric-num">$200</div>
+                  <div class="v-solo-metric-label">花费</div>
+                </div>
+              </div>
+              <div class="v-solo-verdict">
+                布局合理、逻辑清晰 —— 达到可用水准。
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>精雕细琢有代价</strong> ——
+            考 60 分 3 天就够,想考 90 分可能要一个月。有些任务想拿到分,就必须付这个代价。
+          </p>
+        </figure>
+
+        <div class="callout is-anthropic">
+          <strong>一个时间维度上的细节:</strong>Anthropic 一开始在提示词里强制 Generator"一次只做一个功能点"。
+          后来 Opus 4.6 出来,这条约束被去掉了 —— 模型够强,能自己统筹。
+          <em>Harness 是刚好够用,模型变强,harness 该精简。</em>
+        </div>
+
+        <div class="callout is-anthropic">
+          <strong>PM 落点</strong> ——
+          &#10102; 任务超出单 agent 范围 → 上任务级编排。
+          &#10103; 独立 Evaluator 是"王婆卖瓜"的解药。
+          &#10104; Full Harness 有成本 —— PM 要看 ROI 值不值。
+          &#10105; Harness 是动态的 —— 模型升级,你的 harness 可能要减,不是加。
+        </div>
+      </section>
+
+
+      <!-- ===== S4 Cursor ===== -->
+      <section class="page-section he-reveal" id="sec-4" data-toc="Cursor · 组件级">
+        <div class="page-section-eyebrow">S4 · Cursor</div>
+        <h2>没有自家模型,<br>把组件级做到<span class="he-text-accent">极致</span>。</h2>
+
+        <p>
+          Cursor 是一个 IDE(由 VSCode fork 而来)。
+          它<strong>没有自家前沿模型</strong> —— 用 Claude、GPT、Gemini。
+          它甚至不做通用 AI 助手 —— 只做一件事:<strong>让工程师在编辑器里写代码</strong>。
+          就这一个聚焦,两年做到最受欢迎的 AI IDE 之一。
+        </p>
+
+        <!-- Viz #4: 功能栈 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 04 · feature stack</div>
+            <h3 class="viz-title">Cursor 的四层功能栈</h3>
+            <p class="viz-sub">不同任务尺度的工具,按需选用 —— 从闪电补全到多步循环。</p>
+          </div>
+
+          <div class="viz-stage v-stack">
+            <div class="v-stack-layer">
+              <div class="v-stack-name">Tab</div>
+              <div class="v-stack-desc">打几个字 → Tab 一按 → 完整代码补出来。P50 延迟 &lt; 100ms,自有小模型 cursor-tab 驱动。</div>
+              <div class="v-stack-trait">闪电速度</div>
+            </div>
+            <div class="v-stack-layer">
+              <div class="v-stack-name">Cmd-K</div>
+              <div class="v-stack-desc">选一段代码 → 自然语言指令 → diff 预览 → 接受 / 拒绝。外科手术式编辑。</div>
+              <div class="v-stack-trait">精准编辑</div>
+            </div>
+            <div class="v-stack-layer">
+              <div class="v-stack-name">Composer</div>
+              <div class="v-stack-desc">跨文件批量改动。"重构这个模块"类任务的主战场。</div>
+              <div class="v-stack-trait">批量改动</div>
+            </div>
+            <div class="v-stack-layer">
+              <div class="v-stack-name">Agent</div>
+              <div class="v-stack-desc">多步循环:读 → 改 → 跑命令 → 看输出 → 继续。从"建议"升级为"动手做"。</div>
+              <div class="v-stack-trait">自主循环</div>
+            </div>
+          </div>
+
+          <!-- 模型路由 -->
+          <div class="v-routing">
+            <div class="v-routing-source">
+              <div class="v-routing-source-label">CURSOR ROUTER</div>
+              <div class="v-routing-source-name">模型路由</div>
+            </div>
+            <div class="v-routing-branch">
+              <span>&#8594;</span>
+              <span>&#8594;</span>
+            </div>
+            <div class="v-routing-targets">
+              <div class="v-routing-target is-cheap">
+                <div class="v-routing-target-icon">&#9889;</div>
+                <div>
+                  <div class="v-routing-target-model">cursor-tab (自有小模型)</div>
+                  <div class="v-routing-target-text">Tab 补全 —— 成本极低、延迟极短</div>
+                </div>
+              </div>
+              <div class="v-routing-target is-premium">
+                <div class="v-routing-target-icon">&#129504;</div>
+                <div>
+                  <div class="v-routing-target-model">Claude / GPT (前沿大模型)</div>
+                  <div class="v-routing-target-text">Agent / Composer —— 质量高、贵</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>成本结构就是产品优势</strong> —— 不同任务匹配不同模型,既保证质量又让单用户成本远低于"全用前沿模型"。
+          </p>
+          <div class="viz-source">SOURCE · Cursor 官方文档 · cursor.com/docs</div>
+        </figure>
+
+        <div class="callout is-cursor">
+          <strong>PM 落点</strong> ——
+          &#10102; 一个场景的极致,胜过十个场景的平庸。
+          &#10103; "无意识好用"(speed)是真护城河 —— 用户迷恋"零等待"。
+          &#10104; 模型路由是成本结构,不是技术细节 —— 没有这个,规模化注定亏钱。
+          &#10105; 没有模型也能赢 —— 只要你的 harness 比对手好。
+        </div>
+      </section>
+
+
+      <!-- ===== S5 三方对比 ===== -->
+      <section class="page-section he-reveal" id="sec-5" data-toc="三方对比">
+        <div class="page-section-eyebrow">S5 · 横向对比</div>
+        <h2>把三条赛道<br>摊开对照。</h2>
+
+        <!-- Viz #5: 对比网格 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 05 · comparison grid</div>
+            <h3 class="viz-title">三家横向对比:七个维度</h3>
+            <p class="viz-sub">不是比谁更强 —— 是看清三条完全不同的路。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-grid">
+              <!-- Header -->
+              <div class="v-grid-cell is-head"></div>
+              <div class="v-grid-cell is-head is-openai-head">OpenAI</div>
+              <div class="v-grid-cell is-head is-anthropic-head">Anthropic</div>
+              <div class="v-grid-cell is-head is-cursor-head">Cursor</div>
+
+              <!-- 主战场 -->
+              <div class="v-grid-cell is-label">主战场</div>
+              <div class="v-grid-cell">通用 + 写代码</div>
+              <div class="v-grid-cell">长任务 + 写代码</div>
+              <div class="v-grid-cell">工程师 IDE(垂直)</div>
+
+              <!-- 代表性 harness -->
+              <div class="v-grid-cell is-label">代表性 harness</div>
+              <div class="v-grid-cell">Codex + CI / Doc 闭环</div>
+              <div class="v-grid-cell">P / G / E 三件套</div>
+              <div class="v-grid-cell">Tab + Composer + Agent</div>
+
+              <!-- 尺度 -->
+              <div class="v-grid-cell is-label">尺度</div>
+              <div class="v-grid-cell"><span class="v-grid-tag is-openai">组织级</span></div>
+              <div class="v-grid-cell"><span class="v-grid-tag is-anthropic">任务级</span></div>
+              <div class="v-grid-cell"><span class="v-grid-tag is-cursor">组件级(深)</span></div>
+
+              <!-- 设计哲学 -->
+              <div class="v-grid-cell is-label">设计哲学</div>
+              <div class="v-grid-cell"><span class="v-grid-highlight">Humans steer, Agents execute</span></div>
+              <div class="v-grid-cell"><span class="v-grid-highlight">多 agent 合力 &gt; 单 agent 死撑</span></div>
+              <div class="v-grid-cell"><span class="v-grid-highlight">组件级做到无意识好用</span></div>
+
+              <!-- 模型策略 -->
+              <div class="v-grid-cell is-label">模型策略</div>
+              <div class="v-grid-cell">自有 GPT 系列</div>
+              <div class="v-grid-cell">自有 Claude 系列</div>
+              <div class="v-grid-cell"><strong>不自有 —— 多模型路由</strong></div>
+
+              <!-- 核心打法 -->
+              <div class="v-grid-cell is-label">核心打法</div>
+              <div class="v-grid-cell">全自动 / 长产品 / 大投入</div>
+              <div class="v-grid-cell">多 agent 编排 / 独立 evaluator</div>
+              <div class="v-grid-cell">速度 / 聚焦 / 极致 UX</div>
+
+              <!-- 给 PM 的一课 -->
+              <div class="v-grid-cell is-label">给 PM 的一课</div>
+              <div class="v-grid-cell">环境比模型重要</div>
+              <div class="v-grid-cell">不让做的人当判官</div>
+              <div class="v-grid-cell"><strong>没有模型也能赢</strong></div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>元层启示:</strong>AI 产品不是"模型大战"的副产品 ——
+            它是一个多尺度、多哲学的设计空间。你要选打哪一格、用哪种哲学,然后把那一格做到极致。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== S6 选型地图 ===== -->
+      <section class="page-section he-reveal" id="sec-6" data-toc="选型地图">
+        <div class="page-section-eyebrow">S6 · 选型地图</div>
+        <h2>你的产品<br>像<span class="he-text-accent">哪一家</span>？</h2>
+
+        <p>
+          对号入座的本质,是先识别你产品的"尺度" ——
+          你包的是一次模型调用 / 一个长任务 / 一支队伍?
+          <strong>尺度决定 harness 的形态</strong>。
+        </p>
+
+        <!-- Viz #6: 选型地图 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06 · selection map</div>
+            <h3 class="viz-title">你的产品长什么样 → 跟哪条赛道</h3>
+            <p class="viz-sub">先识别尺度,再选路线 —— 这是板块① 那把"尺"的实际用法。</p>
+          </div>
+
+          <div class="viz-stage v-select">
+            <!-- Cursor 路线 -->
+            <div class="v-select-card is-cursor-pick">
+              <div class="v-select-scenario">
+                嵌在用户熟悉的工具里(IDE、文档编辑器、Figma……),实时低延迟给建议
+              </div>
+              <div class="v-select-arrow">&#8595; 匹配</div>
+              <div class="v-select-rec">
+                <div class="v-select-rec-badge">CURSOR 路线</div>
+              </div>
+              <div class="v-select-rec-text">组件级 · 聚焦 + 速度</div>
+              <div class="v-select-detail">
+                一个场景做到极致,速度是真护城河。自有小模型干补全,大模型干难活 —— 控住成本。
+              </div>
+            </div>
+
+            <!-- Anthropic 路线 -->
+            <div class="v-select-card is-anthropic-pick">
+              <div class="v-select-scenario">
+                用户输入一句话 → AI 自动生成完整应用 / 文档 / 设计稿
+              </div>
+              <div class="v-select-arrow">&#8595; 匹配</div>
+              <div class="v-select-rec">
+                <div class="v-select-rec-badge">ANTHROPIC 路线</div>
+              </div>
+              <div class="v-select-rec-text">任务级 · Planner + Generator + Evaluator</div>
+              <div class="v-select-detail">
+                长任务需要拆解、需要独立评判。Full Harness 贵但把"做不出来"变成"做得出来"。
+              </div>
+            </div>
+
+            <!-- OpenAI 路线 -->
+            <div class="v-select-card is-openai-pick">
+              <div class="v-select-scenario">
+                一支队伍长期维护一个产品 / 业务,agent 承担大部分日常实现工作
+              </div>
+              <div class="v-select-arrow">&#8595; 匹配</div>
+              <div class="v-select-rec">
+                <div class="v-select-rec-badge">OPENAI 路线</div>
+              </div>
+              <div class="v-select-rec-text">组织级 · 环境 + 自动闭环 + 技术债清扫</div>
+              <div class="v-select-detail">
+                仓库即唯一事实来源,自验证闭环是准确率杠杆,预防 + 清扫两手都要。
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>你做 agent 产品的第一件事,不是选模型,是选赛道。</strong>
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== S7 一句话总结 ===== -->
+      <section class="page-section he-reveal" id="sec-7" data-toc="一句话总结">
+        <div class="page-section-eyebrow">S7 · 一句话总结</div>
+        <blockquote>
+          <strong>三家、三种哲学、三个尺度,各占一格</strong> ——
+          OpenAI 用组织级证明"AI 能经营产品";
+          Anthropic 用任务级证明"多 agent 合力 > 单 agent 死撑";
+          Cursor 用组件级证明"做最好的 harness,可以打败拥有模型的人"。
+          它们不是竞速,是把 AI 产品的设计空间<strong>撑开成了三条赛道</strong>。
+        </blockquote>
+
+        <h3>一手来源(本板块所有论断的出处)</h3>
+        <ul>
+          <li>OpenAI《Harness engineering: leveraging Codex in an agent-first world》— <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noreferrer">openai.com</a></li>
+          <li>Anthropic《Harness design for long-running application development》— <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noreferrer">anthropic.com</a></li>
+          <li>Cursor 官方文档 — <a href="https://cursor.com/docs" target="_blank" rel="noreferrer">cursor.com</a></li>
+          <li>LangChain《The Anatomy of an Agent Harness》— <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noreferrer">langchain.com</a></li>
+        </ul>
+      </section>
+
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="page-nav" aria-label="板块导航">
+        <a href="survey.html" class="page-nav-link">
+          <span class="page-nav-meta">&#8617; 返回</span>
+          <span class="page-nav-title">全景 · 本组总览</span>
+        </a>
+        <a href="07-chinese.html" class="page-nav-link is-next">
+          <span class="page-nav-meta">下一篇 &#8594;</span>
+          <span class="page-nav-title">&#9318; 中文语境</span>
+        </a>
+      </nav>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/spotlight.js"></script>
+</body>
+</html>

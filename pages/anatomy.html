@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>解剖学 · Harness Engineering</title>
-  <meta name="description" content="Harness Engineering 解剖学 — 拆开一个 harness 看里面每个部件的职责：转 · 知 · 做 · 检。">
+  <meta name="description" content="Harness Engineering 解剖学 — 一个 harness 不管多大，里面跑的都是这 6 个部件：上下文管理 / 记忆系统 / Agent 循环 / 执行边界 / 工具生态 / 评测+可观测。">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,34 +14,350 @@
   <link rel="stylesheet" href="../assets/page.css">
 
   <style>
-    /* Page-specific micro additions */
-    .mono-tag {
-      display: inline-block;
+    /* ============ 6-component flow diagram (copied from what.html) ============ */
+    .six-flow {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 20px;
+      align-items: stretch;
+      padding: 28px;
+      background: var(--bg-card);
+      border: 1px solid rgba(222, 219, 200, 0.08);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .six-flow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(700px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.05) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .six-flow:hover::before { opacity: 1; }
+
+    .six-loop {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
       font-family: var(--font-mono);
       font-size: 11px;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.12em;
       color: var(--cream);
+      padding: 12px 6px;
+      border-left: 1px dashed rgba(222, 219, 200, 0.3);
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .six-steps { display: flex; flex-direction: column; gap: 4px; position: relative; z-index: 1; }
+    .six-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: rgba(222, 219, 200, 0.025);
+      border: 1px solid rgba(222, 219, 200, 0.08);
+      border-radius: 12px;
+      transition: all 0.4s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .six-step::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.1) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .six-step:hover::before { opacity: 1; }
+    .six-step:hover {
+      border-color: rgba(222, 219, 200, 0.25);
+      transform: translateX(4px);
+    }
+    .six-step-num {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--cream);
+      color: #000;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .six-step-num.is-c1 { background: #a5acea; }
+    .six-step-num.is-c2 { background: #fbbf24; }
+    .six-step-num.is-c3 { background: #DEDBC8; }
+    .six-step-num.is-c4 { background: #f87171; }
+    .six-step-num.is-c5 { background: #4ade80; }
+    .six-step-num.is-c6 { background: #94a3b8; }
+
+    .six-step-body { flex: 1; min-width: 0; position: relative; z-index: 1; }
+    .six-step-title { font-size: 15px; font-weight: 700; color: var(--cream-text); }
+    .six-step-desc { font-size: 12.5px; color: var(--cream-dim); line-height: 1.55; margin-top: 2px; }
+
+    .six-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 4px 0;
+      color: var(--gray-600);
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+    .six-arrow span { color: var(--gray-500); }
+
+    .six-rail {
+      writing-mode: vertical-rl;
+      padding: 12px 10px;
+      background: rgba(222, 219, 200, 0.025);
+      border: 1px dashed rgba(222, 219, 200, 0.15);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .six-rail-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--cream-dim);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .six-flow { grid-template-columns: 1fr; padding: 18px; }
+      .six-loop, .six-rail { writing-mode: horizontal-tb; transform: none; border: 1px dashed rgba(222,219,200,0.2); border-radius: 10px; padding: 10px; text-align: center; }
+    }
+
+    /* ============ Component chips (horizontal scroller) ============ */
+    .component-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 0 4px;
+      margin: 28px 0 8px;
+      scrollbar-width: none;
+    }
+    .component-chips::-webkit-scrollbar { display: none; }
+    .component-chip {
+      flex-shrink: 0;
+      padding: 10px 18px;
+      background: rgba(222, 219, 200, 0.04);
+      border: 1px solid rgba(222, 219, 200, 0.12);
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cream-text);
+      transition: all 0.3s var(--ease-out);
+      white-space: nowrap;
+    }
+    .component-chip:hover {
+      background: rgba(222, 219, 200, 0.12);
+      transform: translateY(-2px);
+      border-color: rgba(222, 219, 200, 0.3);
+    }
+
+    /* ============ Case demo (interactive walkthrough) ============ */
+    .case-demo {
+      margin: 28px 0;
+      background: #0a0a0a;
+      border: 1px solid rgba(222, 219, 200, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .case-demo::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(500px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.06) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .case-demo:hover::before { opacity: 1; }
+    .case-demo-head {
+      padding: 14px 20px;
+      background: rgba(222, 219, 200, 0.04);
+      border-bottom: 1px solid rgba(222, 219, 200, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .case-demo-tag {
       padding: 4px 10px;
-      background: rgba(222,219,200,0.06);
-      border: 1px solid rgba(222,219,200,0.12);
-      border-radius: 6px;
-      margin-right: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: #000;
+      background: var(--cream);
+      border-radius: 5px;
     }
-    .pattern-when {
+    .case-demo-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cream-text);
+    }
+    .case-demo-body {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .case-line {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--cream-dim);
+      padding: 4px 0;
+    }
+    .case-line div { flex: 1; }
+    .case-num {
+      flex-shrink: 0;
+      width: 20px;
+      font-family: var(--font-mono);
+      color: var(--cream);
+      text-align: center;
+      margin-top: 2px;
+      font-size: 12px;
+    }
+    .case-line.is-result {
+      margin-top: 6px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(222, 219, 200, 0.1);
+    }
+    .case-line.is-result .case-num { color: #4ade80; }
+    .case-line.is-result div { color: var(--cream-text); }
+    .case-line b { color: var(--cream-text); }
+    .case-line code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 1px 6px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(222, 219, 200, 0.1);
+      border-radius: 4px;
+    }
+    .case-line mark {
+      background: rgba(222, 219, 200, 0.12);
+      color: var(--cream-text);
+      padding: 0 4px;
+      border-radius: 3px;
+    }
+
+    /* ============ PM 该问什么 (distinctive callout) ============ */
+    .pm-ask {
+      margin: 24px 0;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, rgba(222, 219, 200, 0.04), rgba(165, 172, 234, 0.04));
+      border: 1px solid rgba(222, 219, 200, 0.1);
+      border-left: 3px solid var(--cream);
+      border-radius: 0 12px 12px 0;
+    }
+    .pm-ask-h {
       font-family: var(--font-mono);
       font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       color: var(--cream);
-      letter-spacing: 0.06em;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px dashed rgba(222,219,200,0.12);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .pattern-gotcha {
-      font-size: 12px;
+    .pm-ask-h::before {
+      content: '?';
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      background: var(--cream);
+      color: #000;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 11px;
+    }
+    .pm-ask ul li {
+      font-size: 14px;
+      color: var(--cream-text);
+      padding: 4px 0;
+      position: relative;
+      padding-left: 18px;
+      line-height: 1.5;
+    }
+    .pm-ask ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--cream);
+      font-weight: 700;
+    }
+
+    /* ============ Inline helpers ============ */
+    mark {
+      background: rgba(222, 219, 200, 0.12);
+      color: var(--cream-text);
+      padding: 0 4px;
+      border-radius: 3px;
+    }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.92em;
+      padding: 1px 6px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(222, 219, 200, 0.08);
+      border-radius: 4px;
+      color: var(--cream-text);
+    }
+
+    /* Sub-mechanism heading */
+    .sub-mech-h {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cream-text);
+      margin: 36px 0 16px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sub-mech-h::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--cream);
+    }
+
+    /* Cite row at bottom of section */
+    .sec-cites {
+      margin-top: 24px;
+      font-size: 13px;
       color: var(--gray-500);
-      font-style: italic;
-      margin-top: 8px;
     }
+    .sec-cites .cite + .cite { margin-left: 4px; }
+
+    /* Tighter tile styling for the sub-mechanism grids */
+    .anat-tile .tile-num { font-size: 10.5px; }
+    .anat-tile .tile-title { font-size: 16px; margin-bottom: 6px; }
+    .anat-tile .tile-desc { font-size: 13px; line-height: 1.55; }
   </style>
 </head>
 <body>
@@ -55,11 +371,11 @@
       <span class="topnav-brand-text">驾驭工程</span>
     </a>
     <a href="what.html" class="topnav-link">是什么</a>
+    <a href="history.html" class="topnav-link">谱系</a>
     <a href="why.html" class="topnav-link">为什么</a>
     <a href="anatomy.html" class="topnav-link is-active">解剖</a>
     <a href="vendors.html" class="topnav-link">厂商</a>
     <a href="method.html" class="topnav-link">方法</a>
-    <a href="history.html" class="topnav-link">谱系</a>
     <a href="resources.html" class="topnav-link">资源</a>
   </nav>
 
@@ -68,42 +384,46 @@
     <!-- LEFT TOC -->
     <aside class="toc">
       <div class="toc-inner">
-        <div class="toc-label">03 · BOARD</div>
+        <div class="toc-label">04 · BOARD</div>
         <div class="toc-board">解<em>剖学</em></div>
         <nav class="toc-list">
           <a href="#overview" class="toc-link">
-            <span class="toc-num">01</span>
-            <span>四大组件概览</span>
+            <span class="toc-num">00</span>
+            <span>一轮循环总览</span>
           </a>
-          <a href="#loop" class="toc-link">
-            <span class="toc-num">02</span>
-            <span>转 · 主循环</span>
+          <a href="#ctx" class="toc-link">
+            <span class="toc-num">01</span>
+            <span>上下文管理</span>
           </a>
           <a href="#memory" class="toc-link">
+            <span class="toc-num">02</span>
+            <span>记忆系统</span>
+          </a>
+          <a href="#loop" class="toc-link">
             <span class="toc-num">03</span>
-            <span>知 · 上下文与记忆</span>
+            <span>Agent 循环</span>
+          </a>
+          <a href="#boundary" class="toc-link">
+            <span class="toc-num">04</span>
+            <span>执行边界</span>
           </a>
           <a href="#tools" class="toc-link">
-            <span class="toc-num">04</span>
-            <span>做 · 工具与执行</span>
+            <span class="toc-num">05</span>
+            <span>工具生态</span>
           </a>
           <a href="#eval" class="toc-link">
-            <span class="toc-num">05</span>
-            <span>检 · 评测与可观测</span>
-          </a>
-          <a href="#patterns" class="toc-link">
             <span class="toc-num">06</span>
-            <span>6 种常见模式</span>
+            <span>评测 + 可观测</span>
           </a>
         </nav>
         <div class="toc-bottom">
+          <a href="why.html" class="toc-nav-link">
+            <span>← 上一个板块</span>
+            <span class="toc-nav-link-arrow">03 · 为什么</span>
+          </a>
           <a href="vendors.html" class="toc-nav-link">
             <span>下一个板块</span>
-            <span class="toc-nav-link-arrow">04 · 厂商 →</span>
-          </a>
-          <a href="../index.html" class="toc-nav-link">
-            <span>← 返回首页</span>
-            <span class="toc-nav-link-arrow"></span>
+            <span class="toc-nav-link-arrow">05 · 厂商 →</span>
           </a>
         </div>
       </div>
@@ -113,346 +433,608 @@
     <main class="page-main">
 
       <header class="page-header reveal">
-        <div class="page-header-num">03 · ANATOMY</div>
+        <div class="page-header-num">04 · ANATOMY</div>
         <h1 class="page-title">解<em>剖学</em></h1>
         <p class="page-lead">
-          拆开一个 harness，看里面每个部件的职责。
+          一个 harness 不管多大，里面跑的都是这 6 个部件。拆开来看每一块。
         </p>
       </header>
 
-      <!-- ==== SEC 1: 四大组件概览 ==== -->
+      <!-- ==== SEC 0: 一轮循环总览 ==== -->
       <section class="sec" id="overview">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · OVERVIEW</div>
-        <h2 class="sec-title reveal">转 · 知 · 做 · <em>检</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>00 · OVERVIEW</div>
+        <h2 class="sec-title reveal">一轮循环<em>总览</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          不论组件级、任务级还是组织级，一个 harness 都可以拆成这四个部件。<strong style="color:var(--cream-text);">谁缺谁补、谁弱谁砸钱。</strong>
+          这 6 个部件按顺序在一轮循环里走完。先用一张图看全貌，再逐块拆开。
         </p>
 
-        <div class="grid-4 reveal reveal-d2" style="margin-bottom: 32px;">
-          <div class="tile" data-glow>
-            <div class="tile-icon">⟳</div>
-            <div class="tile-title">转 · LOOP</div>
-            <p class="tile-desc">主循环 —— 决定 Agent 下一步做什么。心跳与节拍器。</p>
+        <div class="six-flow reveal reveal-d2" data-glow>
+          <div class="six-loop">结果回流 · 下一圈 ↻</div>
+          <div class="six-steps">
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c1">1</div>
+              <div class="six-step-body">
+                <div class="six-step-title">上下文管理</div>
+                <div class="six-step-desc">装桌面：system prompt + 对话历史 + 工具列表 → 模型此刻看见的一切</div>
+              </div>
+            </div>
+            <div class="six-arrow">↓ <span>查记忆，补进桌面</span></div>
+
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c2">2</div>
+              <div class="six-step-body">
+                <div class="six-step-title">记忆系统</div>
+                <div class="six-step-desc">从记忆库调取长期事实（用户偏好、历史决策…）补入上下文</div>
+              </div>
+            </div>
+            <div class="six-arrow">↓ <span>桌面装好，交给模型</span></div>
+
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c3">3</div>
+              <div class="six-step-body">
+                <div class="six-step-title">Agent 循环</div>
+                <div class="six-step-desc">模型思考，决定下一步：输出 tool call 或最终回答</div>
+              </div>
+            </div>
+            <div class="six-arrow">↓ <span>tool call 先过安检</span></div>
+
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c4">4</div>
+              <div class="six-step-body">
+                <div class="six-step-title">执行边界</div>
+                <div class="six-step-desc">沙箱检查 → 审批策略 → Hook：放行 / 拦截 / 问人</div>
+              </div>
+            </div>
+            <div class="six-arrow">↓ <span>放行后，真正执行</span></div>
+
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c5">5</div>
+              <div class="six-step-body">
+                <div class="six-step-title">工具生态</div>
+                <div class="six-step-desc">调用 API / 读写文件 / 发消息… → 拿到结果</div>
+              </div>
+            </div>
           </div>
-          <div class="tile" data-glow>
-            <div class="tile-icon">◉</div>
-            <div class="tile-title">知 · MEMORY</div>
-            <p class="tile-desc">上下文与记忆 —— Agent 知道什么、记得什么。工作台与抽屉。</p>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-icon">⚡</div>
-            <div class="tile-title">做 · TOOLS</div>
-            <p class="tile-desc">工具与执行 —— Agent 能动什么、不能动什么。手脚与边界。</p>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-icon">◈</div>
-            <div class="tile-title">检 · EVAL</div>
-            <p class="tile-desc">评测与可观测 —— 跑得好不好怎么知道。仪表盘与放大镜。</p>
+          <div class="six-rail">
+            <span class="six-rail-label">⑥ 评测 + 全程可观测 · Trace · 成本 · 告警</span>
           </div>
         </div>
 
-        <div class="concept-pill reveal reveal-d3">
-          <p>
-            这四个部件，在
-            <strong>组件级</strong>（裹一次模型调用）、<strong>任务级</strong>（编排多 Agent）、<strong>组织级</strong>（罩一支队伍）里都一一对应 ——
-            只是尺度变了，<strong>循环、记忆、工具、评测</strong>的颗粒度跟着变大。
-            <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
-            把这四件事称作 "the anatomy of an agent harness"。
-          </p>
+        <p class="reveal" style="font-family: var(--font-mono); font-size: 14px; color: var(--cream-text); text-align: center; margin-top: 28px; letter-spacing: 0.04em;">
+          装桌面 → 补记忆 → 模型想 → 过安检 → 动手做 → 结果回流 → <span style="color: var(--cream);">再来一圈</span>
+        </p>
+        <p class="reveal" style="text-align: center; font-size: 14px; color: var(--gray-500); margin-top: 8px;">
+          下面把每一块单拎出来：定义 · 子机制 · 案例 · PM 该问什么 · 一手来源。
+        </p>
+
+        <!-- Chip navigator -->
+        <div class="component-chips reveal reveal-d2">
+          <a href="#ctx" class="component-chip">01 · 上下文管理</a>
+          <a href="#memory" class="component-chip">02 · 记忆系统</a>
+          <a href="#loop" class="component-chip">03 · Agent 循环</a>
+          <a href="#boundary" class="component-chip">04 · 执行边界</a>
+          <a href="#tools" class="component-chip">05 · 工具生态</a>
+          <a href="#eval" class="component-chip">06 · 评测 + 可观测</a>
         </div>
       </section>
 
-      <!-- ==== SEC 2: 转 · 主循环 ==== -->
-      <section class="sec" id="loop">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · 转 · LOOP</div>
-        <h2 class="sec-title reveal">主<em>循环</em>决定 Agent 每一步做什么</h2>
+      <!-- ==== SEC 1: 上下文管理 ==== -->
+      <section class="sec" id="ctx">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · CONTEXT MANAGEMENT</div>
+        <h2 class="sec-title reveal">上下文管理 · <em>装桌面</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          模型本身是无状态的，跑完一次就结束。让它"持续工作"的，是外面那个 while。<strong style="color:var(--cream-text);">循环的形状，决定 Agent 的人格。</strong>
+          把模型"此刻能看见的一切"组装好。
         </p>
 
-        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 32px;">
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 01</div>
-            <div class="tile-title">ReAct</div>
-            <p class="tile-desc">
-              Think → Act → Observe，每一步都写出推理。模型把"想"暴露在 trace 里，可调试、可干预。<br>
-              <span style="color:var(--gray-500);font-size:13px;">典型用法：</span>问答型 Agent、客服机器人、单步工具调用。
-            </p>
+        <div class="concept-pill reveal reveal-d2">
+          <p>
+            把模型"<strong>此刻能看见的一切</strong>"组装好。包括 system prompt、对话历史、当前任务、可用工具 —— 这一切构成了模型决策的全部依据。
+          </p>
+          <p style="margin-top: 12px;">
+            模型每一次推理都是"<strong>无状态</strong>"的：它不记得上一轮发生了什么，所有状态都得在这一轮一次性塞进上下文窗口。上下文管理就是这个"塞"的工程。
+          </p>
+        </div>
+
+        <div class="sub-mech-h">子机制 · SUB-MECHANISMS</div>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M1 · SYSTEM PROMPT</div>
+            <div class="tile-title">System prompt 装载</div>
+            <p class="tile-desc">角色定义、行为约束、输出格式。是 agent 的"人格说明书"。</p>
           </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 02</div>
-            <div class="tile-title">Plan-and-Execute</div>
-            <p class="tile-desc">
-              先做完整 plan，再分步执行。计划阶段一次性消耗 token，执行阶段每步只看子任务上下文。<br>
-              <span style="color:var(--gray-500);font-size:13px;">典型用法：</span>多步骤代码任务（Claude Code、Devin）、研究型 Agent。
-            </p>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M2 · HISTORY</div>
+            <div class="tile-title">对话历史拼装</div>
+            <p class="tile-desc">用户消息、模型回答、工具结果按时序回流到上下文。</p>
           </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 03</div>
-            <div class="tile-title">Adaptive</div>
-            <p class="tile-desc">
-              不固定循环结构，由模型动态判断"现在要 think、要 act、还是要请用户介入"。最贴近 Claude 4.x、GPT-5 这类 reasoning model 的实际形态。<br>
-              <span style="color:var(--gray-500);font-size:13px;">典型用法：</span>长程任务、深度研究、复杂工程。
-            </p>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M3 · TOOL LIST</div>
+            <div class="tile-title">工具列表注入</div>
+            <p class="tile-desc">当前可用工具的 schema 描述，告诉模型"你能干什么"。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M4 · BUDGET</div>
+            <div class="tile-title">Token 预算切割</div>
+            <p class="tile-desc">窗口管理。超出走摘要 / RAG / 截断。预算就是钱。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M5 · PRIORITY</div>
+            <div class="tile-title">指令优先级</div>
+            <p class="tile-desc">系统级 &gt; 项目级 &gt; 用户级。冲突时上层赢。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M6 · MULTIMODAL</div>
+            <div class="tile-title">多模态拼接</div>
+            <p class="tile-desc">图片、文件、代码块按规范注入到上下文窗口。</p>
           </div>
         </div>
 
-        <div class="prose reveal reveal-d3">
-          <h3>循环的终止条件</h3>
-          <p>
-            循环不能无限转。<strong>哪一条先成立，哪一条先停。</strong>常见的终止条件：
-          </p>
+        <div class="case-demo reveal" data-glow>
+          <div class="case-demo-head">
+            <span class="case-demo-tag">CASE</span>
+            <span class="case-demo-title">电商客服查耳机 · 看上下文管理在干什么</span>
+          </div>
+          <div class="case-demo-body">
+            <div class="case-line"><span class="case-num">→</span><div><b>装入 system prompt</b>："你是 XX 品牌客服，语气亲切，不准透露内部系统名"</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>拼接用户消息</b>："我上周买的耳机到哪了？"</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>注入工具列表</b>：<code>read_order</code>, <code>query_logistics</code>, <code>send_message</code></div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>预算切割</b>：token 预算 8K，历史消息保留最近 10 条，超出走摘要</div></div>
+            <div class="case-line is-result"><span class="case-num">✓</span><div>→ 这就是模型"<mark>此刻看见的一切</mark>"，模型据此决定下一步</div></div>
+          </div>
+        </div>
+
+        <div class="pm-ask reveal">
+          <div class="pm-ask-h">PM 该问什么</div>
           <ul>
-            <li><strong>最大轮次</strong>（max_steps / max_iterations）—— 防止死循环烧 token。</li>
-            <li><strong>成功判据</strong>（success criteria）—— 由模型自报"任务完成"，或由外部验证器（如测试通过）触发。</li>
-            <li><strong>用户中断</strong>（user interrupt）—— 把方向盘交回人手里，常见于 human-in-the-loop。</li>
-            <li><strong>预算耗尽</strong>（budget cap）—— token 数、调用次数、时间预算任一耗尽就停。</li>
+            <li>Token 预算多少？历史从哪截断？溢出时走摘要还是 RAG？</li>
+            <li>System prompt 怎么管理（hardcode / 配置 / 版本化 / A/B 实验）？</li>
+            <li>工具列表是动态的还是固定的？什么场景下隐藏哪些工具？</li>
+            <li>多模态资源（图片、文件）怎么压缩、何时丢弃？</li>
           </ul>
-          <p>
-            ReAct 这套思路的起点是 2022 年 Yao 等人的论文
-            <a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct: Synergizing Reasoning and Acting in Language Models</a>，
-            后来被
-            <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic 2026 年的 harness 设计文</a>
-            扩展成"长程任务里循环 + checkpoint + 子 agent"的复合范式。
-          </p>
         </div>
+
+        <p class="sec-cites">
+          参考：
+          <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a>
+          <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic harness design</a>
+        </p>
       </section>
 
-      <!-- ==== SEC 3: 知 · 上下文与记忆 ==== -->
+      <!-- ==== SEC 2: 记忆系统 ==== -->
       <section class="sec" id="memory">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · 知 · MEMORY</div>
-        <h2 class="sec-title reveal">Agent 的工作<em>记忆</em>与长期<em>知识</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · MEMORY SYSTEM</div>
+        <h2 class="sec-title reveal">记忆系统 · <em>补背景</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          模型只看得到 context window 里的 token。<strong style="color:var(--cream-text);">放进窗口的，是它的"全部已知世界"。</strong>
+          把长期事实补进上下文，让 agent 不像"金鱼"，每次对话都从零开始。
         </p>
 
-        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 32px;">
-          <div class="tile" data-glow>
-            <div class="tile-num">SHORT-TERM · 短期记忆</div>
-            <div class="tile-title">这一次任务里的工作台</div>
-            <p class="tile-desc" style="margin-bottom:12px;">
-              单次对话/单次运行的状态，跟着任务结束就丢。
-            </p>
-            <ul class="prose" style="font-size:13px;">
-              <li>对话历史窗口（messages 数组）</li>
-              <li>思维链 / scratchpad（模型自己写给自己看的草稿）</li>
-              <li>工作变量（中间结果、文件路径、当前 step 编号）</li>
-            </ul>
+        <div class="concept-pill reveal reveal-d2">
+          <p>
+            把<strong>长期事实补进上下文</strong> —— 包括用户偏好、历史决策、组织知识。让 agent 不像"<strong>金鱼</strong>"，每次对话都从零开始。
+          </p>
+          <p style="margin-top: 12px;">
+            记忆系统是"<strong>窗口之外的状态</strong>"：当前 token 窗口装不下的，都进记忆库；下一轮再按需调出来塞回上下文。
+          </p>
+        </div>
+
+        <div class="sub-mech-h">子机制 · SUB-MECHANISMS</div>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M1 · SHORT-TERM</div>
+            <div class="tile-title">短期记忆</div>
+            <p class="tile-desc">对话窗口、工作变量、当前 trace。一次会话结束就丢。</p>
           </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">LONG-TERM · 长期记忆</div>
-            <div class="tile-title">跨次跨用户的抽屉</div>
-            <p class="tile-desc" style="margin-bottom:12px;">
-              跨任务存活的知识，按需召回。
-            </p>
-            <ul class="prose" style="font-size:13px;">
-              <li>向量库 RAG（按语义检索文档片段）</li>
-              <li>知识图谱（结构化实体与关系）</li>
-              <li>用户偏好 / 历史摘要（"我喜欢用 TypeScript"）</li>
-            </ul>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M2 · LONG-TERM</div>
+            <div class="tile-title">长期记忆</div>
+            <p class="tile-desc">向量库 RAG、知识图谱、文档检索。跨会话存活。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M3 · LAYERED</div>
+            <div class="tile-title">多层记忆</div>
+            <p class="tile-desc">用户级（个人偏好）/ 组织级（共享知识）/ 任务级（当前 ticket）。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M4 · CONSOLIDATE</div>
+            <div class="tile-title">记忆固化</div>
+            <p class="tile-desc">什么时候把短期写回长期。需要触发器、去重、冲突合并。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M5 · RETRIEVAL</div>
+            <div class="tile-title">记忆检索</div>
+            <p class="tile-desc">语义搜索 / 关键词 / 时间窗口 / 元数据过滤。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M6 · FORGET</div>
+            <div class="tile-title">遗忘策略</div>
+            <p class="tile-desc">TTL、相关性衰减、用户主动删除。隐私合规也在这层。</p>
           </div>
         </div>
 
-        <div class="prose reveal reveal-d3">
-          <h3>上下文窗口管理</h3>
-          <p>
-            就算用上百万 token 的窗口，也会撞墙。所以 harness 必须主动管 context：
-          </p>
-          <ul>
-            <li><strong>摘要压缩</strong>（summarization）—— 当对话变长，把早期回合压成一段摘要，腾出位置给新内容。</li>
-            <li><strong>滑动窗口</strong>（sliding window）—— 只保留最近 N 个 turn，老的丢弃。</li>
-            <li><strong>RAG 注入</strong>（retrieval-augmented generation）—— 不把全部知识塞进 prompt，而是按当前 query 检索最相关的片段拼进去。</li>
-            <li><strong>记忆固化</strong>（memory consolidation）—— 任务结束后，把"值得记的东西"提炼成长期记忆条目，下次再取。</li>
-          </ul>
-          <p>
-            <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
-            把这一层称作 Agent 的 "memory system"，并主张<strong>短期与长期分层、不要混在一个 store 里</strong>。
-          </p>
+        <div class="case-demo reveal" data-glow>
+          <div class="case-demo-head">
+            <span class="case-demo-tag">CASE</span>
+            <span class="case-demo-title">客服查记忆库 · 看记忆系统在干什么</span>
+          </div>
+          <div class="case-demo-body">
+            <div class="case-line"><span class="case-num">→</span><div><b>用户级检索</b>：用 user_id 查向量库，命中标签 <code>VIP</code> / <code>上周投诉过物流慢</code></div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>组织级检索</b>：拉取该品牌的售后政策（VIP 7 天退、物流延迟可补偿）</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>任务级注入</b>：把这次会话里抓到的关键字（订单号、商品型号）写入短期记忆</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>预算控制</b>：检索到 20 条，按相关性分数取 Top 5 注入上下文</div></div>
+            <div class="case-line is-result"><span class="case-num">✓</span><div>→ 模型决定<mark>语气更小心</mark>、优先给解决方案、主动提补偿券</div></div>
+          </div>
         </div>
+
+        <div class="pm-ask reveal">
+          <div class="pm-ask-h">PM 该问什么</div>
+          <ul>
+            <li>哪些事实进短期、哪些进长期？固化触发器是什么？</li>
+            <li>记忆多久过期？用户能否查看 / 删除自己的记忆（GDPR / 个保法）？</li>
+            <li>多用户共享记忆时，权限怎么隔离？</li>
+            <li>检索回来一堆记忆，怎么排序、怎么避免污染上下文？</li>
+          </ul>
+        </div>
+
+        <p class="sec-cites">
+          参考：
+          <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain · The Anatomy of an Agent Harness</a>
+          <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic harness design</a>
+        </p>
       </section>
 
-      <!-- ==== SEC 4: 做 · 工具与执行 ==== -->
+      <!-- ==== SEC 3: Agent 循环 ==== -->
+      <section class="sec" id="loop">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · AGENT LOOP</div>
+        <h2 class="sec-title reveal">Agent 循环 · <em>模型想</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          agent 的"心跳"，决定下一步做什么、何时停。
+        </p>
+
+        <div class="concept-pill reveal reveal-d2">
+          <p>
+            <strong>模型思考 → 决策 → 工具调用 → 观察 → 再思考</strong>的主循环。这是 agent 的"<strong>心跳</strong>"，决定下一步做什么、何时停。
+          </p>
+          <p style="margin-top: 12px;">
+            没有循环，模型只是个一问一答的聊天机器人。<strong>循环 + 工具 + 终止条件</strong>，才让它成为能干活的 agent。
+          </p>
+        </div>
+
+        <div class="sub-mech-h">子机制 · SUB-MECHANISMS</div>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M1 · REACT</div>
+            <div class="tile-title">ReAct 模式</div>
+            <p class="tile-desc">Thought → Action → Observation 三段式。最经典的循环结构。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M2 · PLAN</div>
+            <div class="tile-title">Plan-and-Execute</div>
+            <p class="tile-desc">先列计划，再分步执行。适合任务路径明确的场景。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M3 · REFLECT</div>
+            <div class="tile-title">自反思 Reflection</div>
+            <p class="tile-desc">走错路时主动回退、换方案。让 agent 不死磕在一条路上。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M4 · STOP</div>
+            <div class="tile-title">循环停止条件</div>
+            <p class="tile-desc">任务完成、达到最大轮次、用户中断、触发缰绳。一定要有。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M5 · DISPATCH</div>
+            <div class="tile-title">子 agent 派遣</div>
+            <p class="tile-desc">主 agent 调度子 agent，并行 / 串行 / 投票汇总。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M6 · ROUTE</div>
+            <div class="tile-title">多模型路由</div>
+            <p class="tile-desc">简单任务用 Haiku，复杂用 Opus。成本 / 时延的工程取舍。</p>
+          </div>
+        </div>
+
+        <div class="case-demo reveal" data-glow>
+          <div class="case-demo-head">
+            <span class="case-demo-tag">CASE</span>
+            <span class="case-demo-title">Claude Code 修 bug · 看 Agent 循环在干什么</span>
+          </div>
+          <div class="case-demo-body">
+            <div class="case-line"><span class="case-num">1</span><div><b>Thought</b>：用户说登录页报 500 → 先看错误日志</div></div>
+            <div class="case-line"><span class="case-num">2</span><div><b>Action</b>：调用 <code>read_file('logs/error.log')</code> → 拿到堆栈</div></div>
+            <div class="case-line"><span class="case-num">3</span><div><b>Thought</b>：堆栈指向 <code>auth.js:42</code> → 读那个文件</div></div>
+            <div class="case-line"><span class="case-num">4</span><div><b>Action</b>：调用 <code>read_file('auth.js')</code> → 看到空指针</div></div>
+            <div class="case-line"><span class="case-num">5</span><div><b>Action</b>：调用 <code>edit_file</code> 加判空 → 改完</div></div>
+            <div class="case-line"><span class="case-num">6</span><div><b>Action</b>：调用 <code>run_tests</code> → 全绿</div></div>
+            <div class="case-line is-result"><span class="case-num">✓</span><div>→ 满足停止条件（测试通过），循环结束。<mark>约 6 圈</mark></div></div>
+          </div>
+        </div>
+
+        <div class="pm-ask reveal">
+          <div class="pm-ask-h">PM 该问什么</div>
+          <ul>
+            <li>单轮最长几步？跑飞了用什么兜底（max_iterations、超时、token 上限）？</li>
+            <li>什么算"任务完成"？是模型自己说完成，还是有外部判断器？</li>
+            <li>走错路怎么纠？反思机制怎么触发？</li>
+            <li>什么时候派子 agent、什么时候用便宜的小模型？</li>
+          </ul>
+        </div>
+
+        <p class="sec-cites">
+          参考：
+          <a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct paper (arXiv:2210.03629)</a>
+          <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic harness design</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 4: 执行边界 ==== -->
+      <section class="sec" id="boundary">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · EXECUTION BOUNDARY</div>
+        <h2 class="sec-title reveal">执行边界 · <em>过安检</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          决定 agent 能干什么、不能干什么。
+        </p>
+
+        <div class="concept-pill reveal reveal-d2">
+          <p>
+            在工具真正执行前的<strong>最后一道安检</strong>。沙箱、审批、Hook、人机交接 —— 决定 agent 能干什么、不能干什么。
+          </p>
+          <p style="margin-top: 12px;">
+            模型可能犯任何错；边界是<strong>"哪怕模型犯错，损失也可控"</strong>的工程兜底。这层做不好，前面 5 层都白搭。
+          </p>
+        </div>
+
+        <div class="sub-mech-h">子机制 · SUB-MECHANISMS</div>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M1 · SANDBOX</div>
+            <div class="tile-title">沙箱隔离</div>
+            <p class="tile-desc">容器、虚拟机、只读文件系统、网络白名单。把爆炸半径锁死。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M2 · APPROVAL</div>
+            <div class="tile-title">审批策略</div>
+            <p class="tile-desc">高风险动作弹窗问人、金额阈值升级、敏感操作走二审。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M3 · PRE-HOOK</div>
+            <div class="tile-title">前置 Hook</div>
+            <p class="tile-desc">工具调用前的检查器：参数过滤、敏感字段屏蔽、改写。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M4 · POST-HOOK</div>
+            <div class="tile-title">后置 Hook</div>
+            <p class="tile-desc">工具调用后的检查器：输出审查、合规过滤、敏感信息脱敏。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M5 · ESCALATE</div>
+            <div class="tile-title">人机交接条件</div>
+            <p class="tile-desc">不确定 / 高风险 / 用户情绪激动时主动 escalate 给人工。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M6 · ROLLBACK</div>
+            <div class="tile-title">回滚机制</div>
+            <p class="tile-desc">错误操作的 undo / git revert / 数据库事务回滚。</p>
+          </div>
+        </div>
+
+        <div class="case-demo reveal" data-glow>
+          <div class="case-demo-head">
+            <span class="case-demo-tag">CASE</span>
+            <span class="case-demo-title">两个真实拦截 · 看执行边界在干什么</span>
+          </div>
+          <div class="case-demo-body">
+            <div class="case-line"><span class="case-num">A1</span><div><b>Coding agent 要跑 <code>rm -rf /</code></b> → 沙箱里的容器拦截</div></div>
+            <div class="case-line"><span class="case-num">A2</span><div><b>审批策略弹窗</b>："这个命令将删除根目录所有文件，是否继续？"</div></div>
+            <div class="case-line"><span class="case-num">A3</span><div><b>用户拒绝</b> → 阻断，工具调用失败，结果回流到模型</div></div>
+            <div class="case-line"><span class="case-num">B1</span><div><b>客服 agent 要承诺超额补偿 ¥5000</b>（策略上限 ¥500）</div></div>
+            <div class="case-line"><span class="case-num">B2</span><div><b>后置 Hook 拦截</b>：检测金额超阈值 → 改写回复 / escalate 给主管</div></div>
+            <div class="case-line is-result"><span class="case-num">✓</span><div>→ 模型可能犯错，但<mark>损失被边界锁在可控范围</mark></div></div>
+          </div>
+        </div>
+
+        <div class="pm-ask reveal">
+          <div class="pm-ask-h">PM 该问什么</div>
+          <ul>
+            <li>哪些操作必须人审？审批走什么流程？审批人不在线怎么办？</li>
+            <li>误操作如何回滚？回滚的粒度有多细（一条命令 / 一整次会话）？</li>
+            <li>沙箱的爆炸半径多大？最坏情况能损失什么？</li>
+            <li>升级到人工的阈值是什么？怎么避免"什么都问人"的躺平？</li>
+          </ul>
+        </div>
+
+        <p class="sec-cites">
+          参考：
+          <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI · Harness Engineering</a>
+          <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler · Thoughtworks</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 5: 工具生态 ==== -->
       <section class="sec" id="tools">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · 做 · TOOLS</div>
-        <h2 class="sec-title reveal">工具是 Agent 的<em>手脚</em>，权限是<em>边界</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · TOOL ECOSYSTEM</div>
+        <h2 class="sec-title reveal">工具生态 · <em>动手</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          模型不能动你的文件、不能上网、不能跑代码 —— 除非你把这些能力以"工具"的形式注册给它。<strong style="color:var(--cream-text);">注册一个工具，就是开一条口子。</strong>
+          agent 能"动手做"的全部能力。
         </p>
 
-        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 32px;">
-          <div class="tile" data-glow>
-            <div class="tile-num">CATEGORY · 01</div>
-            <div class="tile-title">文件系统</div>
-            <p class="tile-desc">
-              read / write / list / search。Agent 在工作目录里读写文件，是绝大多数 coding agent 的基础能力。<br>
-              <span style="color:var(--gray-500);font-size:13px;">示例：</span>Read、Write、Edit、Grep、Glob。
-            </p>
+        <div class="concept-pill reveal reveal-d2">
+          <p>
+            agent 能"<strong>动手做</strong>"的全部能力。每个工具是一个有 schema 的函数，agent 通过 <strong>tool call</strong> 调用。
+          </p>
+          <p style="margin-top: 12px;">
+            模型本身不能读文件、不能发请求、不能改数据。<strong>工具就是模型的"手"</strong>，工具生态的丰俭决定了 agent 的能力边界。
+          </p>
+        </div>
+
+        <div class="sub-mech-h">子机制 · SUB-MECHANISMS</div>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M1 · SCHEMA</div>
+            <div class="tile-title">工具 schema 定义</div>
+            <p class="tile-desc">函数签名、参数描述、返回类型。模型靠 schema 决定调谁。</p>
           </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">CATEGORY · 02</div>
-            <div class="tile-title">代码执行</div>
-            <p class="tile-desc">
-              shell 命令、Python REPL、容器内 build/test。要在沙箱里跑，不能直接接到生产环境。<br>
-              <span style="color:var(--gray-500);font-size:13px;">示例：</span>Bash、code_interpreter、sandboxed Docker。
-            </p>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M2 · DISCOVERY</div>
+            <div class="tile-title">工具发现</div>
+            <p class="tile-desc">MCP 标准、动态加载、按场景启用 / 隐藏。</p>
           </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">CATEGORY · 03</div>
-            <div class="tile-title">网络与 API</div>
-            <p class="tile-desc">
-              HTTP fetch、搜索引擎、内部业务 API、MCP servers。决定了 Agent 能不能"出门办事"。<br>
-              <span style="color:var(--gray-500);font-size:13px;">示例：</span>WebSearch、WebFetch、内部 CRM API、MCP tools。
-            </p>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M3 · PERMISSION</div>
+            <div class="tile-title">权限分配</div>
+            <p class="tile-desc">不同角色 agent 能看到不同工具集。最小权限原则。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M4 · COMPOSE</div>
+            <div class="tile-title">工具组合</div>
+            <p class="tile-desc">chain of tools、子任务复用、宏命令封装。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M5 · ERROR</div>
+            <div class="tile-title">错误处理</div>
+            <p class="tile-desc">重试、降级、超时、熔断。工具失败不能让 agent 卡死。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M6 · IDEMPOTENT</div>
+            <div class="tile-title">幂等性设计</div>
+            <p class="tile-desc">工具调用可重复，避免副作用累加（重发邮件 / 重复扣款）。</p>
           </div>
         </div>
 
-        <div class="prose reveal reveal-d3">
-          <h3>工具 schema 怎么定</h3>
-          <p>
-            每个工具都需要一个机器可读的 schema，告诉模型：<strong>这工具叫什么、做什么、参数是什么、返回什么</strong>。一份合格的 schema 至少包含：
-          </p>
-          <ul>
-            <li><strong>函数签名</strong> —— name、description、parameters（JSON Schema 格式）。</li>
-            <li><strong>参数验证</strong> —— 模型生成的参数先经类型/范围校验，挡住"幻觉调用"。</li>
-            <li><strong>沙箱化</strong> —— 危险操作（写文件、跑代码、调用付费 API）必须跑在隔离环境里。</li>
-            <li><strong>权限分层</strong> —— 读操作默认放行；写/删/付费操作走 human-in-the-loop 审批。</li>
-          </ul>
-          <h3>Human-in-the-Loop Checkpoint</h3>
-          <p>
-            不是所有动作都该让 Agent 自动执行。<strong>"不可逆动作前必须人审"</strong>是社区共识 ——
-            <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI 的 Codex harness</a>
-            把这条做成默认行为：删文件、发邮件、提 PR 前都要人点确认。
-            <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic 长程 harness</a>
-            则进一步把权限按"低/中/高风险"分了 3 个等级。
-          </p>
+        <div class="case-demo reveal" data-glow>
+          <div class="case-demo-head">
+            <span class="case-demo-tag">CASE</span>
+            <span class="case-demo-title">Claude Code 工具集 · 看工具生态在干什么</span>
+          </div>
+          <div class="case-demo-body">
+            <div class="case-line"><span class="case-num">→</span><div><b>读类工具</b>：<code>Read</code> / <code>Glob</code> / <code>Grep</code> → 权限低、无副作用、可任意调</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>写类工具</b>：<code>Edit</code> / <code>Write</code> → 修改文件，需要走文件备份 / git 兜底</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>执行类工具</b>：<code>Bash</code> → 权限最高、副作用大、要过更严的边界</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>schema 写得好</b>：每个工具的参数描述能让模型一眼看懂"什么时候用我"</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>组合</b>：Glob 找文件 → Read 读内容 → Grep 定位 → Edit 改一行（高频链路）</div></div>
+            <div class="case-line is-result"><span class="case-num">✓</span><div>→ <mark>工具粒度 + 权限 + schema 质量</mark> 决定了 agent 好不好用</div></div>
+          </div>
         </div>
+
+        <div class="pm-ask reveal">
+          <div class="pm-ask-h">PM 该问什么</div>
+          <ul>
+            <li>工具粒度怎么定？大而全 vs 小而专，哪种更适合当前场景？</li>
+            <li>schema 描述质量怎么测？模型能不能一眼看懂"什么时候用我"？</li>
+            <li>幂等性谁来保证？工具自身、还是 harness 层去重？</li>
+            <li>哪些工具组合是高频链路？要不要封装成宏命令？</li>
+          </ul>
+        </div>
+
+        <p class="sec-cites">
+          参考：
+          <a class="cite" href="https://modelcontextprotocol.io" target="_blank">Model Context Protocol (MCP)</a>
+          <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI · Harness Engineering</a>
+        </p>
       </section>
 
-      <!-- ==== SEC 5: 检 · 评测与可观测 ==== -->
+      <!-- ==== SEC 6: 评测 + 可观测 ==== -->
       <section class="sec" id="eval">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · 检 · EVAL</div>
-        <h2 class="sec-title reveal">没有评测，就是<em>黑盒</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>06 · EVAL & OBSERVABILITY</div>
+        <h2 class="sec-title reveal">评测 + 可观测 · <em>全程记账</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          Agent 跑赢了没？换了 prompt 是好了还是坏了？没数据，全靠"感觉"——那不叫工程。<strong style="color:var(--cream-text);">eval 是 harness 工程师的护身符。</strong>
+          让 agent 从"黑盒"变成"可控的工程系统"。
         </p>
 
-        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 32px;">
-          <div class="tile" data-glow>
-            <div class="tile-num">METHOD · 01</div>
+        <div class="concept-pill reveal reveal-d2">
+          <p>
+            <strong>全程记账 + 长期评估</strong>。trace 链路、评测集、A/B 实验、告警 —— 让 agent 从"<strong>黑盒</strong>"变成"<strong>可控的工程系统</strong>"。
+          </p>
+          <p style="margin-top: 12px;">
+            这是 harness 工程区别于"<strong>调 prompt 调出感觉</strong>"的关键。没有评测 + 观测，所谓"agent 变好了"就是玄学。
+          </p>
+        </div>
+
+        <div class="sub-mech-h">子机制 · SUB-MECHANISMS</div>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M1 · TRACE</div>
+            <div class="tile-title">Trace 链路追踪</div>
+            <p class="tile-desc">一个请求串起的全部步骤，含 token / 耗时 / 工具调用 / 结果。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M2 · GOLDEN SET</div>
             <div class="tile-title">离线评测集</div>
-            <p class="tile-desc">
-              一组固定的"题目 + 标准答案"。每次改代码、换模型、调 prompt，都跑一遍，看分数变化。<br>
-              <span style="color:var(--gray-500);font-size:13px;">代表：</span>SWE-bench、GAIA、内部业务 golden set。
-            </p>
+            <p class="tile-desc">golden set、回归用例、benchmark。每次发布前跑一遍。</p>
           </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">METHOD · 02</div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M3 · A/B</div>
             <div class="tile-title">在线 A/B 实验</div>
-            <p class="tile-desc">
-              线上分流，新旧 harness 各跑一部分真实流量。看任务完成率、用户满意度、续费率的差异。<br>
-              <span style="color:var(--gray-500);font-size:13px;">代表：</span>Cursor 灰度发布、Claude Code 渠道实验。
-            </p>
+            <p class="tile-desc">新 prompt / 新工具 / 新模型的灰度发布与对照。</p>
           </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">METHOD · 03</div>
-            <div class="tile-title">Trace 链路</div>
-            <p class="tile-desc">
-              每一次 Agent 运行都记录完整 trace（每一步 input/output/工具调用/耗时）。出错时回放，平时做归因。<br>
-              <span style="color:var(--gray-500);font-size:13px;">代表：</span>LangSmith、Weights & Biases、自建 OTel + ClickHouse。
-            </p>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M4 · METRICS</div>
+            <div class="tile-title">关键指标</div>
+            <p class="tile-desc">任务完成率、平均轮次、token 成本、人工介入率、用户满意度。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M5 · ALERT</div>
+            <div class="tile-title">异常告警</div>
+            <p class="tile-desc">失败率突增、token 用量超预算、延迟尖刺 → 实时报警。</p>
+          </div>
+          <div class="tile anat-tile" data-glow>
+            <div class="tile-num">M6 · COST</div>
+            <div class="tile-title">成本归因</div>
+            <p class="tile-desc">按团队 / 功能 / 用户等级拆分。一笔账算到底。</p>
           </div>
         </div>
 
-        <div class="prose reveal reveal-d3">
-          <h3>关键指标</h3>
-          <p>
-            不论用哪种方法，最终落到几个数：
-          </p>
-          <ul>
-            <li><strong>任务完成率</strong>（task success rate）—— 端到端跑通的比例。最重要的"北极星"。</li>
-            <li><strong>Token 成本</strong>（cost per task）—— 一次任务平均烧多少钱。商业化的命脉。</li>
-            <li><strong>平均轮次</strong>（avg steps）—— 一次任务走了多少步循环。越少越高效，但也要警惕"走得少是因为放弃了"。</li>
-            <li><strong>人工介入率</strong>（human handoff rate）—— 多少比例的任务最终求救于人。衡量自动化深度。</li>
-          </ul>
-          <p>
-            评测能力的方法学，可以看
-            <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR 的 capability elicitation 指南</a>
-            —— 它强调一件事：<strong>你测出来的能力，永远是你给的 harness 的下限</strong>。换个更好的 harness，分数能涨。
-          </p>
+        <div class="case-demo reveal" data-glow>
+          <div class="case-demo-head">
+            <span class="case-demo-tag">CASE</span>
+            <span class="case-demo-title">客服 trace 复盘 · 看评测+可观测在干什么</span>
+          </div>
+          <div class="case-demo-body">
+            <div class="case-line"><span class="case-num">→</span><div><b>一条 trace</b>：路由 agent → 退货专员 → 投诉专员 → 人工升级</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>同一 trace ID</b> 串起所有步骤：每一步的输入、模型决策、工具调用、耗时</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>事后复盘</b>："为什么这单走了人工？" → 看 trace：在第 4 圈触发了金额阈值</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>评测集回归</b>：这类 case 加进 golden set，下次模型升级前必跑</div></div>
+            <div class="case-line"><span class="case-num">→</span><div><b>仪表盘</b>：今日任务完成率 92%、平均 3.4 轮、人工介入率 7%、单 case 成本 ¥0.18</div></div>
+            <div class="case-line is-result"><span class="case-num">✓</span><div>→ 从"<mark>感觉 agent 还行</mark>"升级为"<mark>有数据 / 有趋势 / 有回归</mark>"</div></div>
+          </div>
         </div>
+
+        <div class="pm-ask reveal">
+          <div class="pm-ask-h">PM 该问什么</div>
+          <ul>
+            <li>评测集多大？覆盖了哪些场景？多久更新一次？</li>
+            <li>关键指标是什么？怎么发现回归（昨天还好今天怎么变差了）？</li>
+            <li>预警阈值在哪？谁来响应？响应 SLA 是多少？</li>
+            <li>成本怎么归因？哪个功能最烧钱、能不能换便宜模型？</li>
+          </ul>
+        </div>
+
+        <p class="sec-cites">
+          参考：
+          <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR · Capability Elicitation</a>
+          <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain · Anatomy of an Agent Harness</a>
+        </p>
       </section>
 
-      <!-- ==== SEC 6: 6 种常见模式 ==== -->
-      <section class="sec" id="patterns">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>06 · DESIGN PATTERNS</div>
-        <h2 class="sec-title reveal">6 种常见<em>设计模式</em></h2>
-        <p class="sec-lead reveal reveal-d1">
-          把上面四件事（转·知·做·检）以不同方式组合，得到这 6 种已经在工业界落地的 harness 形态。<strong style="color:var(--cream-text);">挑一个起手，再按需混合。</strong>
-        </p>
-
-        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 16px;">
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 01</div>
-            <div class="tile-title">Single-Agent Loop</div>
-            <p class="tile-desc">
-              最朴素的形态：一个 Agent + 一个 ReAct 循环 + 一组工具。
-            </p>
-            <div class="pattern-when">WHEN · 任务边界清晰、可拆步骤少。</div>
-            <div class="pattern-gotcha">⚠ 走偏了没人拉它，长任务容易跑飞。</div>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 02</div>
-            <div class="tile-title">Multi-Agent Orchestration</div>
-            <p class="tile-desc">
-              一个 Orchestrator 派活给多个 Worker Agent，并行或串行收尾。
-            </p>
-            <div class="pattern-when">WHEN · 任务可分工，子任务之间相对独立。</div>
-            <div class="pattern-gotcha">⚠ 通信开销 + 难调试，token 成本爆炸常见。</div>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 03</div>
-            <div class="tile-title">Human-in-the-Loop Checkpoint</div>
-            <p class="tile-desc">
-              不可逆动作前停下，等用户点确认或修改后再继续。
-            </p>
-            <div class="pattern-when">WHEN · 产线、金融、运维等高风险场景。</div>
-            <div class="pattern-gotcha">⚠ 设错检查点用户会疲劳，设少了出事故。</div>
-          </div>
+      <!-- ==== Closing line ==== -->
+      <section class="sec">
+        <div class="concept-pill reveal" style="max-width: none;">
+          <p style="font-size: 17px;">
+            6 个部件，<strong>一个循环</strong>，无限组合。在不同尺度的 harness 里，它们的形态各异，但<strong>每一块都不可少</strong>。
+          </p>
+          <p style="margin-top: 12px; font-family: var(--font-mono); font-size: 14px; color: var(--cream-dim);">
+            装桌面 → 补记忆 → 模型想 → 过安检 → 动手做 → 结果回流 → <span style="color: var(--cream);">再来一圈</span>
+          </p>
         </div>
 
-        <div class="grid-3 reveal reveal-d3">
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 04</div>
-            <div class="tile-title">Reflection / Self-Critique</div>
-            <p class="tile-desc">
-              一个 Agent 跑完，再叫另一个（或同一个换 prompt）的 Agent 来挑刺，循环直到通过。
-            </p>
-            <div class="pattern-when">WHEN · 输出质量要求高、容错小。</div>
-            <div class="pattern-gotcha">⚠ 自反容易过度自信、循环死锁。</div>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 05</div>
-            <div class="tile-title">Tool-Augmented Retrieval (RAG)</div>
-            <p class="tile-desc">
-              每次推理前先去向量库 / 搜索引擎拿事实，再让模型基于事实回答。
-            </p>
-            <div class="pattern-when">WHEN · 知识更新快、有内部文档要查。</div>
-            <div class="pattern-gotcha">⚠ 检索质量差时，幻觉比不带 RAG 还多。</div>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-num">PATTERN · 06</div>
-            <div class="tile-title">Sandboxed Code Execution</div>
-            <p class="tile-desc">
-              在隔离容器/微 VM 里跑 Agent 生成的代码，把结果回填给模型继续推理。
-            </p>
-            <div class="pattern-when">WHEN · 数据分析、coding agent、动作可逆。</div>
-            <div class="pattern-gotcha">⚠ 沙箱逃逸、资源占用、状态污染都常踩坑。</div>
-          </div>
-        </div>
-
-        <p class="prose reveal" style="margin-top: 40px; font-size: 14px; color: var(--gray-500);">
-          想看每种模式在真实产品里长什么样？
-          <a class="cite" href="vendors.html">看板块 04 · 厂商全景 →</a>
+        <p class="prose reveal" style="margin-top: 32px; font-size: 14px; color: var(--gray-500);">
+          ↑ 知道了 harness 内部长什么样，下一步看市场上谁在做、做到了哪一步。
+          <a class="cite" href="vendors.html">板块 · 厂商全景 →</a>
         </p>
       </section>
 
@@ -465,9 +1047,10 @@
       <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
       <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
       <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
-      <a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct</a>
+      <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler</a>
       <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a>
       <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a>
+      <a class="cite" href="https://modelcontextprotocol.io" target="_blank">MCP</a>
     </div>
     <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
   </footer>

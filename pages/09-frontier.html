@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⑨ 前沿与未解 · Harness Engineering</title>
+  <meta name="description" content="5 个没人解决的难题、噱头之争、未来 3 年想象 —— 不做 harness 的信徒，做 harness 的工具人">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/page.css">
+
+  <style>
+    /* ============================================
+       本页可视化专用样式（仅 ⑨ 前沿与未解 用）
+       ============================================ */
+
+    /* ---- Viz 1: 噱头之争 · 天平辩论 ---- */
+    .v-debate {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--sp-4);
+      align-items: start;
+    }
+    .v-debate-side {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+    .v-debate-card {
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+    }
+    .v-debate-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--he-accent);
+    }
+    .v-debate-card.is-attack {
+      border-left: 3px solid #e05252;
+    }
+    .v-debate-card.is-defend {
+      border-left: 3px solid #3dae72;
+    }
+    .v-debate-card-tag {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--sp-2);
+    }
+    .v-debate-card.is-attack .v-debate-card-tag { color: #e05252; }
+    .v-debate-card.is-defend .v-debate-card-tag { color: #3dae72; }
+    .v-debate-card-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.6;
+    }
+    .v-debate-card-text strong { color: var(--he-text-display); }
+    .v-debate-divider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-3);
+      padding: var(--sp-4) var(--sp-2);
+      min-height: 200px;
+    }
+    .v-debate-vs {
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--he-text-muted);
+      letter-spacing: 0.1em;
+      writing-mode: vertical-lr;
+    }
+    .v-debate-line {
+      width: 1px;
+      flex: 1;
+      background: linear-gradient(to bottom, transparent, var(--he-border-strong), transparent);
+    }
+    .v-debate-verdict {
+      grid-column: 1 / -1;
+      margin-top: var(--sp-4);
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border: 1px solid var(--c-indigo-a24);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+    }
+    .v-debate-verdict-label {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      margin-bottom: var(--sp-2);
+    }
+    .v-debate-verdict-text {
+      font-size: var(--he-text-base);
+      font-weight: 600;
+      color: var(--he-text-display);
+      line-height: 1.5;
+    }
+
+    /* ---- Viz 2: 被模型吃掉的层级图 ---- */
+    .v-eaten {
+      display: grid;
+      gap: var(--sp-3);
+    }
+    .v-eaten-layer {
+      display: grid;
+      grid-template-columns: 160px 1fr auto;
+      gap: var(--sp-4);
+      align-items: center;
+      padding: var(--sp-4) var(--sp-5);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .v-eaten-layer:hover {
+      transform: translateX(4px);
+    }
+    .v-eaten-layer.is-eaten {
+      background: rgba(224, 82, 82, 0.06);
+      border: 1px solid rgba(224, 82, 82, 0.25);
+    }
+    .v-eaten-layer.is-safe {
+      background: rgba(61, 174, 114, 0.06);
+      border: 1px solid rgba(61, 174, 114, 0.25);
+    }
+    .v-eaten-name {
+      font-size: var(--he-text-sm);
+      font-weight: 600;
+      color: var(--he-text-display);
+    }
+    .v-eaten-detail {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.5;
+    }
+    .v-eaten-badge {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+    .v-eaten-layer.is-eaten .v-eaten-badge {
+      background: rgba(224, 82, 82, 0.12);
+      color: #e05252;
+    }
+    .v-eaten-layer.is-safe .v-eaten-badge {
+      background: rgba(61, 174, 114, 0.12);
+      color: #3dae72;
+    }
+    .v-eaten-layer.is-eaten::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: #e05252;
+    }
+    .v-eaten-layer.is-safe::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: #3dae72;
+    }
+    /* bite animation */
+    .v-eaten-layer.is-eaten .v-eaten-name {
+      position: relative;
+    }
+    .v-eaten-layer.is-eaten .v-eaten-name::after {
+      content: '';
+      position: absolute;
+      right: -8px; top: 50%;
+      width: 6px; height: 6px;
+      background: #e05252;
+      border-radius: 50%;
+      transform: translateY(-50%);
+      animation: v-bite-pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes v-bite-pulse {
+      0%, 100% { opacity: 0.3; transform: translateY(-50%) scale(0.8); }
+      50% { opacity: 1; transform: translateY(-50%) scale(1.2); }
+    }
+
+    /* ---- Viz 3: 5 个未解难题卡片 ---- */
+    .v-unsolved {
+      display: grid;
+      gap: var(--sp-4);
+    }
+    .v-unsolved-card {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: var(--sp-4);
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .v-unsolved-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px var(--c-indigo-a8);
+    }
+    .v-unsolved-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      background: var(--he-bg-subtle);
+      border: 1px solid var(--he-border);
+      position: relative;
+    }
+    .v-unsolved-icon::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px dashed var(--he-accent);
+      opacity: 0;
+      animation: v-unsolved-ring 4s ease-in-out infinite;
+    }
+    .v-unsolved-card:hover .v-unsolved-icon::after {
+      opacity: 1;
+    }
+    @keyframes v-unsolved-ring {
+      0%, 100% { transform: rotate(0deg); opacity: 0.3; }
+      50% { transform: rotate(180deg); opacity: 0.7; }
+    }
+    .v-unsolved-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .v-unsolved-head {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      flex-wrap: wrap;
+    }
+    .v-unsolved-num {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--he-accent);
+      font-weight: 700;
+    }
+    .v-unsolved-status {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(224, 82, 82, 0.1);
+      color: #e05252;
+      animation: v-status-blink 3s ease-in-out infinite;
+    }
+    @keyframes v-status-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .v-unsolved-severity {
+      display: flex;
+      gap: 3px;
+      margin-left: auto;
+    }
+    .v-unsolved-severity-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--he-border);
+    }
+    .v-unsolved-severity-dot.is-active {
+      background: #e05252;
+    }
+    .v-unsolved-title {
+      font-size: var(--he-text-h4);
+      font-weight: 600;
+      color: var(--he-text-display);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    .v-unsolved-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.6;
+    }
+    .v-unsolved-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-3);
+      margin-top: var(--sp-2);
+    }
+    .v-unsolved-cell {
+      padding: var(--sp-3);
+      background: var(--he-bg-subtle);
+      border-radius: var(--he-radius-sm);
+    }
+    .v-unsolved-cell-label {
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-subtle);
+      margin-bottom: 3px;
+    }
+    .v-unsolved-cell-text {
+      font-size: 12px;
+      color: var(--he-text-strong);
+      line-height: 1.5;
+    }
+
+    /* ---- Viz 4: 影响矩阵 2x2 ---- */
+    .v-matrix {
+      position: relative;
+      display: grid;
+      grid-template-columns: 32px 1fr 1fr;
+      grid-template-rows: auto 1fr 1fr 32px;
+      gap: 2px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .v-matrix-ylabel {
+      grid-column: 1;
+      grid-row: 2 / 4;
+      writing-mode: vertical-lr;
+      transform: rotate(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-muted);
+    }
+    .v-matrix-xlabel {
+      grid-column: 2 / 4;
+      grid-row: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-muted);
+      padding-top: var(--sp-2);
+    }
+    .v-matrix-col-label {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-subtle);
+      padding-bottom: var(--sp-2);
+    }
+    .v-matrix-corner { grid-column: 1; grid-row: 1; }
+    .v-matrix-cell {
+      padding: var(--sp-4);
+      border-radius: var(--he-radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-matrix-cell:hover {
+      transform: scale(1.02);
+    }
+    .v-matrix-cell.is-q1 {
+      background: rgba(224, 82, 82, 0.08);
+      border: 1px solid rgba(224, 82, 82, 0.25);
+    }
+    .v-matrix-cell.is-q2 {
+      background: rgba(94, 106, 210, 0.08);
+      border: 1px solid rgba(94, 106, 210, 0.25);
+    }
+    .v-matrix-cell.is-q3 {
+      background: rgba(61, 174, 114, 0.08);
+      border: 1px solid rgba(61, 174, 114, 0.25);
+    }
+    .v-matrix-cell.is-q4 {
+      background: var(--he-bg-subtle);
+      border: 1px solid var(--he-border);
+    }
+    .v-matrix-cell-zone {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .is-q1 .v-matrix-cell-zone { color: #e05252; }
+    .is-q2 .v-matrix-cell-zone { color: var(--he-accent); }
+    .is-q3 .v-matrix-cell-zone { color: #3dae72; }
+    .is-q4 .v-matrix-cell-zone { color: var(--he-text-muted); }
+    .v-matrix-cell-items {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--he-text-body);
+    }
+    .v-matrix-cell-items li::before {
+      content: '·  ';
+      color: var(--he-text-subtle);
+    }
+
+    /* ---- Viz 5: 未来方向时间线 ---- */
+    .v-timeline {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      padding-left: 48px;
+    }
+    .v-timeline::before {
+      content: '';
+      position: absolute;
+      left: 19px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--he-accent), var(--he-border), transparent);
+    }
+    .v-timeline-item {
+      position: relative;
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-timeline-item:hover {
+      border-color: var(--he-accent);
+      transform: translateX(4px);
+    }
+    .v-timeline-dot {
+      position: absolute;
+      left: -37px; top: var(--sp-5);
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--he-bg);
+      border: 2px solid var(--he-accent);
+    }
+    .v-timeline-item:first-child .v-timeline-dot {
+      background: var(--he-accent);
+      animation: v-dot-glow 2.5s ease-in-out infinite;
+    }
+    @keyframes v-dot-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(94,106,210,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(94,106,210,0); }
+    }
+    .v-timeline-when {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--he-accent);
+      font-weight: 600;
+      margin-bottom: var(--sp-1);
+    }
+    .v-timeline-what {
+      font-size: var(--he-text-sm);
+      font-weight: 600;
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-1);
+      line-height: 1.4;
+    }
+    .v-timeline-detail {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.6;
+    }
+    .v-timeline-confidence {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: var(--sp-2);
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .v-timeline-confidence.is-high {
+      background: rgba(61, 174, 114, 0.1);
+      color: #3dae72;
+    }
+    .v-timeline-confidence.is-mid {
+      background: rgba(217, 169, 55, 0.1);
+      color: #c59a2e;
+    }
+    .v-timeline-confidence.is-low {
+      background: rgba(224, 82, 82, 0.1);
+      color: #e05252;
+    }
+    /* animated progress bar across entire timeline */
+    .v-timeline-progress {
+      position: absolute;
+      left: 19px; top: 0;
+      width: 2px;
+      background: var(--he-accent);
+      animation: v-tl-grow 8s ease-out forwards;
+      transform-origin: top;
+    }
+    @keyframes v-tl-grow {
+      0% { height: 0; }
+      100% { height: 100%; }
+    }
+
+    /* ---- Viz 6: 研究前沿地图 ---- */
+    .v-frontier {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-frontier-area {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      position: relative;
+      overflow: hidden;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-frontier-area:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-frontier-area::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--he-radius-md) var(--he-radius-md) 0 0;
+    }
+    .v-frontier-area.is-hot::before { background: #e05252; }
+    .v-frontier-area.is-warm::before { background: #c59a2e; }
+    .v-frontier-area.is-emerging::before { background: var(--he-accent); }
+    .v-frontier-heat {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--sp-2);
+    }
+    .v-frontier-area.is-hot .v-frontier-heat { color: #e05252; }
+    .v-frontier-area.is-warm .v-frontier-heat { color: #c59a2e; }
+    .v-frontier-area.is-emerging .v-frontier-heat { color: var(--he-accent); }
+    .v-frontier-name {
+      font-size: var(--he-text-sm);
+      font-weight: 600;
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-2);
+      line-height: 1.3;
+    }
+    .v-frontier-players {
+      font-size: 11px;
+      color: var(--he-text-muted);
+      line-height: 1.5;
+    }
+    .v-frontier-bar {
+      margin-top: var(--sp-3);
+      height: 4px;
+      background: var(--he-bg-subtle);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .v-frontier-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      animation: v-bar-load 2s ease-out forwards;
+      transform-origin: left;
+    }
+    .v-frontier-area.is-hot .v-frontier-bar-fill { background: #e05252; }
+    .v-frontier-area.is-warm .v-frontier-bar-fill { background: #c59a2e; }
+    .v-frontier-area.is-emerging .v-frontier-bar-fill { background: var(--he-accent); }
+    @keyframes v-bar-load {
+      0% { width: 0; }
+    }
+
+    /* ---- Viz 7: PM 角色演化 ---- */
+    .v-roles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-roles-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-roles-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-roles-emoji {
+      font-size: 32px;
+      margin-bottom: var(--sp-2);
+    }
+    .v-roles-name {
+      font-size: var(--he-text-sm);
+      font-weight: 600;
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-1);
+    }
+    .v-roles-focus {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.5;
+    }
+    .v-roles-tag {
+      display: inline-block;
+      margin-top: var(--sp-2);
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+    }
+
+    /* ---- 通用小组件 ---- */
+    .callout {
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border-left: 3px solid var(--he-accent);
+      border-radius: 0 var(--he-radius-md) var(--he-radius-md) 0;
+      margin: var(--sp-6) 0;
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .callout strong { color: var(--he-text-display); }
+
+    .callout.is-warn {
+      background: rgba(224, 82, 82, 0.06);
+      border-left-color: #e05252;
+    }
+
+    /* ---- 启示条 ---- */
+    .v-takeaway {
+      display: grid;
+      gap: var(--sp-3);
+      counter-reset: takeaway;
+    }
+    .v-takeaway-item {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: var(--sp-3);
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      counter-increment: takeaway;
+    }
+    .v-takeaway-item:hover {
+      border-color: var(--he-accent);
+      transform: translateX(4px);
+    }
+    .v-takeaway-n {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+      font-family: var(--he-font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+    .v-takeaway-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      justify-content: center;
+    }
+    .v-takeaway-title {
+      font-size: var(--he-text-sm);
+      font-weight: 600;
+      color: var(--he-text-display);
+      line-height: 1.3;
+    }
+    .v-takeaway-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.5;
+    }
+
+    /* ---- 响应式 ---- */
+    @media (max-width: 1024px) {
+      .v-frontier { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .v-debate {
+        grid-template-columns: 1fr;
+      }
+      .v-debate-divider {
+        writing-mode: horizontal-tb;
+        min-height: auto;
+        flex-direction: row;
+        padding: var(--sp-2) 0;
+      }
+      .v-debate-vs { writing-mode: horizontal-tb; }
+      .v-debate-line {
+        width: auto; height: 1px; flex: 1;
+        background: linear-gradient(to right, transparent, var(--he-border-strong), transparent);
+      }
+      .v-eaten-layer {
+        grid-template-columns: 1fr auto;
+      }
+      .v-eaten-layer .v-eaten-detail {
+        grid-column: 1 / -1;
+      }
+      .v-unsolved-card {
+        grid-template-columns: 1fr;
+      }
+      .v-unsolved-icon { display: none; }
+      .v-unsolved-row {
+        grid-template-columns: 1fr;
+      }
+      .v-matrix {
+        grid-template-columns: 24px 1fr 1fr;
+      }
+      .v-frontier { grid-template-columns: 1fr; }
+      .v-roles { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ Page Hero ============ -->
+  <header class="page-hero">
+    <div class="page-hero-inner">
+      <a class="page-back" href="deep.html">← 深入</a>
+      <div class="page-eyebrow">
+        <span class="page-eyebrow-num">板块 09</span>
+        <span class="page-eyebrow-group">深入 · DEEP DIVE</span>
+      </div>
+      <h1 class="he-h1 page-title">前沿<span class="he-text-accent">与未解</span>。</h1>
+      <p class="he-lead page-lead">
+        5 个没人解决的难题，一场"是不是噱头"的辩论，
+        以及未来 3 年 harness 会变成什么样 ——
+        <span class="he-term" data-tip="不做 harness 的信徒，做 harness 的工具人。能讲清局限，比能讲清价值更值钱。">工具视角</span>。
+      </p>
+      <div class="page-meta">
+        <span class="page-meta-item">18 分钟阅读</span>
+        <span class="page-meta-item">7 个小节</span>
+        <span class="page-meta-item">7 个可视化</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Page Layout ============ -->
+  <div class="page-layout">
+    <main class="page-main">
+
+
+      <!-- ===== §1 为什么必须讲这一节 ===== -->
+      <section class="page-section he-reveal" id="sec-1" data-toc="为什么讲争议">
+        <div class="page-section-eyebrow">§1 · 为什么</div>
+        <h2>板块 ①-⑧ 都在讲价值。<br>这一节讲<span class="he-text-accent">争议、局限、未解</span>。</h2>
+
+        <p>
+          任何刚结晶的概念都会面对质疑。
+          能讲清质疑，才说明你不是"信徒"——
+          <strong>比信徒值钱</strong>。
+        </p>
+        <p>
+          面试官最爱问：
+          "你怎么看 harness 的未来？"
+          "模型变强后还有 harness 吗？"
+          —— 这两题答不好，前面 ①-⑧ 的火候全废。
+        </p>
+
+        <div class="callout">
+          <strong>核心立场</strong> ——
+          把 harness 当<strong>工具</strong>，不当神药。
+          工具会迭代、会更新、会在某些场景被替代 —— 这很正常。
+          用工具的人不会因为工具升级而失业，"把工具当信仰"的人才会。
+        </div>
+      </section>
+
+
+      <!-- ===== §2 噱头之争 ===== -->
+      <section class="page-section he-reveal" id="sec-2" data-toc="是不是噱头">
+        <div class="page-section-eyebrow">§2 · 噱头之争</div>
+        <h2>Harness 是不是<br><span class="he-text-accent">新瓶装旧酒</span>？</h2>
+
+        <p>
+          中英文圈对 harness 最常见的两条质疑，和公允的回应 ——
+        </p>
+
+        <!-- Viz #1: 辩论天平 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 01 · the debate</div>
+            <h3 class="viz-title">两条攻击 vs 两条回应</h3>
+            <p class="viz-sub">不替 harness 辩护，也不无脑附和 —— 把两边都讲清楚。</p>
+          </div>
+
+          <div class="viz-stage v-debate">
+            <!-- 攻击方 -->
+            <div class="v-debate-side">
+              <div class="v-debate-card is-attack">
+                <div class="v-debate-card-tag">攻击 ①</div>
+                <div class="v-debate-card-text">
+                  <strong>"技术没新的"</strong> —— linter、任务拆解、评测集、沙箱、工具调用，
+                  这些早就有了。Harness 只是把旧东西换了个新词。
+                </div>
+              </div>
+              <div class="v-debate-card is-attack">
+                <div class="v-debate-card-tag">攻击 ②</div>
+                <div class="v-debate-card-text">
+                  <strong>"迟早被淘汰"</strong> —— 模型越来越强，
+                  今天的 harness 设计迟早被模型自身能力吸收，最终不再需要。
+                </div>
+              </div>
+            </div>
+
+            <!-- 中间分割 -->
+            <div class="v-debate-divider">
+              <div class="v-debate-line"></div>
+              <div class="v-debate-vs">VS</div>
+              <div class="v-debate-line"></div>
+            </div>
+
+            <!-- 回应方 -->
+            <div class="v-debate-side">
+              <div class="v-debate-card is-defend">
+                <div class="v-debate-card-tag">回应 ①</div>
+                <div class="v-debate-card-text">
+                  <strong>部分对，但漏了关键</strong> —— 工程领域的进步往往不是发明新技术，
+                  而是<strong>有一套统一框架把散落能力组织起来</strong>。
+                  MVC 也没发明新技术，但让 Web 开发从"野生"变成"工程"。
+                </div>
+              </div>
+              <div class="v-debate-card is-defend">
+                <div class="v-debate-card-tag">回应 ②</div>
+                <div class="v-debate-card-text">
+                  <strong>部分对，但要看吃哪一部分</strong> —— 模型吃掉的是"机械性约束"那层。
+                  <strong>应用层</strong>（项目知识、业务规则、评测体系）反而不会被吃掉 —— 模型再强也不知道你公司的事。
+                </div>
+              </div>
+            </div>
+
+            <!-- 结论 -->
+            <div class="v-debate-verdict">
+              <div class="v-debate-verdict-label">公允结论</div>
+              <div class="v-debate-verdict-text">
+                不是噱头（硬证据在），也不是终局（形态会变）。
+                它是<strong>过渡期的关键技术</strong>。
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            面试时被问"harness 是不是噱头"，<strong>不要急着辩护</strong> —— 先承认对方有道理的部分，再补上他漏掉的关键。
+          </p>
+          <div class="viz-source">SOURCE · 综合 Anthropic 文章 / 马克视频讲解 / LangChain 论述</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §3 被模型吃掉的先兆 ===== -->
+      <section class="page-section he-reveal" id="sec-3" data-toc="哪些会被吃掉">
+        <div class="page-section-eyebrow">§3 · 被模型吃掉</div>
+        <h2>哪些 harness 零件<br><span class="he-text-accent">正在被模型吞噬</span>？</h2>
+
+        <p>
+          这不是假设，<strong>已经在发生了</strong>。
+          Opus 4.6 出后，Anthropic 自己拆掉了"强制分步执行"这条约束 ——
+          模型自己就能管全局了。
+        </p>
+
+        <!-- Viz #2: 被吃掉 vs 吃不掉 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02 · what gets eaten</div>
+            <h3 class="viz-title">机械层会被吃，应用层吃不掉</h3>
+            <p class="viz-sub">红色 = 正在或即将被模型吸收；绿色 = 模型再强也替代不了。</p>
+          </div>
+
+          <div class="viz-stage v-eaten">
+            <div class="v-eaten-layer is-eaten">
+              <div class="v-eaten-name">分步执行约束</div>
+              <div class="v-eaten-detail">强制 agent 一次只做一件事 —— Opus 4.6 出后已删</div>
+              <div class="v-eaten-badge">已被吃掉</div>
+            </div>
+            <div class="v-eaten-layer is-eaten">
+              <div class="v-eaten-name">上下文焦虑修补</div>
+              <div class="v-eaten-detail">防止模型察觉窗口快满时急于收尾 —— Opus 4.5 已大幅缓解</div>
+              <div class="v-eaten-badge">已被吃掉</div>
+            </div>
+            <div class="v-eaten-layer is-eaten">
+              <div class="v-eaten-name">简单 hook 拦截</div>
+              <div class="v-eaten-detail">拦常见危险动作 —— 模型可能默认"懂得不该做"</div>
+              <div class="v-eaten-badge">1-2 年内</div>
+            </div>
+            <div class="v-eaten-layer is-eaten">
+              <div class="v-eaten-name">工具数量上限</div>
+              <div class="v-eaten-detail">当前限制 &lt; 20 个工具 —— 模型可能管 100+ 工具</div>
+              <div class="v-eaten-badge">2-3 年内</div>
+            </div>
+
+            <div class="v-eaten-layer is-safe">
+              <div class="v-eaten-name">项目专属知识</div>
+              <div class="v-eaten-detail">产品背景、用户画像、团队约定 —— 模型不知道你公司的事</div>
+              <div class="v-eaten-badge">吃不掉</div>
+            </div>
+            <div class="v-eaten-layer is-safe">
+              <div class="v-eaten-name">业务硬规则</div>
+              <div class="v-eaten-detail">碰这个文件就停、不能承诺退款 —— 法律风险是产品决策</div>
+              <div class="v-eaten-badge">吃不掉</div>
+            </div>
+            <div class="v-eaten-layer is-safe">
+              <div class="v-eaten-name">评测体系</div>
+              <div class="v-eaten-detail">评什么维度、合格线在哪 —— 是 PM 决策，不是模型能力</div>
+              <div class="v-eaten-badge">吃不掉</div>
+            </div>
+            <div class="v-eaten-layer is-safe">
+              <div class="v-eaten-name">组织级 harness 设计</div>
+              <div class="v-eaten-detail">跨产品、跨团队的 agent 协调 —— 是组织设计问题</div>
+              <div class="v-eaten-badge">吃不掉</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>一句预测</strong>：下一代 harness 工程的重心，
+            会从"把 agent 拼起来"转向"<strong>把 agent 配置到具体产品/业务</strong>"上。
+            这恰好是 PM 视角，不是工程师视角。
+          </p>
+          <div class="viz-source">SOURCE · Anthropic《Harness design for long-running application development》</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §4 五个未解难题 ===== -->
+      <section class="page-section he-reveal" id="sec-4" data-toc="5 个未解难题">
+        <div class="page-section-eyebrow">§4 · 未解难题</div>
+        <h2>5 个<span class="he-text-accent">没人解决</span>的<br>工程难题。</h2>
+
+        <p>
+          这些是当前 harness 工程界真正还没解决的问题。
+          学员讲这些，能讲出"前沿研究感"，而不是"二手知识"。
+        </p>
+
+        <!-- Viz #3: 5 个未解难题 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03 · five hard problems</div>
+            <h3 class="viz-title">5 个没人解决的难题</h3>
+            <p class="viz-sub">严重度从高到低排列。状态：全部 UNSOLVED。</p>
+          </div>
+
+          <div class="viz-stage v-unsolved">
+
+            <!-- 难题 1 -->
+            <div class="v-unsolved-card">
+              <div class="v-unsolved-icon">🧠</div>
+              <div class="v-unsolved-body">
+                <div class="v-unsolved-head">
+                  <span class="v-unsolved-num">PROBLEM 01</span>
+                  <span class="v-unsolved-status">UNSOLVED</span>
+                  <div class="v-unsolved-severity">
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                  </div>
+                </div>
+                <h4 class="v-unsolved-title">长会话压缩的本质损失</h4>
+                <p class="v-unsolved-desc">
+                  Compaction 永远会丢东西。无论用什么策略，摘要永远不等于原文。
+                  Anthropic 的 context reset（让新 agent 带交接文档接手）是个 hack，不是真正无损解决。
+                </p>
+                <div class="v-unsolved-row">
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">核心矛盾</span>
+                    <span class="v-unsolved-cell-text">窗口有限 vs 信息无限增长</span>
+                  </div>
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">未解之处</span>
+                    <span class="v-unsolved-cell-text">如何让 agent 压缩后"觉得自己还是那个自己"</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 难题 2 -->
+            <div class="v-unsolved-card">
+              <div class="v-unsolved-icon">💸</div>
+              <div class="v-unsolved-body">
+                <div class="v-unsolved-head">
+                  <span class="v-unsolved-num">PROBLEM 02</span>
+                  <span class="v-unsolved-status">UNSOLVED</span>
+                  <div class="v-unsolved-severity">
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot"></span>
+                  </div>
+                </div>
+                <h4 class="v-unsolved-title">多 Agent 协调的成本爆炸</h4>
+                <p class="v-unsolved-desc">
+                  Anthropic 的 Full Harness 比 Solo 贵 20 倍 —— 而那只是 3 个 agent。
+                  N=10 可能贵 100 倍，N=100 完全不可承受。
+                </p>
+                <div class="v-unsolved-row">
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">核心矛盾</span>
+                    <span class="v-unsolved-cell-text">协作质量 vs 成本线性/超线性增长</span>
+                  </div>
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">未解之处</span>
+                    <span class="v-unsolved-cell-text">"按需召唤、用完就睡"的经济编排方案</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 难题 3 -->
+            <div class="v-unsolved-card">
+              <div class="v-unsolved-icon">🔌</div>
+              <div class="v-unsolved-body">
+                <div class="v-unsolved-head">
+                  <span class="v-unsolved-num">PROBLEM 03</span>
+                  <span class="v-unsolved-status">UNSOLVED</span>
+                  <div class="v-unsolved-severity">
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot"></span>
+                    <span class="v-unsolved-severity-dot"></span>
+                  </div>
+                </div>
+                <h4 class="v-unsolved-title">跨平台 Hook 协议缺失</h4>
+                <p class="v-unsolved-desc">
+                  Claude Code 有 PreToolUse hook、Cursor 有 rules、Codex 有 settings
+                  —— 互不相通，各家自己一套。一份 hook 不能跨平台复用。
+                </p>
+                <div class="v-unsolved-row">
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">类比</span>
+                    <span class="v-unsolved-cell-text">LSP 之于编辑器 —— 但 Hook 还没有自己的 LSP</span>
+                  </div>
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">未解之处</span>
+                    <span class="v-unsolved-cell-text">一套通用 hook 标准，一份 hook 挂所有平台</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 难题 4 -->
+            <div class="v-unsolved-card">
+              <div class="v-unsolved-icon">📦</div>
+              <div class="v-unsolved-body">
+                <div class="v-unsolved-head">
+                  <span class="v-unsolved-num">PROBLEM 04</span>
+                  <span class="v-unsolved-status">UNSOLVED</span>
+                  <div class="v-unsolved-severity">
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot"></span>
+                    <span class="v-unsolved-severity-dot"></span>
+                  </div>
+                </div>
+                <h4 class="v-unsolved-title">跨厂商 Skill 互通</h4>
+                <p class="v-unsolved-desc">
+                  AGENTS.md 是个开始，但 Skill 的 frontmatter 格式没标准、references 加载机制各家不同、
+                  调用边界语义各家不同。MCP 解决了"工具协议"，但 Skill 还没有自己的 MCP。
+                </p>
+                <div class="v-unsolved-row">
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">核心矛盾</span>
+                    <span class="v-unsolved-cell-text">Skill 是 harness 最有价值的单元，却不能跨平台</span>
+                  </div>
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">未解之处</span>
+                    <span class="v-unsolved-cell-text">Skill 跨厂商可移植标准</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 难题 5 -->
+            <div class="v-unsolved-card">
+              <div class="v-unsolved-icon">⚖️</div>
+              <div class="v-unsolved-body">
+                <div class="v-unsolved-head">
+                  <span class="v-unsolved-num">PROBLEM 05</span>
+                  <span class="v-unsolved-status">UNSOLVED</span>
+                  <div class="v-unsolved-severity">
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot is-active"></span>
+                    <span class="v-unsolved-severity-dot"></span>
+                  </div>
+                </div>
+                <h4 class="v-unsolved-title">LLM-as-Judge 的盲区</h4>
+                <p class="v-unsolved-desc">
+                  用强模型评弱模型 OK，但用同等级模型互评 —— judge 的盲区就是你看不见的盲区。
+                  更深的坑：agent 用 GPT-5，judge 也用 GPT-5 —— 它会"理解"自己的错误而给高分。
+                </p>
+                <div class="v-unsolved-row">
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">核心矛盾</span>
+                    <span class="v-unsolved-cell-text">最强的评测方法，也有最隐蔽的偏见</span>
+                  </div>
+                  <div class="v-unsolved-cell">
+                    <span class="v-unsolved-cell-label">可能的方向</span>
+                    <span class="v-unsolved-cell-text">多模型 ensemble judge / Adversarial judge / 人工抽检</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="viz-caption">
+            <strong>整个 harness 工程链最大的潜在偏见源就在第 5 个</strong>（评测层），但很多人都没意识到。
+          </p>
+          <div class="viz-source">SOURCE · Anthropic 文章 / AGENTS.md 标准进展 / ML 评测界 LLM-as-judge 偏见讨论</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §5 影响矩阵 ===== -->
+      <section class="page-section he-reveal" id="sec-5" data-toc="影响矩阵">
+        <div class="page-section-eyebrow">§5 · 优先级</div>
+        <h2>哪些问题<br><span class="he-text-accent">最该先解决</span>？</h2>
+
+        <p>
+          5 个难题不一样重要。按"影响大小"和"短期能解决的可能性"画个矩阵 ——
+        </p>
+
+        <!-- Viz #4: 影响矩阵 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 04 · impact matrix</div>
+            <h3 class="viz-title">影响 x 可解度 矩阵</h3>
+            <p class="viz-sub">红区 = 影响大 + 短期难解（最头疼）；绿区 = 影响大 + 有希望解决（最该投入）。</p>
+          </div>
+
+          <div class="viz-stage v-matrix">
+            <div class="v-matrix-corner"></div>
+            <div class="v-matrix-col-label">短期难解</div>
+            <div class="v-matrix-col-label">有希望解决</div>
+
+            <div class="v-matrix-ylabel">影响程度 ↑</div>
+
+            <!-- Q1: 高影响 + 难解 -->
+            <div class="v-matrix-cell is-q1">
+              <div class="v-matrix-cell-zone">最头疼</div>
+              <ul class="v-matrix-cell-items">
+                <li>长会话压缩损失</li>
+                <li>LLM-as-judge 盲区</li>
+              </ul>
+            </div>
+
+            <!-- Q2: 高影响 + 有希望 -->
+            <div class="v-matrix-cell is-q2">
+              <div class="v-matrix-cell-zone">最该投入</div>
+              <ul class="v-matrix-cell-items">
+                <li>多 agent 成本爆炸</li>
+                <li>跨平台 hook 协议</li>
+              </ul>
+            </div>
+
+            <!-- Q4: 低影响 + 难解 -->
+            <div class="v-matrix-cell is-q4">
+              <div class="v-matrix-cell-zone">可以等</div>
+              <ul class="v-matrix-cell-items">
+                <li>（暂无明确候选）</li>
+              </ul>
+            </div>
+
+            <!-- Q3: 低影响 + 有希望 -->
+            <div class="v-matrix-cell is-q3">
+              <div class="v-matrix-cell-zone">顺手解决</div>
+              <ul class="v-matrix-cell-items">
+                <li>Skill 跨厂商互通</li>
+              </ul>
+            </div>
+
+            <div class="v-matrix-xlabel">可解度 →</div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>"最该投入"象限</strong>是 PM 该盯的地方 —— 多 agent 成本和跨平台 hook 是近期最有可能出突破的。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §6 未来方向 ===== -->
+      <section class="page-section he-reveal" id="sec-6" data-toc="未来 3 年">
+        <div class="page-section-eyebrow">§6 · 未来方向</div>
+        <h2>未来 3 年，<br>harness 会变成<span class="he-text-accent">什么样</span>？</h2>
+
+        <div class="callout is-warn">
+          <strong>以下是推测，不是预言。</strong>
+          技术发展节奏可能比预期快或慢。每半年应该回头校准一次。
+        </div>
+
+        <!-- Viz #5: 时间线 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 05 · future timeline</div>
+            <h3 class="viz-title">5 个预测 + 1 个反预测</h3>
+            <p class="viz-sub">未来 12-36 个月可能发生的事。置信度标注 = 提醒自己这只是猜测。</p>
+          </div>
+
+          <div class="viz-stage v-timeline">
+            <div class="v-timeline-progress"></div>
+
+            <div class="v-timeline-item">
+              <div class="v-timeline-dot"></div>
+              <div class="v-timeline-when">6-12 个月内</div>
+              <div class="v-timeline-what">应用层 Harness 包管理器出现</div>
+              <div class="v-timeline-detail">
+                类似 npm 之于 JavaScript。你可以 harness install pm-docs-harness，
+                直接 fork 一个完整的应用层 harness 进你的项目。
+              </div>
+              <span class="v-timeline-confidence is-high">置信度 · 高</span>
+            </div>
+
+            <div class="v-timeline-item">
+              <div class="v-timeline-dot"></div>
+              <div class="v-timeline-when">6-12 个月内</div>
+              <div class="v-timeline-what">Skill 市场化</div>
+              <div class="v-timeline-detail">
+                Skills Hub 出现，Skill 像 GitHub package 一样可以 install / publish / star / fork。
+                好 Skill 的作者会成为新一种"开源大牛"。
+              </div>
+              <span class="v-timeline-confidence is-high">置信度 · 高</span>
+            </div>
+
+            <div class="v-timeline-item">
+              <div class="v-timeline-dot"></div>
+              <div class="v-timeline-when">12-18 个月内</div>
+              <div class="v-timeline-what">Hook 跨平台协议</div>
+              <div class="v-timeline-detail">
+                出现"通用 hook 标准"，类似 LSP 之于编辑器 ——
+                一份 hook 可以挂到 Claude Code / Cursor / Codex 任一家。
+              </div>
+              <span class="v-timeline-confidence is-mid">置信度 · 中</span>
+            </div>
+
+            <div class="v-timeline-item">
+              <div class="v-timeline-dot"></div>
+              <div class="v-timeline-when">18-24 个月内</div>
+              <div class="v-timeline-what">评测 as a Service</div>
+              <div class="v-timeline-detail">
+                出现专门给 agent 产品做第三方评测的公司。
+                类似 PCI compliance 之于支付 —— evals 合规可能成为发布上线的必要条件。
+              </div>
+              <span class="v-timeline-confidence is-mid">置信度 · 中</span>
+            </div>
+
+            <div class="v-timeline-item">
+              <div class="v-timeline-dot"></div>
+              <div class="v-timeline-when">12-24 个月内</div>
+              <div class="v-timeline-what">PM 角色分化</div>
+              <div class="v-timeline-detail">
+                Generalist PM / Harness PM / Evals Lead 三个角色开始在头部 AI 公司分开设置。
+              </div>
+              <span class="v-timeline-confidence is-mid">置信度 · 中</span>
+            </div>
+
+            <div class="v-timeline-item" style="border-left: 2px dashed rgba(224,82,82,0.3);">
+              <div class="v-timeline-dot" style="border-color: #e05252;"></div>
+              <div class="v-timeline-when" style="color: #e05252;">反预测 · 谨防神化</div>
+              <div class="v-timeline-what">模型能力进步可能比预期快得多</div>
+              <div class="v-timeline-detail">
+                如果 GPT-7 / Claude 5 接近"通用智能"，应用层 harness 也会简化 ——
+                只剩"项目专属信息" + "硬合规边界"两块。
+                但会写好这两块的 PM 仍然有溢价。
+              </div>
+              <span class="v-timeline-confidence is-low">置信度 · 不确定</span>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>不管模型怎么进化，有一件事不变</strong> ——
+            会写"项目专属信息"和"硬合规边界"的 PM 永远有溢价，因为这些永远是产品决策，不是模型能力。
+          </p>
+        </figure>
+
+        <!-- Viz #6: 研究前沿地图 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06 · research landscape</div>
+            <h3 class="viz-title">活跃研究方向一览</h3>
+            <p class="viz-sub">按热度排列。红 = 最热、黄 = 升温中、蓝 = 刚兴起。</p>
+          </div>
+
+          <div class="viz-stage v-frontier">
+            <div class="v-frontier-area is-hot">
+              <div class="v-frontier-heat">最热 · HOT</div>
+              <div class="v-frontier-name">长上下文 & 无损压缩</div>
+              <div class="v-frontier-players">Anthropic / Google / OpenAI 都在投入</div>
+              <div class="v-frontier-bar"><div class="v-frontier-bar-fill" style="width:95%"></div></div>
+            </div>
+            <div class="v-frontier-area is-hot">
+              <div class="v-frontier-heat">最热 · HOT</div>
+              <div class="v-frontier-name">多 Agent 经济编排</div>
+              <div class="v-frontier-players">LangChain / CrewAI / Anthropic</div>
+              <div class="v-frontier-bar"><div class="v-frontier-bar-fill" style="width:88%"></div></div>
+            </div>
+            <div class="v-frontier-area is-hot">
+              <div class="v-frontier-heat">最热 · HOT</div>
+              <div class="v-frontier-name">评测基础设施</div>
+              <div class="v-frontier-players">METR / Braintrust / Anthropic</div>
+              <div class="v-frontier-bar"><div class="v-frontier-bar-fill" style="width:82%"></div></div>
+            </div>
+            <div class="v-frontier-area is-warm">
+              <div class="v-frontier-heat">升温 · WARM</div>
+              <div class="v-frontier-name">通用 Hook / 规约协议</div>
+              <div class="v-frontier-players">AGENTS.md / MCP 社区</div>
+              <div class="v-frontier-bar"><div class="v-frontier-bar-fill" style="width:60%"></div></div>
+            </div>
+            <div class="v-frontier-area is-warm">
+              <div class="v-frontier-heat">升温 · WARM</div>
+              <div class="v-frontier-name">Skill 市场 & 包管理</div>
+              <div class="v-frontier-players">各编码工具厂商</div>
+              <div class="v-frontier-bar"><div class="v-frontier-bar-fill" style="width:50%"></div></div>
+            </div>
+            <div class="v-frontier-area is-emerging">
+              <div class="v-frontier-heat">兴起 · EMERGING</div>
+              <div class="v-frontier-name">Agent 可观测性标准</div>
+              <div class="v-frontier-players">Langfuse / Arize / OpenTelemetry</div>
+              <div class="v-frontier-bar"><div class="v-frontier-bar-fill" style="width:35%"></div></div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            PM 关注建议：<strong>评测基础设施</strong>和<strong>多 agent 经济编排</strong>是最直接影响产品决策的两个方向。
+          </p>
+        </figure>
+
+        <!-- Viz #7: PM 角色分化 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 07 · PM role evolution</div>
+            <h3 class="viz-title">PM 角色可能的分化方向</h3>
+            <p class="viz-sub">目前这三个角色还没分开 —— 未来 1-2 年可能在头部 AI 公司先看到。</p>
+          </div>
+
+          <div class="viz-stage v-roles">
+            <div class="v-roles-card">
+              <div class="v-roles-emoji">🎯</div>
+              <div class="v-roles-name">Generalist PM</div>
+              <div class="v-roles-focus">管业务方向、用户研究、痛点定位、跨部门协调</div>
+              <div class="v-roles-tag">一直都有</div>
+            </div>
+            <div class="v-roles-card">
+              <div class="v-roles-emoji">🔧</div>
+              <div class="v-roles-name">Harness PM</div>
+              <div class="v-roles-focus">专门设计应用层 harness —— 规约、Skill、边界、编排方案</div>
+              <div class="v-roles-tag">新角色</div>
+            </div>
+            <div class="v-roles-card">
+              <div class="v-roles-emoji">📊</div>
+              <div class="v-roles-name">Evals Lead</div>
+              <div class="v-roles-focus">专门管评测体系 —— golden set、rubric、Reviewer、合规</div>
+              <div class="v-roles-tag">新角色</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>无论怎么分化，PM 的稳定核心不变</strong> ——
+            用户研究、产品决策、边界设计、评测维度选择、跨部门协调。
+            这些是产品决策，模型再强也代替不了。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §7 实战启示 + 总结 ===== -->
+      <section class="page-section he-reveal" id="sec-7" data-toc="5 条实战启示">
+        <div class="page-section-eyebrow">§7 · 启示与总结</div>
+        <h2>给 PM 的<br><span class="he-text-accent">5 条实战启示</span>。</h2>
+
+        <p>
+          把 harness 当工具，不当神药 —— 5 条 ——
+        </p>
+
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Takeaways</div>
+            <h3 class="viz-title">带得走的 5 条</h3>
+          </div>
+
+          <div class="viz-stage v-takeaway">
+            <div class="v-takeaway-item">
+              <div class="v-takeaway-n">1</div>
+              <div class="v-takeaway-text">
+                <div class="v-takeaway-title">跟进模型升级，别死守过时的工程实践</div>
+                <div class="v-takeaway-desc">每半年看一次模型升级带来了什么新能力，对照你的 harness 哪几条可以拆掉。</div>
+              </div>
+            </div>
+            <div class="v-takeaway-item">
+              <div class="v-takeaway-n">2</div>
+              <div class="v-takeaway-text">
+                <div class="v-takeaway-title">项目专属知识永远值钱</div>
+                <div class="v-takeaway-desc">产品背景、用户画像、业务规则 —— 不会因模型升级而贬值。把投入压在这里。</div>
+              </div>
+            </div>
+            <div class="v-takeaway-item">
+              <div class="v-takeaway-n">3</div>
+              <div class="v-takeaway-text">
+                <div class="v-takeaway-title">评测体系是稳定护城河</div>
+                <div class="v-takeaway-desc">"切模型要过哪几个指标"会从可选项变成必须项。这层投入永远值钱。</div>
+              </div>
+            </div>
+            <div class="v-takeaway-item">
+              <div class="v-takeaway-n">4</div>
+              <div class="v-takeaway-text">
+                <div class="v-takeaway-title">学 harness 思维，不学具体平台细节</div>
+                <div class="v-takeaway-desc">"转 · 知 · 做 · 检"框架抗模型变化、跨平台通用 —— 这是跟着你一辈子的东西。</div>
+              </div>
+            </div>
+            <div class="v-takeaway-item">
+              <div class="v-takeaway-n">5</div>
+              <div class="v-takeaway-text">
+                <div class="v-takeaway-title">拥抱质疑，不替 harness 辩护</div>
+                <div class="v-takeaway-desc">被问"harness 是不是噱头"时，先承认对方有道理的部分，再补上他漏掉的关键。</div>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <blockquote>
+          <strong>Harness Engineering 不是噱头，但也不是终局。</strong>
+          它是过渡期的关键技术。
+          对 PM 来说，值得学的不是某个平台的 hook 语法，
+          是 harness 思维：<strong>把"agent 怎么跑"拆成零件去决策</strong>。
+          这种思维抗模型变化、跨平台通用，跟着你一辈子。
+        </blockquote>
+
+        <div class="callout">
+          <strong>AI 产品的护城河，永远在"应用层"</strong> ——
+          项目知识、业务边界、评测体系。
+          机械那层会被模型吃掉，但应用层永远在，而且会越来越重要。
+          —— 如果你只能从这门课带走一句话，带走这句。
+        </div>
+
+        <h3>一手来源（本板块所有论断的出处）</h3>
+        <ul>
+          <li>Anthropic《Harness design for long-running application development》— <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noreferrer">anthropic.com</a></li>
+          <li>马克 Harness Engineering 讲解视频 — 噱头之争的完整讨论</li>
+          <li>LangChain《The Anatomy of an Agent Harness》— <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noreferrer">langchain.com</a></li>
+          <li>AGENTS.md 标准进展 — <a href="https://agents.md/" target="_blank" rel="noreferrer">agents.md</a></li>
+          <li>ML 评测界 LLM-as-judge 偏见研究</li>
+        </ul>
+      </section>
+
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="page-nav" aria-label="板块导航">
+        <a href="05-how-to.html" class="page-nav-link">
+          <span class="page-nav-meta">↩ 上一篇</span>
+          <span class="page-nav-title">⑤ 怎么做</span>
+        </a>
+        <a href="practice.html" class="page-nav-link is-next">
+          <span class="page-nav-meta">下一篇 →</span>
+          <span class="page-nav-title">实战 · 本组总览</span>
+        </a>
+      </nav>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/spotlight.js"></script>
+</body>
+</html>

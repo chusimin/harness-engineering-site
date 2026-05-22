@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>③ 解剖学 · Harness Engineering</title>
+  <meta name="description" content="打开 harness 的皮,看里面 6 个器官 —— 转·知·做·检,逐个拆解">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/page.css">
+
+  <style>
+    /* ============================================
+       本页可视化专用样式（仅 ③ 解剖学 用）
+       ============================================ */
+
+    /* ---- Viz 1: 6 器官总览地图 ---- */
+    .v-organs {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .v-organs-runtime {
+      position: relative;
+      padding: var(--sp-8);
+      border: 2px solid var(--he-accent);
+      border-radius: var(--he-radius-lg);
+      background: rgba(94, 106, 210, 0.03);
+    }
+    .v-organs-runtime-label {
+      position: absolute;
+      top: -11px; left: var(--sp-5);
+      background: var(--he-bg-subtle);
+      padding: 0 var(--sp-3);
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-organs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-organs-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .v-organs-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-3px);
+      box-shadow: var(--he-shadow-glow);
+    }
+    .v-organs-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--he-accent);
+      transform: scaleX(0);
+      transition: transform var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-organs-card:hover::after { transform: scaleX(1); }
+    .v-organs-char {
+      font-size: 36px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      line-height: 1;
+      margin-bottom: var(--sp-1);
+    }
+    .v-organs-card.is-loop .v-organs-char { color: var(--he-accent); }
+    .v-organs-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+      margin-bottom: 4px;
+    }
+    .v-organs-en {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-muted);
+      margin-bottom: var(--sp-2);
+    }
+    .v-organs-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.5;
+    }
+    .v-organs-card.is-wide {
+      grid-column: 1 / -1;
+    }
+    .v-organs-meta {
+      position: relative;
+      margin-top: var(--sp-4);
+      padding: var(--sp-5) var(--sp-8);
+      border: 2px dashed var(--he-border-strong);
+      border-radius: var(--he-radius-lg);
+      background: var(--he-bg);
+    }
+    .v-organs-meta-label {
+      position: absolute;
+      top: -11px; left: var(--sp-5);
+      background: var(--he-bg-subtle);
+      padding: 0 var(--sp-3);
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-muted);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-organs-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-3);
+    }
+    .v-organs-card.is-meta {
+      border-style: dashed;
+    }
+
+    /* ---- Viz 2: 主循环动画 ---- */
+    .v-aloop {
+      position: relative;
+      width: min(520px, 100%);
+      margin: 0 auto;
+    }
+    .v-aloop-ring {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .v-aloop-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px dashed var(--he-border-strong);
+      animation: v-aloop-rotate 20s linear infinite;
+    }
+    @keyframes v-aloop-rotate {
+      to { transform: rotate(360deg); }
+    }
+    .v-aloop-step {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--he-bg);
+      border: 2px solid var(--he-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      z-index: 2;
+    }
+    .v-aloop-step:hover {
+      border-color: var(--he-accent);
+      box-shadow: var(--he-shadow-glow);
+      transform: scale(1.08);
+    }
+    .v-aloop-step-num {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-aloop-step-name {
+      font-size: 13px;
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+      text-align: center;
+      line-height: 1.2;
+    }
+    .v-aloop-step.is-top    { top: -10px;  left: 50%; transform: translateX(-50%); }
+    .v-aloop-step.is-right  { top: 50%;  right: -10px; transform: translateY(-50%); }
+    .v-aloop-step.is-bottom { bottom: -10px; left: 50%; transform: translateX(-50%); }
+    .v-aloop-step.is-left   { top: 50%;  left: -10px; transform: translateY(-50%); }
+    .v-aloop-step.is-top:hover    { transform: translateX(-50%) scale(1.08); }
+    .v-aloop-step.is-right:hover  { transform: translateY(-50%) scale(1.08); }
+    .v-aloop-step.is-bottom:hover { transform: translateX(-50%) scale(1.08); }
+    .v-aloop-step.is-left:hover   { transform: translateY(-50%) scale(1.08); }
+    .v-aloop-center {
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      background: var(--he-text-display);
+      color: var(--he-text-inverse);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      z-index: 3;
+      box-shadow: 0 8px 32px rgba(15,23,42,0.3);
+    }
+    .v-aloop-center-icon {
+      font-size: 28px;
+      animation: v-aloop-spin 3s linear infinite;
+    }
+    @keyframes v-aloop-spin { to { transform: rotate(360deg); } }
+    .v-aloop-center-label {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+    }
+    /* arrows between steps */
+    .v-aloop-arrow {
+      position: absolute;
+      z-index: 1;
+      color: var(--he-accent);
+      font-size: 18px;
+      font-family: var(--he-font-mono);
+      animation: v-arrow-pulse 2s ease-in-out infinite;
+    }
+    @keyframes v-arrow-pulse {
+      0%, 100% { opacity: 0.4; }
+      50%      { opacity: 1; }
+    }
+    .v-aloop-arrow.a-tr { top: 15%; right: 12%; }
+    .v-aloop-arrow.a-rb { bottom: 15%; right: 12%; }
+    .v-aloop-arrow.a-bl { bottom: 15%; left: 12%; }
+    .v-aloop-arrow.a-lt { top: 15%; left: 12%; }
+
+    /* reins cards below loop */
+    .v-reins {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp-3);
+      margin-top: var(--sp-8);
+    }
+    .v-rein {
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-rein:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-rein-icon {
+      font-size: 24px;
+      margin-bottom: var(--sp-2);
+    }
+    .v-rein-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+      margin-bottom: 4px;
+    }
+    .v-rein-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.5;
+    }
+
+    /* ---- Viz 3: 知(桌面 + 文件柜) ---- */
+    .v-desk {
+      display: grid;
+      grid-template-columns: 1.4fr 0.6fr;
+      gap: var(--sp-5);
+      align-items: start;
+    }
+    .v-desk-workspace {
+      padding: var(--sp-6);
+      background: var(--he-bg);
+      border: 2px solid var(--he-accent);
+      border-radius: var(--he-radius-lg);
+      position: relative;
+      min-height: 240px;
+    }
+    .v-desk-workspace-label {
+      position: absolute;
+      top: -11px; left: var(--sp-4);
+      background: var(--he-bg-subtle);
+      padding: 0 var(--sp-3);
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-desk-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+    }
+    .v-desk-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--he-bg-subtle);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-sm);
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      animation: v-desk-float 4s ease-in-out infinite;
+    }
+    .v-desk-item:nth-child(2) { animation-delay: 0.5s; }
+    .v-desk-item:nth-child(3) { animation-delay: 1s; }
+    .v-desk-item:nth-child(4) { animation-delay: 1.5s; }
+    .v-desk-item:nth-child(5) { animation-delay: 2s; }
+    @keyframes v-desk-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-3px); }
+    }
+    .v-desk-item-icon { font-size: 14px; }
+    .v-desk-capacity {
+      margin-top: var(--sp-4);
+      height: 6px;
+      background: var(--he-bg-muted);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .v-desk-capacity-bar {
+      height: 100%;
+      width: 72%;
+      background: linear-gradient(90deg, var(--he-accent), var(--c-indigo-300));
+      border-radius: 3px;
+      animation: v-desk-fill 6s ease-in-out infinite;
+    }
+    @keyframes v-desk-fill {
+      0%   { width: 30%; }
+      50%  { width: 85%; }
+      100% { width: 30%; }
+    }
+    .v-desk-capacity-text {
+      margin-top: var(--sp-1);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: var(--he-text-subtle);
+      text-align: right;
+    }
+
+    .v-desk-cabinet {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 2px dashed var(--he-border-strong);
+      border-radius: var(--he-radius-lg);
+      position: relative;
+    }
+    .v-desk-cabinet-label {
+      position: absolute;
+      top: -11px; left: var(--sp-4);
+      background: var(--he-bg-subtle);
+      padding: 0 var(--sp-3);
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-muted);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-desk-drawer {
+      padding: var(--sp-3);
+      background: var(--he-bg-subtle);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-sm);
+      margin-bottom: var(--sp-2);
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--he-dur-fast);
+    }
+    .v-desk-drawer:hover {
+      border-color: var(--he-accent);
+      background: var(--he-accent-soft);
+    }
+    .v-desk-drawer-icon { font-size: 14px; }
+    .v-desk-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--he-font-mono);
+      font-size: 20px;
+      color: var(--he-accent);
+      animation: v-desk-flow 2s ease-in-out infinite;
+      align-self: center;
+    }
+    @keyframes v-desk-flow {
+      0%, 100% { opacity: 0.3; transform: translateX(0); }
+      50%      { opacity: 1; transform: translateX(-4px); }
+    }
+
+    /* pitfall warning cards */
+    .v-pitfalls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+      margin-top: var(--sp-6);
+    }
+    .v-pitfall {
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      border-left: 3px solid #e5484d;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-pitfall:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--he-shadow-sm);
+    }
+    .v-pitfall-tag {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e5484d;
+      font-weight: var(--he-weight-semibold);
+      margin-bottom: var(--sp-2);
+    }
+    .v-pitfall-title {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .v-pitfall-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.5;
+    }
+
+    /* three-words table */
+    .v-three-words {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+      margin-top: var(--sp-5);
+    }
+    .v-word-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-word-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-word-zh {
+      font-size: 22px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-1);
+    }
+    .v-word-en {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--he-accent);
+      margin-bottom: var(--sp-2);
+    }
+    .v-word-what {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.5;
+      margin-bottom: var(--sp-2);
+    }
+    .v-word-life {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: var(--he-text-subtle);
+      padding-top: var(--sp-2);
+      border-top: 1px dashed var(--he-border);
+    }
+
+    /* ---- Viz 4: 做(三旋钮) ---- */
+    .v-knobs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-4);
+    }
+    .v-knob {
+      padding: var(--sp-6);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-lg);
+      text-align: center;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+    }
+    .v-knob:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-3px);
+      box-shadow: var(--he-shadow-glow);
+    }
+    .v-knob-dial {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 3px solid var(--he-border-strong);
+      margin: 0 auto var(--sp-4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all var(--he-dur-base);
+    }
+    .v-knob:hover .v-knob-dial {
+      border-color: var(--he-accent);
+    }
+    .v-knob-dial-icon {
+      font-size: 28px;
+    }
+    .v-knob-dial-tick {
+      position: absolute;
+      top: 4px; left: 50%;
+      width: 2px; height: 16px;
+      background: var(--he-accent);
+      border-radius: 1px;
+      transform-origin: bottom center;
+      animation: v-knob-tick 4s ease-in-out infinite;
+    }
+    @keyframes v-knob-tick {
+      0%, 100% { transform: translateX(-50%) rotate(-30deg); }
+      50%      { transform: translateX(-50%) rotate(30deg); }
+    }
+    .v-knob:nth-child(2) .v-knob-dial-tick { animation-delay: 1.3s; }
+    .v-knob:nth-child(3) .v-knob-dial-tick { animation-delay: 2.6s; }
+    .v-knob-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-1);
+    }
+    .v-knob-sub {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-muted);
+      margin-bottom: var(--sp-3);
+    }
+    .v-knob-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.5;
+      margin-bottom: var(--sp-4);
+    }
+    .v-knob-levels {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+    }
+    .v-knob-level {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding: 6px var(--sp-3);
+      background: var(--he-bg-subtle);
+      border-radius: var(--he-radius-sm);
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      transition: all var(--he-dur-fast);
+    }
+    .v-knob-level:hover {
+      background: var(--he-accent-soft);
+    }
+    .v-knob-level-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .v-knob-level-dot.is-low  { background: #30a46c; }
+    .v-knob-level-dot.is-mid  { background: #f5a623; }
+    .v-knob-level-dot.is-high { background: #e5484d; }
+    .v-knob-level-dot.is-max  { background: var(--he-text-display); }
+
+    /* orthogonal badge */
+    .v-orthogonal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-5);
+      padding: var(--sp-4);
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-md);
+    }
+    .v-orthogonal-icon {
+      font-size: 20px;
+      color: var(--he-accent);
+    }
+    .v-orthogonal-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-strong);
+      font-weight: var(--he-weight-medium);
+    }
+    .v-orthogonal-text em {
+      color: var(--he-text-muted);
+      font-weight: var(--he-weight-normal);
+    }
+
+    /* sandbox vs hook comparison */
+    .v-compare-sh {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+      margin-top: var(--sp-6);
+    }
+    .v-compare-sh-col {
+      padding: var(--sp-5);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-compare-sh-col:hover { transform: translateY(-2px); }
+    .v-compare-sh-col.is-sandbox {
+      background: rgba(94, 106, 210, 0.05);
+      border: 1px solid rgba(94, 106, 210, 0.25);
+    }
+    .v-compare-sh-col.is-hook {
+      background: rgba(229, 72, 77, 0.04);
+      border: 1px solid rgba(229, 72, 77, 0.2);
+    }
+    .v-compare-sh-icon {
+      font-size: 28px;
+      margin-bottom: var(--sp-3);
+    }
+    .v-compare-sh-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-2);
+    }
+    .v-compare-sh-rows {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .v-compare-sh-row {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: var(--sp-2);
+      font-size: var(--he-text-xs);
+    }
+    .v-compare-sh-row-label {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-subtle);
+      text-transform: uppercase;
+    }
+    .v-compare-sh-row-val {
+      color: var(--he-text-body);
+      line-height: 1.4;
+    }
+
+    /* ---- Viz 5: 检(Dashboard) ---- */
+    .v-dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-3);
+    }
+    .v-dash-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-dash-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-dash-card.is-wide {
+      grid-column: 1 / -1;
+    }
+    .v-dash-head {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-3);
+    }
+    .v-dash-icon {
+      width: 32px; height: 32px;
+      border-radius: var(--he-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .v-dash-icon.is-eval { background: rgba(94, 106, 210, 0.1); }
+    .v-dash-icon.is-obs  { background: rgba(48, 164, 108, 0.1); }
+    .v-dash-icon.is-cost { background: rgba(245, 166, 35, 0.1); }
+    .v-dash-icon.is-alert { background: rgba(229, 72, 77, 0.1); }
+    .v-dash-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+    }
+    .v-dash-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.5;
+      margin-bottom: var(--sp-3);
+    }
+    .v-dash-bar-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .v-dash-bar-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 40px;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: var(--he-text-xs);
+    }
+    .v-dash-bar-label {
+      color: var(--he-text-body);
+      font-size: 11px;
+    }
+    .v-dash-bar-track {
+      height: 6px;
+      background: var(--he-bg-muted);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .v-dash-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s var(--he-ease-out);
+    }
+    .v-dash-bar-fill.is-good { background: #30a46c; }
+    .v-dash-bar-fill.is-warn { background: #f5a623; }
+    .v-dash-bar-fill.is-bad  { background: #e5484d; }
+    .v-dash-bar-val {
+      text-align: right;
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      color: var(--he-text-strong);
+    }
+    /* trace mini timeline */
+    .v-dash-trace {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: var(--sp-3) 0;
+    }
+    .v-dash-trace-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: v-trace-blink 3s ease-in-out infinite;
+    }
+    .v-dash-trace-dot:nth-child(2) { animation-delay: 0.3s; }
+    .v-dash-trace-dot:nth-child(3) { animation-delay: 0.6s; }
+    .v-dash-trace-dot:nth-child(4) { animation-delay: 0.9s; }
+    .v-dash-trace-dot:nth-child(5) { animation-delay: 1.2s; }
+    .v-dash-trace-dot:nth-child(6) { animation-delay: 1.5s; }
+    .v-dash-trace-dot:nth-child(7) { animation-delay: 1.8s; }
+    .v-dash-trace-line {
+      flex: 1;
+      height: 2px;
+      background: var(--he-border);
+    }
+    @keyframes v-trace-blink {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50%      { opacity: 1; transform: scale(1.3); }
+    }
+    .v-dash-trace-dot.is-input  { background: var(--he-accent); }
+    .v-dash-trace-dot.is-model  { background: var(--he-text-display); }
+    .v-dash-trace-dot.is-tool   { background: #30a46c; }
+    .v-dash-trace-dot.is-result { background: #f5a623; }
+    .v-dash-trace-legend {
+      display: flex;
+      gap: var(--sp-3);
+      margin-top: var(--sp-2);
+    }
+    .v-dash-trace-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--he-text-muted);
+    }
+    .v-dash-trace-legend-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+
+    /* ---- Viz 6: 症状→器官 诊断表 ---- */
+    .v-diag {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .v-diag th {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-subtle);
+      padding: var(--sp-3) var(--sp-4);
+      border-bottom: 2px solid var(--he-border-strong);
+      text-align: left;
+    }
+    .v-diag td {
+      padding: var(--sp-3) var(--sp-4);
+      border-bottom: 1px solid var(--he-border);
+      font-size: var(--he-text-sm);
+      vertical-align: top;
+      transition: background var(--he-dur-fast);
+    }
+    .v-diag tr:hover td {
+      background: var(--he-accent-soft);
+    }
+    .v-diag-symptom {
+      color: var(--he-text-strong);
+      font-weight: var(--he-weight-medium);
+      line-height: 1.4;
+    }
+    .v-diag-organ {
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      font-weight: var(--he-weight-bold);
+      white-space: nowrap;
+    }
+    .v-diag-organ.is-zhuan { color: var(--he-accent); }
+    .v-diag-organ.is-zhi   { color: #30a46c; }
+    .v-diag-organ.is-zuo   { color: #f5a623; }
+    .v-diag-organ.is-jian  { color: #e5484d; }
+    .v-diag-detail {
+      color: var(--he-text-muted);
+      font-size: var(--he-text-xs);
+      line-height: 1.4;
+    }
+
+    /* ---- 通用小组件 ---- */
+    .callout {
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border-left: 3px solid var(--he-accent);
+      border-radius: 0 var(--he-radius-md) var(--he-radius-md) 0;
+      margin: var(--sp-6) 0;
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .callout strong { color: var(--he-text-display); }
+
+    .callout-warn {
+      padding: var(--sp-5);
+      background: rgba(229, 72, 77, 0.05);
+      border-left: 3px solid #e5484d;
+      border-radius: 0 var(--he-radius-md) var(--he-radius-md) 0;
+      margin: var(--sp-6) 0;
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .callout-warn strong { color: #e5484d; }
+
+    /* PM 决策卡 */
+    .pm-decisions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-3);
+      margin: var(--sp-5) 0;
+    }
+    .pm-decision {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-3);
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .pm-decision:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-1px);
+    }
+    .pm-decision-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--he-accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .pm-decision-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-strong);
+      line-height: 1.4;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 1024px) {
+      .v-knobs { grid-template-columns: 1fr; }
+      .v-pitfalls { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .v-organs-grid { grid-template-columns: 1fr; }
+      .v-organs-meta-grid { grid-template-columns: 1fr; }
+      .v-desk { grid-template-columns: 1fr; }
+      .v-reins { grid-template-columns: repeat(2, 1fr); }
+      .v-compare-sh { grid-template-columns: 1fr; }
+      .v-dashboard { grid-template-columns: 1fr; }
+      .v-three-words { grid-template-columns: 1fr; }
+      .pm-decisions { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .v-aloop-ring { width: 320px; height: 320px; margin: 0 auto; }
+      .v-aloop-step { width: 76px; height: 76px; }
+      .v-aloop-step-name { font-size: 11px; }
+      .v-aloop-center { width: 90px; height: 90px; }
+      .v-aloop-center-icon { font-size: 20px; }
+      .v-reins { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ Page Hero ============ -->
+  <header class="page-hero">
+    <div class="page-hero-inner">
+      <a class="page-back" href="deep.html">&larr; 深入</a>
+      <div class="page-eyebrow">
+        <span class="page-eyebrow-num">板块 03</span>
+        <span class="page-eyebrow-group">深入 &middot; DEEP DIVE</span>
+      </div>
+      <h1 class="he-h1 page-title">解剖<span class="he-text-accent">学</span>。</h1>
+      <p class="he-lead page-lead">
+        打开 harness 的皮,看里面 6 个器官 ——
+        每一个都是在补<span class="he-term" data-tip="模型自己做不到的事:不会循环、管不住注意力、不能动手、不会自检。">模型做不到的事</span>。
+      </p>
+      <div class="page-meta">
+        <span class="page-meta-item">20 分钟阅读</span>
+        <span class="page-meta-item">8 个小节</span>
+        <span class="page-meta-item">6 个可视化</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Page Layout ============ -->
+  <div class="page-layout">
+    <main class="page-main">
+
+
+      <!-- ===== &sect;1 开篇 ===== -->
+      <section class="page-section he-reveal" id="sec-1" data-toc="开篇:6 个器官">
+        <div class="page-section-eyebrow">&sect;1 &middot; 开篇</div>
+        <h2>打开 harness,<br>看里面的 <span class="he-text-accent">6 个器官</span></h2>
+
+        <p>
+          板块① 你已经知道:<strong>Agent = Model + Harness</strong>。
+          这一板块,我们把 harness 的皮掀开,看里面到底有几个器官、各管什么。
+        </p>
+
+        <blockquote>
+          <strong>Harness 存在的唯一理由,是补"模型做不到的事"。</strong>
+          所以"它有几个部件",其实是"模型有几种关键的'做不到'"。
+        </blockquote>
+
+        <p>
+          按这条原则数下来,<strong>组件级 harness 有 6 个部件</strong>,挂在四个字上:
+          <strong class="he-text-accent">转 &middot; 知 &middot; 做 &middot; 检</strong>。
+        </p>
+      </section>
+
+
+      <!-- ===== &sect;2 6 器官总览 ===== -->
+      <section class="page-section he-reveal" id="sec-2" data-toc="6 器官总览图">
+        <div class="page-section-eyebrow">&sect;2 &middot; 总览</div>
+        <h2>整体地图:<br>转 &middot; 知 &middot; 做 &middot; 检</h2>
+
+        <p>
+          <strong>5 + 1 结构</strong>:转 / 知 / 做(共 5 个部件)在 loop <strong>里头</strong>干活,让 agent 跑起来 ——
+          是运行时部件。<strong>检</strong>(2 个部件)在 loop <strong>外头</strong>,告诉你"跑得好不好" ——
+          是元层。
+        </p>
+
+        <!-- Viz #1: 6 器官总览地图 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 01 &middot; organ map</div>
+            <h3 class="viz-title">6 个器官,挂在 4 个字上</h3>
+            <p class="viz-sub">上面 5 个在循环里头(运行时),下面 2 个在循环外头(元层)。</p>
+          </div>
+
+          <div class="viz-stage v-organs">
+            <!-- 运行时层 -->
+            <div class="v-organs-runtime">
+              <div class="v-organs-runtime-label">Loop 内 &middot; 运行时部件</div>
+              <div class="v-organs-grid">
+                <div class="v-organs-card is-wide is-loop">
+                  <div class="v-organs-char">转</div>
+                  <div class="v-organs-name">主循环</div>
+                  <div class="v-organs-en">MAIN LOOP</div>
+                  <div class="v-organs-desc">驱动"推理 &rarr; 执行 &rarr; 回喂"一直转下去</div>
+                </div>
+                <div class="v-organs-card">
+                  <div class="v-organs-char">知</div>
+                  <div class="v-organs-name">上下文</div>
+                  <div class="v-organs-en">CONTEXT</div>
+                  <div class="v-organs-desc">此刻它看见的全部</div>
+                </div>
+                <div class="v-organs-card">
+                  <div class="v-organs-char">知</div>
+                  <div class="v-organs-name">记忆</div>
+                  <div class="v-organs-en">MEMORY</div>
+                  <div class="v-organs-desc">跨会话记得的事实</div>
+                </div>
+                <div class="v-organs-card">
+                  <div class="v-organs-char">做</div>
+                  <div class="v-organs-name">工具</div>
+                  <div class="v-organs-en">TOOLS</div>
+                  <div class="v-organs-desc">能做什么具体动作</div>
+                </div>
+                <div class="v-organs-card">
+                  <div class="v-organs-char">做</div>
+                  <div class="v-organs-name">执行边界</div>
+                  <div class="v-organs-en">BOUNDARIES</div>
+                  <div class="v-organs-desc">准做什么、不准做什么</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 元层 -->
+            <div class="v-organs-meta">
+              <div class="v-organs-meta-label">Loop 外 &middot; 元层</div>
+              <div class="v-organs-meta-grid">
+                <div class="v-organs-card is-meta">
+                  <div class="v-organs-char">检</div>
+                  <div class="v-organs-name">评测</div>
+                  <div class="v-organs-en">EVALUATION</div>
+                  <div class="v-organs-desc">产品在变好还是变坏</div>
+                </div>
+                <div class="v-organs-card is-meta">
+                  <div class="v-organs-char">检</div>
+                  <div class="v-organs-name">可观测</div>
+                  <div class="v-organs-en">OBSERVABILITY</div>
+                  <div class="v-organs-desc">一次出事能查出来吗</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>记忆点</strong>:转 / 知 / 做让 agent 跑,检让你知道它跑得好不好。
+            每一件,都是在补"模型当下还做不到的事"。
+          </p>
+          <div class="viz-source">SOURCE &middot; Anthropic + LangChain 解剖学框架综合</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== &sect;3 转:主循环 ===== -->
+      <section class="page-section he-reveal" id="sec-3" data-toc="转:主循环">
+        <div class="page-section-eyebrow">&sect;3 &middot; 转</div>
+        <h2>主循环 ——<br>agent 的<span class="he-text-accent">命根子</span></h2>
+
+        <p>
+          <strong>聊天机器人</strong>:模型跑一遍,出个答复,停。
+          <strong>Agent</strong>:模型跑一遍 &rarr; 看工具结果 &rarr; <strong>再</strong>跑一遍 &rarr; 再看 &rarr; 再跑 ......
+          这个"再"就是循环。没有这个循环,再强的模型也只是问答机。
+        </p>
+
+        <div class="callout-warn">
+          <strong>反直觉</strong> ——
+          用户说一句话(一个 turn),主循环可能转几百圈才停。OpenAI 在官方文章里说过:一个 turn 里 agent 可能发起数百次工具调用。
+          <strong>"一句话 ≠ 一步"</strong> 是 PM 的第一个反直觉。
+        </div>
+
+        <!-- Viz #2: 主循环动画 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02 &middot; main loop</div>
+            <h3 class="viz-title">一轮 loop,转 5 步</h3>
+            <p class="viz-sub">从"收到输入"到"判断停 or 再转" ---- 循环往复,直到任务完成。4 根缰绳防脱缰。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-aloop">
+              <div class="v-aloop-ring">
+                <div class="v-aloop-track"></div>
+
+                <div class="v-aloop-step is-top">
+                  <div class="v-aloop-step-num">01</div>
+                  <div class="v-aloop-step-name">收到<br>输入</div>
+                </div>
+                <div class="v-aloop-step is-right">
+                  <div class="v-aloop-step-num">02</div>
+                  <div class="v-aloop-step-name">装配<br>上下文</div>
+                </div>
+                <div class="v-aloop-step is-bottom">
+                  <div class="v-aloop-step-num">03</div>
+                  <div class="v-aloop-step-name">模型<br>推理</div>
+                </div>
+                <div class="v-aloop-step is-left">
+                  <div class="v-aloop-step-num">04</div>
+                  <div class="v-aloop-step-name">执行<br>工具</div>
+                </div>
+
+                <!-- arrows -->
+                <span class="v-aloop-arrow a-tr">&searr;</span>
+                <span class="v-aloop-arrow a-rb">&swarr;</span>
+                <span class="v-aloop-arrow a-bl">&nwarr;</span>
+                <span class="v-aloop-arrow a-lt">&nearr;</span>
+
+                <div class="v-aloop-center">
+                  <div class="v-aloop-center-icon">&#x21bb;</div>
+                  <div class="v-aloop-center-label">05 &middot; 回喂<br>再转?</div>
+                </div>
+              </div>
+            </div>
+
+            <h4>但循环也最危险 ---- 4 根缰绳防脱缰</h4>
+            <div class="v-reins">
+              <div class="v-rein">
+                <div class="v-rein-icon">&#x1F6D1;</div>
+                <div class="v-rein-name">最大步数</div>
+                <div class="v-rein-desc">转够 N 圈强制停、回来问人</div>
+              </div>
+              <div class="v-rein">
+                <div class="v-rein-icon">&#x1F4B0;</div>
+                <div class="v-rein-name">预算上限</div>
+                <div class="v-rein-desc">按 token / 花费封顶,超了暂停</div>
+              </div>
+              <div class="v-rein">
+                <div class="v-rein-icon">&#x1F504;</div>
+                <div class="v-rein-name">卡死检测</div>
+                <div class="v-rein-desc">原地打转?连续 3 次同一失败,立即掐断</div>
+              </div>
+              <div class="v-rein">
+                <div class="v-rein-icon">&#x270B;</div>
+                <div class="v-rein-name">可打断 + 可恢复</div>
+                <div class="v-rein-desc">用户能喊停;中断后能续跑、不从头来</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>记忆点</strong>:模型本身只做第 03 步(推理)。
+            其他 4 步 + 判断逻辑,<strong>全部都是 harness 干的</strong>。
+            循环是马的奔跑;四根缰绳,是让马能跑、但跑不脱缰的马具。
+          </p>
+          <div class="viz-source">SOURCE &middot; Anthropic &amp; OpenAI 官方文章</div>
+        </figure>
+
+        <h3>PM 落点</h3>
+        <div class="pm-decisions">
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x23F1;</div>
+            <div class="pm-decision-text">这个 agent 最多自己跑多久?</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F4B5;</div>
+            <div class="pm-decision-text">最多花多少钱?</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F64B;</div>
+            <div class="pm-decision-text">卡住了停下问人、还是继续试?</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F6D1;</div>
+            <div class="pm-decision-text">用户能不能中途喊停?</div>
+          </div>
+        </div>
+
+        <p><strong>这几个数,直接决定产品的成本、安全感和体验。</strong></p>
+      </section>
+
+
+      <!-- ===== &sect;4 知:上下文 + 记忆 ===== -->
+      <section class="page-section he-reveal" id="sec-4" data-toc="知:上下文 + 记忆">
+        <div class="page-section-eyebrow">&sect;4 &middot; 知</div>
+        <h2>上下文 + 记忆 ——<br><span class="he-text-accent">桌面</span>和<span class="he-text-accent">文件柜</span></h2>
+
+        <p>
+          <strong>记忆是源,上下文是容器。</strong>
+          每一轮,harness 像个秘书 ---- 从文件柜(记忆)、资料库(检索)和今天的对话(历史)里,
+          挑出该带的,装进桌面(上下文)。这个动作叫"上下文装配"。
+        </p>
+
+        <!-- Viz #3: 桌面 + 文件柜 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03 &middot; desk &amp; cabinet</div>
+            <h3 class="viz-title">桌面(上下文)&amp; 文件柜(记忆)</h3>
+            <p class="viz-sub">秘书每轮从文件柜选材料、装上桌面。桌面有限,塞满 ≠ 用好。</p>
+          </div>
+
+          <div class="viz-stage v-desk">
+            <!-- 桌面 -->
+            <div class="v-desk-workspace">
+              <div class="v-desk-workspace-label">桌面 &middot; 上下文窗口</div>
+              <div class="v-desk-items">
+                <span class="v-desk-item"><span class="v-desk-item-icon">&#x1F4CB;</span> System prompt</span>
+                <span class="v-desk-item"><span class="v-desk-item-icon">&#x1F4AC;</span> 对话历史</span>
+                <span class="v-desk-item"><span class="v-desk-item-icon">&#x1F527;</span> 工具定义</span>
+                <span class="v-desk-item"><span class="v-desk-item-icon">&#x1F4DA;</span> 检索资料</span>
+                <span class="v-desk-item"><span class="v-desk-item-icon">&#x1F4CC;</span> 项目规则</span>
+              </div>
+              <div class="v-desk-capacity">
+                <div class="v-desk-capacity-bar"></div>
+              </div>
+              <div class="v-desk-capacity-text">上下文窗口占用</div>
+            </div>
+
+            <!-- 文件柜 -->
+            <div class="v-desk-cabinet">
+              <div class="v-desk-cabinet-label">文件柜 &middot; 记忆</div>
+              <div class="v-desk-drawer"><span class="v-desk-drawer-icon">&#x1F4C1;</span> session 级记忆</div>
+              <div class="v-desk-drawer"><span class="v-desk-drawer-icon">&#x1F464;</span> 用户级记忆</div>
+              <div class="v-desk-drawer"><span class="v-desk-drawer-icon">&#x1F465;</span> 团队级记忆</div>
+              <div class="v-desk-drawer"><span class="v-desk-drawer-icon">&#x1F3E2;</span> 组织级记忆</div>
+            </div>
+          </div>
+
+          <!-- 3 个坑 -->
+          <h4 style="margin-top: var(--sp-6);">工作台(上下文)的 3 个坑</h4>
+          <div class="v-pitfalls">
+            <div class="v-pitfall">
+              <div class="v-pitfall-tag">坑 1</div>
+              <div class="v-pitfall-title">"窗口越大越好"?错。</div>
+              <div class="v-pitfall-desc">
+                模型注意力会衰减,中间段最容易"失明"(lost in the middle)。
+                塞满 ≠ 用好。<br>
+                <strong>PM 决策:每轮塞什么,是"塞得准"的问题。</strong>
+              </div>
+            </div>
+            <div class="v-pitfall">
+              <div class="v-pitfall-tag">坑 2</div>
+              <div class="v-pitfall-title">压缩的代价</div>
+              <div class="v-pitfall-desc">
+                桌面快满,harness 压缩历史 ---- 摘要替细节。代价:规则可能一起被压没。
+                好的 harness 压缩后会重读项目规则再注回桌面。<br>
+                <strong>PM 决策:长会话后,agent 还记得规矩吗?</strong>
+              </div>
+            </div>
+            <div class="v-pitfall">
+              <div class="v-pitfall-tag">坑 3</div>
+              <div class="v-pitfall-title">上下文焦虑</div>
+              <div class="v-pitfall-desc">
+                模型察觉桌面快满,会急着收尾、草草交差。
+                对策:让新 agent 带交接文档接手,而不是死撑同一个上下文。<br>
+                <strong>PM 决策:有没有 context reset 方案?</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- 三个词一刀分清 -->
+          <h4>历史 / 记忆 / 上下文 ---- 三词一刀切</h4>
+          <div class="v-three-words">
+            <div class="v-word-card">
+              <div class="v-word-zh">历史</div>
+              <div class="v-word-en">HISTORY</div>
+              <div class="v-word-what">这次对话累积的全部对话</div>
+              <div class="v-word-life">寿命:临时 &middot; 只活在这次会话</div>
+            </div>
+            <div class="v-word-card">
+              <div class="v-word-zh">记忆</div>
+              <div class="v-word-en">MEMORY</div>
+              <div class="v-word-what">写进硬盘的长期事实</div>
+              <div class="v-word-life">寿命:跨会话 &middot; 长期</div>
+            </div>
+            <div class="v-word-card">
+              <div class="v-word-zh">上下文</div>
+              <div class="v-word-en">CONTEXT</div>
+              <div class="v-word-what">此刻塞进窗口的全部内容</div>
+              <div class="v-word-life">寿命:此刻 &middot; 随装配而变</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>一刀切判据</strong>:这事实能在硬盘上找到吗?
+            能 &rarr; 记忆;只活在当前对话里 &rarr; 历史 / 上下文。
+            "知"链路两步 ---- 写得对(进了记忆吗?) + 读得到(秘书装上桌了吗?),任何一边失守,agent 看不到。
+          </p>
+          <div class="viz-source">SOURCE &middot; Anthropic &amp; Claude Code 实践</div>
+        </figure>
+
+        <h3>PM 落点</h3>
+        <div class="pm-decisions">
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x270D;</div>
+            <div class="pm-decision-text">该记什么、不该记什么(写策略)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F5D1;</div>
+            <div class="pm-decision-text">过期了怎么扔(衰减策略)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F50D;</div>
+            <div class="pm-decision-text">做哪些动作前主动查记忆(读触发)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F512;</div>
+            <div class="pm-decision-text">谁能看谁不能看(scope / 隐私)</div>
+          </div>
+        </div>
+        <p><strong>这几条,直接决定产品的连续感、智能感、合规风险。</strong></p>
+      </section>
+
+
+      <!-- ===== &sect;5 做:工具 + 执行边界 ===== -->
+      <section class="page-section he-reveal" id="sec-5" data-toc="做:工具 + 边界">
+        <div class="page-section-eyebrow">&sect;5 &middot; 做</div>
+        <h2>工具 + 执行边界 ——<br>让它<span class="he-text-accent">能动手</span>,又<span class="he-text-accent">管得住</span></h2>
+
+        <p>
+          工具是 agent 的"手" ---- 读写文件、跑命令、调 API、发邮件 ......
+          执行边界则管住这双手:
+          <strong>不是一根滑块,是三根独立的旋钮</strong>(彼此正交,各管各的,可任意组合)。
+        </p>
+
+        <!-- Viz #4: 三旋钮 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 04 &middot; three knobs</div>
+            <h3 class="viz-title">执行边界:3 根独立旋钮</h3>
+            <p class="viz-sub">沙箱、审批、hook ---- 三根正交旋钮,各管各的,可任意组合。</p>
+          </div>
+
+          <div class="viz-stage v-knobs">
+            <!-- 旋钮 1: 沙箱 -->
+            <div class="v-knob">
+              <div class="v-knob-dial">
+                <span class="v-knob-dial-icon">&#x1F3F0;</span>
+                <div class="v-knob-dial-tick"></div>
+              </div>
+              <div class="v-knob-name">沙箱</div>
+              <div class="v-knob-sub">SANDBOX &middot; 物理墙</div>
+              <div class="v-knob-desc">
+                给 agent 装一台"假电脑"。它在假电脑里随便折腾,真电脑动都没动。
+              </div>
+              <div class="v-knob-levels">
+                <div class="v-knob-level"><span class="v-knob-level-dot is-low"></span> 只读</div>
+                <div class="v-knob-level"><span class="v-knob-level-dot is-mid"></span> 工作区可写</div>
+                <div class="v-knob-level"><span class="v-knob-level-dot is-high"></span> 完全开放</div>
+              </div>
+            </div>
+
+            <!-- 旋钮 2: 审批 -->
+            <div class="v-knob">
+              <div class="v-knob-dial">
+                <span class="v-knob-dial-icon">&#x1F464;</span>
+                <div class="v-knob-dial-tick"></div>
+              </div>
+              <div class="v-knob-name">审批策略</div>
+              <div class="v-knob-sub">APPROVAL &middot; 问不问人</div>
+              <div class="v-knob-desc">
+                每个动作出现时,要不要先问用户?从全问到永不问,档位由你定。
+              </div>
+              <div class="v-knob-levels">
+                <div class="v-knob-level"><span class="v-knob-level-dot is-low"></span> 全问 &middot; 最严</div>
+                <div class="v-knob-level"><span class="v-knob-level-dot is-mid"></span> 失败时问</div>
+                <div class="v-knob-level"><span class="v-knob-level-dot is-high"></span> agent 自判时问</div>
+                <div class="v-knob-level"><span class="v-knob-level-dot is-max"></span> 永不问 &middot; 全自动</div>
+              </div>
+            </div>
+
+            <!-- 旋钮 3: hook -->
+            <div class="v-knob">
+              <div class="v-knob-dial">
+                <span class="v-knob-dial-icon">&#x1F6E1;</span>
+                <div class="v-knob-dial-tick"></div>
+              </div>
+              <div class="v-knob-name">Hook</div>
+              <div class="v-knob-sub">HOOK &middot; 自定义安检员</div>
+              <div class="v-knob-desc">
+                工具调用前后自动跑的一段你写的代码 ---- 审计、拦截、改参数、通知人。
+              </div>
+              <div class="v-knob-levels">
+                <div class="v-knob-level"><span class="v-knob-level-dot is-low"></span> PreToolUse &middot; 调用前</div>
+                <div class="v-knob-level"><span class="v-knob-level-dot is-mid"></span> PostToolUse &middot; 调用后</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="v-orthogonal">
+            <span class="v-orthogonal-icon">&#x2A09;</span>
+            <span class="v-orthogonal-text">
+              <strong>正交</strong> = 两根独立旋钮,改一个不影响另一个。<em>像电视的音量和亮度。</em>
+            </span>
+          </div>
+
+          <p class="viz-caption">
+            <strong>经验法则</strong>:能用沙箱挡的,优先沙箱;沙箱挡不住的"按动作 / 按内容 / 按时间临场拍板"的事,用 hook。
+            <strong>软提醒写 prompt,硬规矩写 hook。</strong>
+          </p>
+        </figure>
+
+        <h4>沙箱 vs Hook ---- 容易搞混的一对</h4>
+        <div class="v-compare-sh">
+          <div class="v-compare-sh-col is-sandbox">
+            <div class="v-compare-sh-icon">&#x1F3F0;</div>
+            <div class="v-compare-sh-name">沙箱</div>
+            <div class="v-compare-sh-rows">
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">性质</span><span class="v-compare-sh-row-val">结构性、静态的环境约束</span></div>
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">比喻</span><span class="v-compare-sh-row-val">城墙 / 假电脑</span></div>
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">管什么</span><span class="v-compare-sh-row-val">根本能不能做到</span></div>
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">适合</span><span class="v-compare-sh-row-val">大类、永久、物理可达性</span></div>
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">强度</span><span class="v-compare-sh-row-val">硬 ---- 物理上没接口</span></div>
+            </div>
+          </div>
+          <div class="v-compare-sh-col is-hook">
+            <div class="v-compare-sh-icon">&#x1F6E1;</div>
+            <div class="v-compare-sh-name">Hook</div>
+            <div class="v-compare-sh-rows">
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">性质</span><span class="v-compare-sh-row-val">临场、动态的动作拦截</span></div>
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">比喻</span><span class="v-compare-sh-row-val">门口的卫兵</span></div>
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">管什么</span><span class="v-compare-sh-row-val">这一次让不让做</span></div>
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">适合</span><span class="v-compare-sh-row-val">按动作 / 内容 / 上下文临场判断</span></div>
+              <div class="v-compare-sh-row"><span class="v-compare-sh-row-label">强度</span><span class="v-compare-sh-row-val">软 ---- 靠代码逻辑,代码错就漏</span></div>
+            </div>
+          </div>
+        </div>
+
+        <h3>PM 落点</h3>
+        <div class="pm-decisions">
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F3F0;</div>
+            <div class="pm-decision-text">这个 agent 在哪几种环境跑?(沙箱档位)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F464;</div>
+            <div class="pm-decision-text">哪类动作必须问人?(审批策略)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F6E1;</div>
+            <div class="pm-decision-text">业务有没有特殊规则要拦?(hook)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x2A09;</div>
+            <div class="pm-decision-text">三根旋钮组合:沙箱兜底 + 审批兜底 + hook 兜底</div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ===== &sect;6 检:评测 + 可观测 ===== -->
+      <section class="page-section he-reveal" id="sec-6" data-toc="检:评测 + 可观测">
+        <div class="page-section-eyebrow">&sect;6 &middot; 检</div>
+        <h2>评测 + 可观测 ——<br>让你知道它<span class="he-text-accent">跑得好不好</span></h2>
+
+        <p>
+          转 / 知 / 做 让 agent 跑起来;<strong>检在 loop 外头</strong>,负责告诉你"跑得好不好"。
+          它不让 agent 转一圈,但 ----
+        </p>
+
+        <blockquote>
+          没评测的 harness 是裸奔;没可观测的 harness 是开车不看仪表盘。
+        </blockquote>
+
+        <!-- Viz #5: Dashboard -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 05 &middot; dashboard</div>
+            <h3 class="viz-title">"检"的仪表盘</h3>
+            <p class="viz-sub">评测告诉你"在变好还是变坏";可观测告诉你"这一次出了什么事"。</p>
+          </div>
+
+          <div class="viz-stage v-dashboard">
+            <!-- Golden Set -->
+            <div class="v-dash-card">
+              <div class="v-dash-head">
+                <div class="v-dash-icon is-eval">&#x1F3AF;</div>
+                <div class="v-dash-name">Golden Set 基准任务集</div>
+              </div>
+              <div class="v-dash-desc">
+                100-1000 个代表性任务 + 期望答案。每次发版前全跑,任何回归立刻可见。
+              </div>
+              <div class="v-dash-bar-group">
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">v2.1 (旧)</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-good" style="width:92%"></div></div>
+                  <span class="v-dash-bar-val">92%</span>
+                </div>
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">v2.2 (新)</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-warn" style="width:78%"></div></div>
+                  <span class="v-dash-bar-val">78%</span>
+                </div>
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">差值</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-bad" style="width:14%"></div></div>
+                  <span class="v-dash-bar-val">-14%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 在线指标 -->
+            <div class="v-dash-card">
+              <div class="v-dash-head">
+                <div class="v-dash-icon is-eval">&#x1F4CA;</div>
+                <div class="v-dash-name">在线指标</div>
+              </div>
+              <div class="v-dash-desc">
+                真实用户的隐式反馈:重试率、放弃率、点赞点踩、停留时长。用户用脚投票。
+              </div>
+              <div class="v-dash-bar-group">
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">重试率</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-warn" style="width:23%"></div></div>
+                  <span class="v-dash-bar-val">23%</span>
+                </div>
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">放弃率</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-bad" style="width:8%"></div></div>
+                  <span class="v-dash-bar-val">8%</span>
+                </div>
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">点赞率</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-good" style="width:71%"></div></div>
+                  <span class="v-dash-bar-val">71%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trace -->
+            <div class="v-dash-card">
+              <div class="v-dash-head">
+                <div class="v-dash-icon is-obs">&#x1F50E;</div>
+                <div class="v-dash-name">Trace 全链路记录</div>
+              </div>
+              <div class="v-dash-desc">
+                用户输入 &rarr; 模型调用 &rarr; 工具 &rarr; 子 agent &rarr; 结果,每一步带同一个 trace ID。像飞机黑匣子。
+              </div>
+              <div class="v-dash-trace">
+                <div class="v-dash-trace-dot is-input"></div>
+                <div class="v-dash-trace-line"></div>
+                <div class="v-dash-trace-dot is-model"></div>
+                <div class="v-dash-trace-line"></div>
+                <div class="v-dash-trace-dot is-tool"></div>
+                <div class="v-dash-trace-line"></div>
+                <div class="v-dash-trace-dot is-model"></div>
+                <div class="v-dash-trace-line"></div>
+                <div class="v-dash-trace-dot is-tool"></div>
+                <div class="v-dash-trace-line"></div>
+                <div class="v-dash-trace-dot is-result"></div>
+              </div>
+              <div class="v-dash-trace-legend">
+                <span class="v-dash-trace-legend-item"><span class="v-dash-trace-legend-dot" style="background:var(--he-accent)"></span> 输入</span>
+                <span class="v-dash-trace-legend-item"><span class="v-dash-trace-legend-dot" style="background:var(--he-text-display)"></span> 模型</span>
+                <span class="v-dash-trace-legend-item"><span class="v-dash-trace-legend-dot" style="background:#30a46c"></span> 工具</span>
+                <span class="v-dash-trace-legend-item"><span class="v-dash-trace-legend-dot" style="background:#f5a623"></span> 结果</span>
+              </div>
+            </div>
+
+            <!-- 成本归因 -->
+            <div class="v-dash-card">
+              <div class="v-dash-head">
+                <div class="v-dash-icon is-cost">&#x1F4B0;</div>
+                <div class="v-dash-name">成本归因</div>
+              </div>
+              <div class="v-dash-desc">
+                哪个用户 / 功能 / 团队烧了多少 token,实时可查,不靠月底账单。
+              </div>
+              <div class="v-dash-bar-group">
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">用户 A</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-bad" style="width:65%"></div></div>
+                  <span class="v-dash-bar-val">65%</span>
+                </div>
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">用户 B</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-warn" style="width:22%"></div></div>
+                  <span class="v-dash-bar-val">22%</span>
+                </div>
+                <div class="v-dash-bar-row">
+                  <span class="v-dash-bar-label">其余</span>
+                  <div class="v-dash-bar-track"><div class="v-dash-bar-fill is-good" style="width:13%"></div></div>
+                  <span class="v-dash-bar-val">13%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 异常告警 -->
+            <div class="v-dash-card is-wide">
+              <div class="v-dash-head">
+                <div class="v-dash-icon is-alert">&#x1F6A8;</div>
+                <div class="v-dash-name">异常告警 + Replay 重放</div>
+              </div>
+              <div class="v-dash-desc">
+                延迟突变、成本突变、失败率突变 &rarr; 自动报警,不等用户投诉。
+                拿线上 trace,用同样输入 + 状态重新跑一遍 ---- 专治非确定性 bug。
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>金句</strong>:评测集让你在切之前不犯傻;基准让你能比较;监控 + 灰度让你切之后能撤退。
+            <em>敢切,是因为能撤。</em>
+          </p>
+          <div class="viz-source">SOURCE &middot; Anthropic &amp; OpenAI 官方实践</div>
+        </figure>
+
+        <h3>PM 落点</h3>
+        <div class="pm-decisions">
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F3AF;</div>
+            <div class="pm-decision-text">上线前,有没有 golden set 跑一遍?(质量基线)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F4CA;</div>
+            <div class="pm-decision-text">在线 KPI 有没有 dashboard + 告警?(实时雷达)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F50E;</div>
+            <div class="pm-decision-text">用户报 bug,能不能 5 分钟内 replay?(debug 能力)</div>
+          </div>
+          <div class="pm-decision">
+            <div class="pm-decision-icon">&#x1F4B0;</div>
+            <div class="pm-decision-text">出问题前,能定位"谁在烧钱"?(成本归因粒度)</div>
+          </div>
+        </div>
+        <p>任何一道答"没",产品就处于"<strong>还活着但看不见自己</strong>"的状态。出事故只是时间问题。</p>
+      </section>
+
+
+      <!-- ===== &sect;7 分工地图:症状→器官 ===== -->
+      <section class="page-section he-reveal" id="sec-7" data-toc="症状→器官 诊断表">
+        <div class="page-section-eyebrow">&sect;7 &middot; 分工地图</div>
+        <h2>症状归器官 ——<br>PM 的<span class="he-text-accent">听诊器</span></h2>
+
+        <p>
+          读完 6 个器官,最重要的 PM 能力是 ----
+          <strong>看到一个症状,立即识别它归哪个器官</strong>。
+          多数事故不是"模型不行",是<strong>特定器官的设计缺失</strong>。
+        </p>
+
+        <!-- Viz #6: 诊断表 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06 &middot; diagnostic table</div>
+            <h3 class="viz-title">症状 &rarr; 器官 诊断速查</h3>
+            <p class="viz-sub">看到症状,直接定位器官,而不是抱怨"模型不行"。</p>
+          </div>
+
+          <div class="viz-stage" style="overflow-x: auto;">
+            <table class="v-diag">
+              <thead>
+                <tr>
+                  <th style="width: 45%;">你看到的症状</th>
+                  <th style="width: 15%;">归哪个器官</th>
+                  <th style="width: 40%;">查什么</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="v-diag-symptom">agent 永远做不完 / 烧钱不停</td>
+                  <td><span class="v-diag-organ is-zhuan">转</span></td>
+                  <td class="v-diag-detail">主循环 + 4 根缰绳:最大步数、预算上限</td>
+                </tr>
+                <tr>
+                  <td class="v-diag-symptom">agent 越改越糟 / 死循环</td>
+                  <td><span class="v-diag-organ is-zhuan">转</span></td>
+                  <td class="v-diag-detail">卡死检测:是否在原地打转</td>
+                </tr>
+                <tr>
+                  <td class="v-diag-symptom">agent "忘了"刚才说的事</td>
+                  <td><span class="v-diag-organ is-zhi">知</span></td>
+                  <td class="v-diag-detail">压缩没保规则 / 历史丢失</td>
+                </tr>
+                <tr>
+                  <td class="v-diag-symptom">同一个事实第二次会话又得重新教</td>
+                  <td><span class="v-diag-organ is-zhi">知</span></td>
+                  <td class="v-diag-detail">记忆没写 / 没召回</td>
+                </tr>
+                <tr>
+                  <td class="v-diag-symptom">agent 动了不该动的东西</td>
+                  <td><span class="v-diag-organ is-zuo">做</span></td>
+                  <td class="v-diag-detail">沙箱 / 工具白名单 / hook</td>
+                </tr>
+                <tr>
+                  <td class="v-diag-symptom">高危操作没人审就执行了</td>
+                  <td><span class="v-diag-organ is-zuo">做</span></td>
+                  <td class="v-diag-detail">审批策略缺位</td>
+                </tr>
+                <tr>
+                  <td class="v-diag-symptom">升模型后效果悄悄变差</td>
+                  <td><span class="v-diag-organ is-jian">检</span></td>
+                  <td class="v-diag-detail">评测 / 基准 / 灰度缺位</td>
+                </tr>
+                <tr>
+                  <td class="v-diag-symptom">月底账单暴雷</td>
+                  <td><span class="v-diag-organ is-jian">检</span></td>
+                  <td class="v-diag-detail">成本归因 + 异常告警</td>
+                </tr>
+                <tr>
+                  <td class="v-diag-symptom">用户报 bug,replay 不出来</td>
+                  <td><span class="v-diag-organ is-jian">检</span></td>
+                  <td class="v-diag-detail">trace + replay</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="viz-caption">
+            <strong>这张表,就是 PM 看 agent 产品的"听诊器"。</strong>
+            听到症状,直接定位器官,而不是抱怨"模型不行"。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== &sect;8 一句话总结 ===== -->
+      <section class="page-section he-reveal" id="sec-8" data-toc="一句话总结">
+        <div class="page-section-eyebrow">&sect;8 &middot; 总结</div>
+        <blockquote>
+          <strong>6 个器官,挂在 4 个字上:转(主循环)&middot; 知(上下文 + 记忆)&middot; 做(工具 + 执行边界)&middot; 检(评测 + 可观测)。</strong>
+          前 5 个让 agent 跑起来,第 6 个让你知道它跑得好不好。
+          每一件,都是在补"模型当下还做不到的事"。
+        </blockquote>
+
+        <p>
+          每个器官,落到 PM 都不是代码,是<strong>一组产品决策</strong>:
+          agent 自己能跑多远?能记什么?能动什么?要不要问人?有没有自检?
+          <strong>回答这些问题,就是 PM 设计 agent 产品的工作。</strong>
+        </p>
+
+        <h3>一手来源(本板块所有论断的出处)</h3>
+        <ul>
+          <li>Anthropic《Harness design for long-running application development》&mdash; <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noreferrer">anthropic.com</a></li>
+          <li>OpenAI《Harness engineering》&mdash; <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noreferrer">openai.com</a></li>
+          <li>LangChain《The Anatomy of an Agent Harness》&mdash; <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noreferrer">langchain.com</a></li>
+        </ul>
+      </section>
+
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="page-nav" aria-label="板块导航">
+        <a href="deep.html" class="page-nav-link">
+          <span class="page-nav-meta">&larr; 返回</span>
+          <span class="page-nav-title">深入 &middot; 本组总览</span>
+        </a>
+        <a href="05-how-to.html" class="page-nav-link is-next">
+          <span class="page-nav-meta">下一篇 &rarr;</span>
+          <span class="page-nav-title">⑤ 怎么做</span>
+        </a>
+      </nav>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/spotlight.js"></script>
+</body>
+</html>

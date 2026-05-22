@@ -13,6 +13,135 @@
   <link rel="stylesheet" href="../assets/shared.css">
   <link rel="stylesheet" href="../assets/page.css">
   <link rel="stylesheet" href="../assets/simulator.css">
+
+  <style>
+    /* Page-specific: 6-component flow diagram inline */
+    .six-flow {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 20px;
+      align-items: stretch;
+      padding: 28px;
+      background: var(--bg-card);
+      border: 1px solid rgba(222, 219, 200, 0.08);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .six-flow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(700px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.05) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .six-flow:hover::before { opacity: 1; }
+
+    .six-loop {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--cream);
+      padding: 12px 6px;
+      border-left: 1px dashed rgba(222, 219, 200, 0.3);
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .six-steps { display: flex; flex-direction: column; gap: 4px; position: relative; z-index: 1; }
+    .six-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: rgba(222, 219, 200, 0.025);
+      border: 1px solid rgba(222, 219, 200, 0.08);
+      border-radius: 12px;
+      transition: all 0.4s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .six-step::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.1) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .six-step:hover::before { opacity: 1; }
+    .six-step:hover {
+      border-color: rgba(222, 219, 200, 0.25);
+      transform: translateX(4px);
+    }
+    .six-step-num {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--cream);
+      color: #000;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .six-step-num.is-c1 { background: #a5acea; }
+    .six-step-num.is-c2 { background: #fbbf24; }
+    .six-step-num.is-c3 { background: #DEDBC8; }
+    .six-step-num.is-c4 { background: #f87171; }
+    .six-step-num.is-c5 { background: #4ade80; }
+    .six-step-num.is-c6 { background: #94a3b8; }
+
+    .six-step-body { flex: 1; min-width: 0; position: relative; z-index: 1; }
+    .six-step-title { font-size: 15px; font-weight: 700; color: var(--cream-text); }
+    .six-step-desc { font-size: 12.5px; color: var(--cream-dim); line-height: 1.55; margin-top: 2px; }
+
+    .six-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 4px 0;
+      color: var(--gray-600);
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+    .six-arrow span { color: var(--gray-500); }
+
+    .six-rail {
+      writing-mode: vertical-rl;
+      padding: 12px 10px;
+      background: rgba(222, 219, 200, 0.025);
+      border: 1px dashed rgba(222, 219, 200, 0.15);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .six-rail-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--cream-dim);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .six-flow { grid-template-columns: 1fr; padding: 18px; }
+      .six-loop, .six-rail { writing-mode: horizontal-tb; transform: none; border: 1px dashed rgba(222,219,200,0.2); border-radius: 10px; padding: 10px; text-align: center; }
+    }
+  </style>
 </head>
 <body>
 
@@ -25,11 +154,11 @@
       <span class="topnav-brand-text">驾驭工程</span>
     </a>
     <a href="what.html" class="topnav-link">是什么</a>
+    <a href="history.html" class="topnav-link">谱系</a>
     <a href="why.html" class="topnav-link">为什么</a>
     <a href="anatomy.html" class="topnav-link">解剖</a>
     <a href="vendors.html" class="topnav-link">厂商</a>
     <a href="method.html" class="topnav-link">方法</a>
-    <a href="history.html" class="topnav-link">谱系</a>
     <a href="resources.html" class="topnav-link">资源</a>
   </nav>
 
@@ -49,13 +178,13 @@
             <span class="toc-num">02</span>
             <span>三个尺度</span>
           </a>
-          <a href="#sim" class="toc-link">
+          <a href="#flow" class="toc-link">
             <span class="toc-num">03</span>
-            <span>3 个生成式模拟</span>
+            <span>六大组件 · 一轮循环</span>
           </a>
-          <a href="#anatomy-preview" class="toc-link">
+          <a href="#sim" class="toc-link">
             <span class="toc-num">04</span>
-            <span>四大组件预览</span>
+            <span>3 个生成式模拟</span>
           </a>
           <a href="#nesting" class="toc-link">
             <span class="toc-num">05</span>
@@ -63,9 +192,9 @@
           </a>
         </nav>
         <div class="toc-bottom">
-          <a href="why.html" class="toc-nav-link">
+          <a href="history.html" class="toc-nav-link">
             <span>下一个板块</span>
-            <span class="toc-nav-link-arrow">02 · 为什么 →</span>
+            <span class="toc-nav-link-arrow">02 · 谱系 →</span>
           </a>
           <a href="../index.html" class="toc-nav-link">
             <span>← 返回首页</span>
@@ -91,7 +220,7 @@
         <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · DEFINITION</div>
         <h2 class="sec-title reveal">一句话<em>讲清楚</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          Agent = Model + Harness。<strong style="color:var(--cream-text);">模型负责"想"，harness 负责让它"能干活"。</strong>
+          <b style="color:var(--cream-text);">Agent = Model + Harness</b>。模型负责"想"，harness 负责让它"能干活"。
         </p>
 
         <div class="reveal reveal-d2" style="margin: 24px 0 32px;">
@@ -129,7 +258,7 @@
           <div class="tile" data-glow>
             <div class="tile-num">COMPONENT · 组件级</div>
             <div class="tile-title">裹一次模型调用</div>
-            <p class="tile-desc">最小单位。包括上下文构造、工具调用、输出解析、重试、单条 trace。一个 harness 组件 = "一次有围栏的模型调用"。</p>
+            <p class="tile-desc">最小单位。一次有围栏的模型调用 + 一次工具调用。像电商客服回答一个简单问题。</p>
             <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
               代表观点：
               <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
@@ -137,8 +266,8 @@
           </div>
           <div class="tile" data-glow>
             <div class="tile-num">TASK · 任务级</div>
-            <div class="tile-title">编排多 Agent 干成一件事</div>
-            <p class="tile-desc">中等粒度。多个组件协作完成一个有终点的任务。包括分工、状态机、人机交接、最终交付物。</p>
+            <div class="tile-title">编排多步完成一件事</div>
+            <p class="tile-desc">中等粒度。多圈循环、多工具混用、边界判断随动作变化。像 Claude Code 修一个 bug。</p>
             <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
               代表观点：
               <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Thoughtworks</a>
@@ -146,8 +275,8 @@
           </div>
           <div class="tile" data-glow>
             <div class="tile-num">ORG · 组织级</div>
-            <div class="tile-title">罩一支 Agent 队伍</div>
-            <p class="tile-desc">最大粒度。一个长期运行的产品 + 一群 Agent。包括灰度发布、A/B 实验、评测集、成本治理、安全合规。</p>
+            <div class="tile-title">管一支 agent 队伍</div>
+            <p class="tile-desc">最大粒度。多 agent 路由协作、多层记忆、组织级策略、全局仪表盘。像一个客服中心管几十号人。</p>
             <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
               代表观点：
               <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
@@ -158,184 +287,224 @@
         <div class="concept-pill reveal reveal-d3">
           <p>
             <strong>组件级 ⊂ 任务级 ⊂ 组织级。</strong>
-            外层包裹内层 —— 你做一个组织级 harness，必然也在做任务级、组件级。
+            外层包裹内层 —— 做组织级 harness，必然也在做任务级、组件级。
           </p>
         </div>
       </section>
 
-      <!-- ==== SEC 3: 3 个生成式模拟 ==== -->
+      <!-- ==== SEC 3: 六大组件 ==== -->
+      <section class="sec" id="flow">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · 6 COMPONENTS · ONE LOOP</div>
+        <h2 class="sec-title reveal">六大组件 · <em>一轮循环</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          不管 harness 在哪个尺度，里面跑的都是这 6 个部件 —— 按顺序在一轮循环里走完。下面三个模拟器就是它在不同尺度的样子。
+        </p>
+
+        <div class="six-flow reveal reveal-d2" data-glow>
+          <div class="six-loop">结果回流 · 下一圈 ↻</div>
+          <div class="six-steps">
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c1">1</div>
+              <div class="six-step-body">
+                <div class="six-step-title">上下文管理</div>
+                <div class="six-step-desc">装桌面：system prompt + 对话历史 + 工具列表 → 模型此刻看见的一切</div>
+              </div>
+            </div>
+            <div class="six-arrow">↓ <span>查记忆，补进桌面</span></div>
+
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c2">2</div>
+              <div class="six-step-body">
+                <div class="six-step-title">记忆系统</div>
+                <div class="six-step-desc">从记忆库调取长期事实（用户偏好、历史决策…）补入上下文</div>
+              </div>
+            </div>
+            <div class="six-arrow">↓ <span>桌面装好，交给模型</span></div>
+
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c3">3</div>
+              <div class="six-step-body">
+                <div class="six-step-title">Agent 循环</div>
+                <div class="six-step-desc">模型思考，决定下一步：输出 tool call 或最终回答</div>
+              </div>
+            </div>
+            <div class="six-arrow">↓ <span>tool call 先过安检</span></div>
+
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c4">4</div>
+              <div class="six-step-body">
+                <div class="six-step-title">执行边界</div>
+                <div class="six-step-desc">沙箱检查 → 审批策略 → Hook：放行 / 拦截 / 问人</div>
+              </div>
+            </div>
+            <div class="six-arrow">↓ <span>放行后，真正执行</span></div>
+
+            <div class="six-step" data-glow>
+              <div class="six-step-num is-c5">5</div>
+              <div class="six-step-body">
+                <div class="six-step-title">工具生态</div>
+                <div class="six-step-desc">调用 API / 读写文件 / 发消息… → 拿到结果</div>
+              </div>
+            </div>
+          </div>
+          <div class="six-rail">
+            <span class="six-rail-label">⑥ 评测 + 全程可观测 · Trace · 成本 · 告警</span>
+          </div>
+        </div>
+
+        <p class="reveal" style="font-family: var(--font-mono); font-size: 14px; color: var(--cream-text); text-align: center; margin-top: 28px; letter-spacing: 0.04em;">
+          装桌面 → 补记忆 → 模型想 → 过安检 → 动手做 → 结果回流 → <span style="color: var(--cream);">再来一圈</span>
+        </p>
+        <p class="reveal" style="text-align: center; font-size: 14px; color: var(--gray-500); margin-top: 8px;">
+          任务没完，循环继续；任务完成或触发缰绳，循环停。
+        </p>
+      </section>
+
+      <!-- ==== SEC 4: 3 个模拟器 ==== -->
       <section class="sec" id="sim">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · LIVE SIMULATION</div>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · LIVE SIMULATION</div>
         <h2 class="sec-title reveal">点一下，<em>跑一遍</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          三个生成式 UI 模拟器，让你"看见" harness 在不同尺度下到底在干什么。<br>
+          三个学生一听就懂的场景，按同一条链路（六大组件）走一遍。<br>
           <span style="font-size: 14px; color: var(--gray-500);">所有数据为示意性演示。</span>
         </p>
 
         <div class="reveal reveal-d2">
           <!-- Tabs -->
           <div class="sim-tabs">
-            <button class="sim-tab">
-              组件级 · 一次调用
-              <span class="sim-tab-meta">COMPONENT</span>
+            <button class="sim-tab" data-target="sim-comp">
+              组件级
+              <span class="sim-tab-meta">裹一次模型调用</span>
             </button>
-            <button class="sim-tab">
-              任务级 · 多 Agent 协作
-              <span class="sim-tab-meta">TASK</span>
+            <button class="sim-tab" data-target="sim-task">
+              任务级
+              <span class="sim-tab-meta">编排多步完成一件事</span>
             </button>
-            <button class="sim-tab">
-              组织级 · Agent 队伍
-              <span class="sim-tab-meta">ORGANIZATIONAL</span>
+            <button class="sim-tab" data-target="sim-org">
+              组织级
+              <span class="sim-tab-meta">管一支 agent 队伍</span>
             </button>
           </div>
 
-          <!-- ==== SIM 1: COMPONENT ==== -->
-          <div class="sim">
+          <!-- ==== SIM 1: 组件级 · 电商客服 ==== -->
+          <div class="sim" id="sim-comp">
             <div class="sim-head">
               <div class="sim-head-left">
                 <div class="sim-dots">
                   <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
                 </div>
-                <span class="sim-tag">component_harness.py · 一次有围栏的模型调用</span>
+                <span class="sim-tag">component_harness · 电商智能客服</span>
               </div>
-              <button class="sim-btn" id="sim-comp-btn">▶ 启动模拟</button>
+              <button class="sim-btn">▶ 启动模拟</button>
             </div>
+
+            <div class="sim-scenario">
+              <span class="sim-scenario-label">场景：电商智能客服，用户打字问了一句：</span>
+              <span class="sim-scenario-bubble">"我上周买的耳机到哪了？"</span>
+            </div>
+            <div class="sim-progress"><div class="sim-progress-fill"></div></div>
+
             <div class="sim-body">
-              <div class="sim-comp">
-                <div>
-                  <div class="sim-comp-prompt">
-                    <div class="sim-comp-prompt-label">USER PROMPT</div>
-                    <div class="sim-comp-prompt-text">写一段 Python 代码，读取 sales.csv 并算月度总和。</div>
-                  </div>
-                  <div class="sim-comp-tools">
-                    <div class="sim-comp-tools-label">TOOL REGISTRY</div>
-                    <div id="sim-comp-tools"></div>
-                  </div>
-                </div>
-                <div class="sim-log" id="sim-comp-log"></div>
+              <div class="sim-body-steps">
+                <div class="sim-steps"></div>
               </div>
+              <div class="sim-aside">
+                <div class="sim-aside-h">实时记账 · METRICS</div>
+                <div class="sim-meta">
+                  <div class="meta-tile"><div class="meta-label">耗时</div><div class="meta-val" data-meta="time">—</div></div>
+                  <div class="meta-tile"><div class="meta-label">TOKENS</div><div class="meta-val" data-meta="tokens">—</div></div>
+                  <div class="meta-tile"><div class="meta-label">工具调用</div><div class="meta-val" data-meta="tools">—</div></div>
+                  <div class="meta-tile"><div class="meta-label">成本</div><div class="meta-val" data-meta="cost">—</div></div>
+                </div>
+                <div class="sim-aside-h">最终回复 · REPLY TO USER</div>
+                <div class="reply-box"><div class="reply-content"><div class="reply-placeholder">等待 agent 回复…</div></div></div>
+              </div>
+            </div>
+
+            <div class="sim-feature">
+              <b>组件级特征：</b>裹住一次模型调用。循环短（<mark>1–3 圈</mark>），工具少，边界简单。像一个前台客服处理一个小问题。
             </div>
           </div>
 
-          <!-- ==== SIM 2: TASK ==== -->
-          <div class="sim">
+          <!-- ==== SIM 2: 任务级 · Claude Code 修 bug ==== -->
+          <div class="sim" id="sim-task">
             <div class="sim-head">
               <div class="sim-head-left">
                 <div class="sim-dots">
                   <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
                 </div>
-                <span class="sim-tag">task_harness.py · 5 个 Agent 协作完成任务</span>
+                <span class="sim-tag">task_harness · Claude Code 修 bug</span>
               </div>
-              <button class="sim-btn" id="sim-task-btn">▶ 启动模拟</button>
+              <button class="sim-btn">▶ 启动模拟</button>
             </div>
+
+            <div class="sim-scenario">
+              <span class="sim-scenario-label">场景：Claude Code 修 bug，开发者说了一句：</span>
+              <span class="sim-scenario-bubble">"登录页报 500 错误，帮我修一下"</span>
+            </div>
+            <div class="sim-progress"><div class="sim-progress-fill"></div></div>
+
             <div class="sim-body">
-              <div class="sim-task">
-                <div class="sim-task-input">
-                  <span class="sim-task-input-label">TASK</span>
-                  <span>分析 Q1 用户反馈数据，生成洞察报告。</span>
-                </div>
-                <div class="sim-flow" id="sim-task-flow"></div>
-                <div class="sim-task-output" id="sim-task-output">
-                  <div class="sim-task-output-label">FINAL REPORT</div>
-                  <div class="sim-task-output-text"></div>
-                </div>
+              <div class="sim-body-steps">
+                <div class="sim-steps"></div>
               </div>
+              <div class="sim-aside">
+                <div class="sim-aside-h">运行时状态 · RUNTIME</div>
+                <div class="sim-meta">
+                  <div class="meta-tile"><div class="meta-label">循环圈数</div><div class="meta-val" data-meta="loop">—</div></div>
+                  <div class="meta-tile"><div class="meta-label">工具调用</div><div class="meta-val" data-meta="tools">—</div></div>
+                  <div class="meta-tile"><div class="meta-label">TOKENS</div><div class="meta-val" data-meta="tokens">—</div></div>
+                  <div class="meta-tile"><div class="meta-label">成本</div><div class="meta-val" data-meta="cost">—</div></div>
+                </div>
+                <div class="sim-aside-h">文件系统视图 · FS</div>
+                <div class="fs-box"><div class="fs-content"><div class="fs-placeholder">等待修复…</div></div></div>
+              </div>
+            </div>
+
+            <div class="sim-feature">
+              <b>任务级特征：</b>编排多步干完一件有终点的事。循环长（<mark>6+ 圈</mark>），多种工具混用，边界判断随动作变化。像一个工程师接了一张工单从头到尾修完。
             </div>
           </div>
 
-          <!-- ==== SIM 3: ORG ==== -->
-          <div class="sim">
+          <!-- ==== SIM 3: 组织级 · 电商 AI 客服平台 ==== -->
+          <div class="sim" id="sim-org">
             <div class="sim-head">
               <div class="sim-head-left">
                 <div class="sim-dots">
                   <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
                 </div>
-                <span class="sim-tag">org_dashboard.live · 一支 Agent 队伍 · 长期运行</span>
+                <span class="sim-tag">org_harness · 电商 AI 客服平台 · 10 万咨询/天</span>
               </div>
-              <button class="sim-btn" id="sim-org-btn">▶ 启动模拟</button>
+              <button class="sim-btn">▶ 启动模拟</button>
             </div>
+
+            <div class="sim-scenario">
+              <span class="sim-scenario-label">场景：某电商公司的 AI 客服平台，一天处理 10 万条咨询。不是一个 agent，是<b style="color:var(--cream-text);">一支 agent 队伍</b>。这条用户消息：</span>
+              <span class="sim-scenario-bubble">"（某用户）买的手机屏幕碎了，要退货，而且我是 VIP 要补偿"</span>
+            </div>
+            <div class="sim-progress"><div class="sim-progress-fill"></div></div>
+
             <div class="sim-body">
-              <div class="sim-org">
-                <div class="sim-org-left">
-                  <div class="sim-metric">
-                    <div class="sim-metric-label">ACTIVE AGENTS</div>
-                    <div class="sim-metric-value" id="m-active">0</div>
-                    <div class="sim-metric-delta">+12% vs 1h ago</div>
-                  </div>
-                  <div class="sim-metric">
-                    <div class="sim-metric-label">QPS</div>
-                    <div class="sim-metric-value" id="m-qps">0</div>
-                    <div class="sim-metric-delta">+3 / sec</div>
-                  </div>
-                  <div class="sim-metric">
-                    <div class="sim-metric-label">SUCCESS RATE</div>
-                    <div class="sim-metric-value" id="m-success">—</div>
-                    <div class="sim-metric-delta">+1.4% vs baseline</div>
-                  </div>
-                  <div class="sim-metric">
-                    <div class="sim-metric-label">TOKENS / HR</div>
-                    <div class="sim-metric-value" id="m-tokens">0</div>
-                    <div class="sim-metric-delta is-down">−4% (优化)</div>
-                  </div>
-                  <div class="sim-bars">
-                    <div class="sim-bars-label">QPS · 过去 1 分钟</div>
-                    <div class="sim-bars-row" id="sim-org-bars"></div>
-                  </div>
-                </div>
-                <div class="sim-feed" id="sim-org-feed">
-                  <div class="sim-feed-label">LIVE AGENT FEED · 等待启动…</div>
-                </div>
+              <div class="sim-body-steps">
+                <div class="sim-steps"></div>
               </div>
+              <div class="sim-aside">
+                <!-- Filled by JS -->
+              </div>
+            </div>
+
+            <div class="sim-feature">
+              <b>组织级特征：</b>管一支 agent 队伍 + 一个长期产品。<mark>多 agent 路由协作</mark>，记忆分层（组织/用户），边界按角色分配，评测是全局仪表盘。像一个客服中心的运营总监管几十号人。
             </div>
           </div>
         </div>
 
-        <div class="prose reveal" style="margin-top: 40px;">
+        <div class="prose reveal" style="margin-top: 32px;">
           <p style="font-size: 14px; color: var(--gray-500);">
-            ↑ 这三个模拟器对应的真实工程，分别引用自
-            <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic harness design</a>、
-            <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI Codex harness</a>、
-            <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain anatomy</a>
-            的核心机制。
+            ↑ 三个模拟器走同一条链路（六大组件），核心区别在<b style="color:var(--cream-text);">圈数、工具数、agent 数、记忆层级</b>。深入拆解见
+            <a class="cite" href="anatomy.html">板块 · 解剖学 →</a>
           </p>
         </div>
-      </section>
-
-      <!-- ==== SEC 4: 四大组件预览 ==== -->
-      <section class="sec" id="anatomy-preview">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · CORE COMPONENTS</div>
-        <h2 class="sec-title reveal">四大<em>组件</em></h2>
-        <p class="sec-lead reveal reveal-d1">
-          一个 harness 不管多大，都可拆成这四个部件：<strong style="color:var(--cream-text);">转 · 知 · 做 · 检</strong>。
-        </p>
-
-        <div class="grid-4 reveal reveal-d2">
-          <div class="tile" data-glow>
-            <div class="tile-icon">⟳</div>
-            <div class="tile-title">转 · LOOP</div>
-            <p class="tile-desc">主循环：感知 → 推理 → 行动。Agent 的心跳。决定下一步做什么、何时停。</p>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-icon">◉</div>
-            <div class="tile-title">知 · MEMORY</div>
-            <p class="tile-desc">上下文管理：短期工作记忆 + 长期知识库。决定 Agent 知道什么、记得什么。</p>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-icon">⚡</div>
-            <div class="tile-title">做 · TOOLS</div>
-            <p class="tile-desc">工具与执行：可调用的工具集 + 沙箱与权限。决定 Agent 能动什么、不能动什么。</p>
-          </div>
-          <div class="tile" data-glow>
-            <div class="tile-icon">◈</div>
-            <div class="tile-title">检 · EVAL</div>
-            <p class="tile-desc">评测与可观测：trace 链路、离线评测、在线 A/B。决定 Agent 跑得好不好。</p>
-          </div>
-        </div>
-
-        <p class="prose reveal reveal-d3" style="margin-top: 24px; font-size: 14px; color: var(--gray-500);">
-          → 想深入每一个组件的设计模式？看
-          <a class="cite" href="anatomy.html">板块 03 · 解剖学 →</a>
-        </p>
       </section>
 
       <!-- ==== SEC 5: 嵌套关系 ==== -->
@@ -374,7 +543,7 @@
 
         <p class="prose reveal reveal-d3" style="margin-top: 32px; font-size: 14px; color: var(--gray-500);">
           每一次外扩，都是因为前一层"控制面积"不够了。
-          <a class="cite" href="history.html">看完整谱系演化 →</a>
+          <a class="cite" href="history.html">看完整谱系演化 + 案例串联 →</a>
         </p>
       </section>
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>厂商全景 · Harness Engineering</title>
-  <meta name="description" content="Harness Engineering 厂商全景 — 五款主流 Agent 的 harness 对照拆解：Claude Code、Codex、Cursor、Windsurf、Devin。">
+  <meta name="description" content="Harness Engineering 厂商全景 — 五款主流 Agent 的 harness 对照拆解：Claude Code、Codex、Cursor、Windsurf、Devin。演化路线 · 踩过的坑 · 设计亮点 · 可交互演示。">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,128 +12,372 @@
 
   <link rel="stylesheet" href="../assets/shared.css">
   <link rel="stylesheet" href="../assets/page.css">
+  <link rel="stylesheet" href="../assets/simulator.css">
 
   <style>
-    /* Page-specific additions */
-    .vendor-mark {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      background: rgba(222,219,200,0.08);
-      display: grid;
-      place-items: center;
-      margin-bottom: 16px;
-      font-family: var(--font-mono);
-      font-weight: 800;
-      font-size: 18px;
-      color: var(--cream);
-      letter-spacing: -0.02em;
-    }
-    .vendor-facts {
+    /* ============= Vendor tags (top facts row) ============= */
+    .vendor-tags {
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px dashed rgba(222,219,200,0.12);
+      margin: 20px 0;
+      flex-wrap: wrap;
     }
-    .vendor-fact {
+    .vendor-tag {
+      padding: 6px 12px;
       font-family: var(--font-mono);
       font-size: 11px;
-      letter-spacing: 0.06em;
-      color: var(--cream);
-      padding: 4px 10px;
-      background: rgba(222,219,200,0.06);
-      border: 1px solid rgba(222,219,200,0.12);
+      color: var(--cream-dim);
+      background: rgba(222, 219, 200, 0.04);
+      border: 1px solid rgba(222, 219, 200, 0.1);
       border-radius: 6px;
+      letter-spacing: 0.04em;
     }
-    .vendor-fact-label {
-      color: var(--gray-500);
-      margin-right: 6px;
-    }
-    .scenario-tile h4 {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--cream);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      font-family: var(--font-mono);
-    }
-    .scenario-tile ul {
-      list-style: none;
-      margin: 0;
-    }
-    .scenario-tile li {
+    .vendor-tag.is-scale-comp { color: #a5acea; border-color: rgba(165, 172, 234, 0.3); }
+    .vendor-tag.is-scale-task { color: #DEDBC8; border-color: rgba(222, 219, 200, 0.3); }
+    .vendor-tag.is-scale-org { color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); }
+
+    /* ============= Evolution timeline ============= */
+    .evo-timeline {
       position: relative;
-      padding-left: 18px;
-      margin-bottom: 10px;
-      font-size: 14px;
+      padding-left: 32px;
+    }
+    .evo-timeline::before {
+      content: '';
+      position: absolute;
+      left: 6px; top: 6px; bottom: 6px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--cream), rgba(222,219,200,0.1));
+    }
+    .evo-item {
+      position: relative;
+      padding: 8px 0 18px;
+      font-size: 13.5px;
+    }
+    .evo-item::before {
+      content: '';
+      position: absolute;
+      left: -32px; top: 12px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--cream);
+      background: var(--bg);
+    }
+    .evo-item-h {
+      font-weight: 700;
+      color: var(--cream-text);
+      margin-bottom: 2px;
+    }
+    .evo-item-d {
+      font-size: 12.5px;
       color: var(--cream-dim);
       line-height: 1.6;
     }
-    .scenario-tile li::before {
-      content: '→';
-      position: absolute;
-      left: 0; top: 0;
-      color: var(--cream);
+
+    /* ============= Pitfall card ============= */
+    .pitfall {
+      margin: 24px 0;
+      padding: 16px 20px;
+      background: rgba(248, 113, 113, 0.04);
+      border: 1px solid rgba(248, 113, 113, 0.18);
+      border-left: 3px solid #f87171;
+      border-radius: 8px;
+    }
+    .pitfall-h {
       font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #f87171;
+      margin-bottom: 8px;
+    }
+    .pitfall-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .pitfall-list li {
+      font-size: 13px;
+      color: var(--cream-dim);
+      padding: 4px 0;
+      padding-left: 14px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .pitfall-list li::before {
+      content: '!';
+      position: absolute;
+      left: 0;
+      top: 4px;
+      color: #f87171;
+      font-family: var(--font-mono);
+      font-weight: 700;
       font-size: 12px;
     }
 
-    /* Comparison table */
-    .compare-wrap {
-      overflow-x: auto;
-      border-radius: 16px;
-      border: 1px solid rgba(222,219,200,0.08);
-      background: var(--bg-card);
-    }
-    table.compare {
+    /* ============= Matrix comparison table ============= */
+    .matrix-table {
       width: 100%;
       border-collapse: collapse;
       font-family: var(--font-mono);
-      font-size: 13px;
-      min-width: 720px;
+      font-size: 12.5px;
+      margin: 24px 0;
+      background: var(--bg-card);
+      border: 1px solid rgba(222,219,200,0.08);
+      border-radius: 12px;
+      overflow: hidden;
     }
-    table.compare th, table.compare td {
-      padding: 16px 18px;
+    .matrix-table th {
       text-align: left;
-      border-bottom: 1px solid rgba(222,219,200,0.06);
-    }
-    table.compare th {
+      padding: 12px 14px;
       background: rgba(222,219,200,0.04);
-      color: var(--cream);
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      color: var(--cream-text);
       font-size: 11px;
-      white-space: nowrap;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(222,219,200,0.08);
     }
-    table.compare td {
+    .matrix-table td {
+      padding: 12px 14px;
       color: var(--cream-dim);
+      border-bottom: 1px dashed rgba(222,219,200,0.06);
+      border-right: 1px dashed rgba(222,219,200,0.04);
       vertical-align: top;
+      line-height: 1.55;
     }
-    table.compare tr:last-child td { border-bottom: none; }
-    table.compare tr:hover td {
+    .matrix-table tbody tr:hover {
       background: rgba(222,219,200,0.03);
-      color: var(--cream-text);
     }
-    table.compare td:first-child {
+    .matrix-table .vendor-cell {
       color: var(--cream-text);
       font-weight: 700;
-      font-family: var(--font-sans);
     }
-    .tag {
-      display: inline-block;
+    .matrix-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .matrix-table td:last-child {
+      border-right: none;
+    }
+
+    /* ============= Overview grid ============= */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin: 28px 0;
+    }
+    .overview-card {
+      padding: 18px 16px;
+      background: var(--bg-card);
+      border: 1px solid rgba(222,219,200,0.1);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.3s var(--ease-out);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .overview-card:hover {
+      border-color: rgba(222,219,200,0.3);
+      transform: translateY(-2px);
+    }
+    .overview-card-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--cream);
+    }
+    .overview-card-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--cream-text);
+      letter-spacing: -0.01em;
+    }
+    .overview-card-name em {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--cream);
+    }
+    .overview-card-parent {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--gray-500);
+      letter-spacing: 0.04em;
+    }
+    .overview-card-scale {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      align-self: flex-start;
+      letter-spacing: 0.04em;
+    }
+    .overview-card-scale.is-comp {
+      color: #a5acea;
+      background: rgba(165, 172, 234, 0.1);
+    }
+    .overview-card-scale.is-task {
+      color: #DEDBC8;
+      background: rgba(222, 219, 200, 0.1);
+    }
+    .overview-card-scale.is-org {
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+    }
+    .overview-card-line {
+      font-size: 12.5px;
+      color: var(--cream-dim);
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+
+    /* ============= Scale ruler ============= */
+    .scale-ruler {
+      margin: 36px 0 12px;
+      padding: 28px 24px 36px;
+      background: var(--bg-card);
+      border: 1px solid rgba(222,219,200,0.08);
+      border-radius: 16px;
+      position: relative;
+    }
+    .scale-ruler-h {
       font-family: var(--font-mono);
       font-size: 11px;
-      letter-spacing: 0.04em;
-      padding: 3px 8px;
-      background: rgba(222,219,200,0.06);
-      border: 1px solid rgba(222,219,200,0.12);
-      border-radius: 5px;
+      letter-spacing: 0.12em;
       color: var(--cream);
-      margin: 2px;
+      margin-bottom: 22px;
+      text-align: center;
+    }
+    .scale-axis {
+      position: relative;
+      height: 110px;
+    }
+    .scale-line {
+      position: absolute;
+      top: 50%;
+      left: 4%;
+      right: 4%;
+      height: 2px;
+      background: linear-gradient(to right,
+        rgba(165, 172, 234, 0.4),
+        rgba(222, 219, 200, 0.4),
+        rgba(251, 191, 36, 0.4)
+      );
+      transform: translateY(-50%);
+    }
+    .scale-label {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--gray-500);
+    }
+    .scale-label.is-start { left: 0; }
+    .scale-label.is-end { right: 0; }
+    .scale-point {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--cream);
+      z-index: 2;
+    }
+    .scale-point-label {
+      position: absolute;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cream-text);
+      font-weight: 700;
       white-space: nowrap;
+    }
+    .scale-point-label.is-above {
+      bottom: calc(50% + 18px);
+    }
+    .scale-point-label.is-below {
+      top: calc(50% + 18px);
+    }
+
+    /* ============= Design highlight tiles ============= */
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .highlight-tile {
+      padding: 14px 16px;
+      background: rgba(222,219,200,0.025);
+      border: 1px solid rgba(222,219,200,0.08);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--cream-dim);
+      line-height: 1.55;
+      transition: all 0.3s var(--ease-out);
+    }
+    .highlight-tile:hover {
+      border-color: rgba(222,219,200,0.2);
+      background: rgba(222,219,200,0.04);
+    }
+    .highlight-tile b {
+      color: var(--cream-text);
+      font-size: 13.5px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ============= Section sub-headers ============= */
+    .vendor-subh {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--cream);
+      margin: 24px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed rgba(222,219,200,0.12);
+    }
+
+    .final-shape {
+      margin: 16px 0;
+      padding: 14px 18px;
+      background: rgba(165, 172, 234, 0.05);
+      border-left: 3px solid #a5acea;
+      border-radius: 0 8px 8px 0;
+      font-size: 13.5px;
+      color: var(--cream-dim);
+      line-height: 1.6;
+    }
+    .final-shape b { color: var(--cream-text); }
+
+    /* ============= Takeaway tiles ============= */
+    .takeaway-num {
+      display: inline-block;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--cream);
+      color: #000;
+      text-align: center;
+      line-height: 26px;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 1024px) {
+      .overview-grid { grid-template-columns: repeat(2, 1fr); }
+      .matrix-table { font-size: 11.5px; }
+      .matrix-table th, .matrix-table td { padding: 10px 8px; }
+    }
+    @media (max-width: 768px) {
+      .overview-grid { grid-template-columns: 1fr; }
+      .highlight-grid { grid-template-columns: 1fr; }
+      .matrix-table { display: block; overflow-x: auto; }
+      .scale-point-label { font-size: 10px; }
     }
   </style>
 </head>
@@ -148,11 +392,11 @@
       <span class="topnav-brand-text">驾驭工程</span>
     </a>
     <a href="what.html" class="topnav-link">是什么</a>
+    <a href="history.html" class="topnav-link">谱系</a>
     <a href="why.html" class="topnav-link">为什么</a>
     <a href="anatomy.html" class="topnav-link">解剖</a>
     <a href="vendors.html" class="topnav-link is-active">厂商</a>
     <a href="method.html" class="topnav-link">方法</a>
-    <a href="history.html" class="topnav-link">谱系</a>
     <a href="resources.html" class="topnav-link">资源</a>
   </nav>
 
@@ -165,32 +409,36 @@
         <div class="toc-board">厂商<em>全景</em></div>
         <nav class="toc-list">
           <a href="#overview" class="toc-link">
-            <span class="toc-num">01</span>
-            <span>5 款 Agent 一览</span>
+            <span class="toc-num">00</span>
+            <span>五款一览</span>
           </a>
           <a href="#claude-code" class="toc-link">
-            <span class="toc-num">02</span>
+            <span class="toc-num">01</span>
             <span>Claude Code</span>
           </a>
           <a href="#codex" class="toc-link">
-            <span class="toc-num">03</span>
+            <span class="toc-num">02</span>
             <span>Codex</span>
           </a>
           <a href="#cursor" class="toc-link">
-            <span class="toc-num">04</span>
+            <span class="toc-num">03</span>
             <span>Cursor</span>
           </a>
           <a href="#windsurf" class="toc-link">
-            <span class="toc-num">05</span>
+            <span class="toc-num">04</span>
             <span>Windsurf</span>
           </a>
           <a href="#devin" class="toc-link">
-            <span class="toc-num">06</span>
+            <span class="toc-num">05</span>
             <span>Devin</span>
           </a>
           <a href="#matrix" class="toc-link">
+            <span class="toc-num">06</span>
+            <span>5 维对照表</span>
+          </a>
+          <a href="#takeaway" class="toc-link">
             <span class="toc-num">07</span>
-            <span>5 维度对照表</span>
+            <span>PM 选型建议</span>
           </a>
         </nav>
         <div class="toc-bottom">
@@ -198,9 +446,9 @@
             <span>下一个板块</span>
             <span class="toc-nav-link-arrow">05 · 方法 →</span>
           </a>
-          <a href="../index.html" class="toc-nav-link">
-            <span>← 返回首页</span>
-            <span class="toc-nav-link-arrow"></span>
+          <a href="anatomy.html" class="toc-nav-link">
+            <span>← 上一板块</span>
+            <span class="toc-nav-link-arrow">03 · 解剖</span>
           </a>
         </div>
       </div>
@@ -210,358 +458,710 @@
     <main class="page-main">
 
       <header class="page-header reveal">
-        <div class="page-header-num">04 · VENDORS</div>
+        <div class="page-header-num">04 · VENDOR LANDSCAPE</div>
         <h1 class="page-title">厂商<em>全景</em></h1>
         <p class="page-lead">
-          五款主流 Agent 的 harness 对照拆解。
+          五款主流 Agent，对应着<mark>截然不同</mark>的 harness 设计哲学。同一个模型可以塞进完全不同的 harness —— 看它怎么被裹，决定它能干什么。
         </p>
       </header>
 
-      <!-- ==== SEC 1: 5 款 Agent 一览 ==== -->
+      <!-- ==== SEC 0: 五款一览 + Scale Ruler ==== -->
       <section class="sec" id="overview">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · OVERVIEW</div>
-        <h2 class="sec-title reveal">五款主流 <em>Coding Agent</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>00 · OVERVIEW</div>
+        <h2 class="sec-title reveal">五款<em>一览</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          截至 2026 年初，开发者圈子里被频繁讨论的 5 款"能真干活"的 coding agent。<strong style="color:var(--cream-text);">同样的目标，五种 harness 答卷。</strong>
+          同一类问题（写代码），五种不同尺度的 harness 解法。每张卡点进去看完整解剖。
         </p>
 
-        <div class="grid-3 reveal reveal-d2" style="margin-bottom: 16px;">
-          <div class="tile" data-glow>
-            <div class="vendor-mark">CC</div>
-            <div class="tile-num">ANTHROPIC</div>
-            <div class="tile-title">Claude Code</div>
-            <p class="tile-desc">终端原生的长程编码 Agent。以"sub-agent + plan mode + 长时任务"为最大特色。</p>
-          </div>
-          <div class="tile" data-glow>
-            <div class="vendor-mark">CX</div>
-            <div class="tile-num">OPENAI</div>
-            <div class="tile-title">Codex</div>
-            <p class="tile-desc">云端隔离沙箱里的 PR 风格 Agent。并行多任务，每个任务给你一个 pull request。</p>
-          </div>
-          <div class="tile" data-glow>
-            <div class="vendor-mark">CR</div>
-            <div class="tile-num">ANYSPHERE</div>
-            <div class="tile-title">Cursor</div>
-            <p class="tile-desc">VS Code fork，IDE 原生 Agent。以"Composer + 代码库索引"打出差异化。</p>
-          </div>
+        <div class="overview-grid reveal reveal-d2">
+          <a href="#claude-code" class="overview-card" data-glow>
+            <div class="overview-card-num">01</div>
+            <div class="overview-card-name">Claude <em>Code</em></div>
+            <div class="overview-card-parent">ANTHROPIC</div>
+            <div class="overview-card-scale is-task">任务级 + 组织级</div>
+            <div class="overview-card-line">终端原生，长任务 + 项目记忆 + sub-agents。</div>
+          </a>
+          <a href="#codex" class="overview-card" data-glow>
+            <div class="overview-card-num">02</div>
+            <div class="overview-card-name"><em>Codex</em></div>
+            <div class="overview-card-parent">OPENAI</div>
+            <div class="overview-card-scale is-task">任务级</div>
+            <div class="overview-card-line">全云端沙箱，独立任务自闭环，输出 PR diff。</div>
+          </a>
+          <a href="#cursor" class="overview-card" data-glow>
+            <div class="overview-card-num">03</div>
+            <div class="overview-card-name"><em>Cursor</em></div>
+            <div class="overview-card-parent">ANYSPHERE</div>
+            <div class="overview-card-scale is-comp">组件级</div>
+            <div class="overview-card-line">IDE 深度集成，@-context，Composer 多文件改。</div>
+          </a>
+          <a href="#windsurf" class="overview-card" data-glow>
+            <div class="overview-card-num">04</div>
+            <div class="overview-card-name"><em>Windsurf</em></div>
+            <div class="overview-card-parent">CODEIUM</div>
+            <div class="overview-card-scale is-task">任务级</div>
+            <div class="overview-card-line">Cascade 长流程 + Flow Memories 持久跨会话。</div>
+          </a>
+          <a href="#devin" class="overview-card" data-glow>
+            <div class="overview-card-num">05</div>
+            <div class="overview-card-name"><em>Devin</em></div>
+            <div class="overview-card-parent">COGNITION AI</div>
+            <div class="overview-card-scale is-org">组织级雏形</div>
+            <div class="overview-card-line">独立 SWE，工作台 1-8 小时长任务。</div>
+          </a>
         </div>
-        <div class="grid-2 reveal reveal-d3">
-          <div class="tile" data-glow>
-            <div class="vendor-mark">WS</div>
-            <div class="tile-num">CODEIUM</div>
-            <div class="tile-title">Windsurf</div>
-            <p class="tile-desc">同为 VS Code fork。以 Cascade（链式工作流）+ "flow state" 多步记忆见长。</p>
-          </div>
-          <div class="tile" data-glow>
-            <div class="vendor-mark">DV</div>
-            <div class="tile-num">COGNITION</div>
-            <div class="tile-title">Devin</div>
-            <p class="tile-desc">自称"AI 软件工程师"。给 Agent 完整 stack：shell + 浏览器 + 编辑器 + planning。</p>
+
+        <div class="scale-ruler reveal reveal-d3" data-glow>
+          <div class="scale-ruler-h">SCALE RULER · 五款在尺度尺上的位置</div>
+          <div class="scale-axis">
+            <div class="scale-line"></div>
+            <span class="scale-label is-start">组件级 →</span>
+            <span class="scale-label is-end">← 组织级</span>
+
+            <div class="scale-point" style="left: 10%;"></div>
+            <div class="scale-point-label is-above" style="left: 10%;">Cursor</div>
+
+            <div class="scale-point" style="left: 38%;"></div>
+            <div class="scale-point-label is-below" style="left: 38%;">Codex / Windsurf</div>
+
+            <div class="scale-point" style="left: 68%;"></div>
+            <div class="scale-point-label is-above" style="left: 68%;">Claude Code</div>
+
+            <div class="scale-point" style="left: 90%;"></div>
+            <div class="scale-point-label is-below" style="left: 90%;">Devin</div>
           </div>
         </div>
 
-        <div class="concept-pill reveal" style="margin-top:32px;">
-          <p>
-            <strong>读法：</strong>每一节先看"Harness 设计特色"（这家的差异化在哪里），再看"选型场景"（什么团队该挑它），最后用底部 mono 标签快速 grep 关键事实。完整对比表见
-            <a class="cite" href="#matrix">板块末尾的 5 维度对照表 →</a>
-          </p>
-        </div>
+        <p class="reveal" style="text-align: center; font-size: 13px; color: var(--gray-500); margin-top: 8px;">
+          Cursor 钉死在 IDE 里裹住"一次问答"；Devin 裹住"一个独立 SWE 全天的工作"。同样是写代码，harness 的边界<mark>差出三个数量级</mark>。
+        </p>
       </section>
 
-      <!-- ==== SEC 2: Claude Code ==== -->
+      <!-- ============================================================== -->
+      <!-- ==== SEC 1: Claude Code ==== -->
+      <!-- ============================================================== -->
       <section class="sec" id="claude-code">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · VENDOR 01</div>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · ANTHROPIC</div>
         <h2 class="sec-title reveal">Claude <em>Code</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          Anthropic 官方的 CLI 编码 Agent。把"在你 repo 里干活"做到极致 —— 终端跑、长任务、可中断、可恢复。
+          Anthropic 出品的<mark>终端编程 agent</mark>，2024 年发布。在 2026 年的官方文档里被定位为 harness 三个尺度全覆盖的工程载体。
         </p>
 
-        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
-          <div class="prose">
-            <h3>Harness 设计特色</h3>
-            <ul>
-              <li><strong>长程任务 harness</strong> —— 单次任务可跑数十分钟到数小时，靠 checkpoint 和压缩上下文撑住长循环。</li>
-              <li><strong>Sub-agent 派工</strong> —— 主 Agent 把子任务派给独立 sub-agent，各自带干净 context，结果回主线。</li>
-              <li><strong>Plan mode</strong> —— 先和你对齐计划再开干，避免一上来就乱改文件。</li>
-              <li><strong>Skill / 命令体系</strong> —— 用 SKILL.md 写"专家模块"，按需触发，等于把领域知识注成 sidecar。</li>
-            </ul>
+        <div class="vendor-tags reveal reveal-d2">
+          <span class="vendor-tag">形态：CLI 工具</span>
+          <span class="vendor-tag">模型：Claude Sonnet / Opus</span>
+          <span class="vendor-tag is-scale-task">尺度：任务级 + 组织级</span>
+          <span class="vendor-tag">发布：2024 年</span>
+        </div>
+
+        <div class="grid-2 reveal reveal-d3" style="margin-top: 8px;">
+          <div>
+            <div class="vendor-subh">EVOLUTION · 演化路线</div>
+            <div class="evo-timeline">
+              <div class="evo-item">
+                <div class="evo-item-h">1. 初代 · 终端补全 + ask 对话</div>
+                <div class="evo-item-d">最初只是 CLI 里跟 Claude 聊天，能读文件、写文件。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">2. 引入 Sub-agents</div>
+                <div class="evo-item-d">并行思考多方案，把"探索"和"执行"拆开。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">3. Plan mode 上线</div>
+                <div class="evo-item-d">长任务先出计划，人审节点强制存在 —— 任务级 harness 的关键拼图。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">4. CLAUDE.md / AGENTS.md 项目记忆</div>
+                <div class="evo-item-d">每个仓库携带规则书。打开就有上下文，不用每次重述。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">5. MCP 集成 · 标准化工具发现</div>
+                <div class="evo-item-d">从写死工具到对接 MCP server，组织级 harness 的雏形。</div>
+              </div>
+            </div>
           </div>
-          <div class="tile scenario-tile" data-glow>
-            <h4>选型场景</h4>
-            <ul>
-              <li>项目级重构、跨文件大改</li>
-              <li>需要在终端/服务器里跑、不接 IDE</li>
-              <li>对 PR 形态结果不感兴趣，希望"直接改我本地 repo"</li>
-              <li>团队已经吃 Anthropic 模型生态（API、Bedrock）</li>
-            </ul>
+
+          <div>
+            <div class="vendor-subh">DESIGN HIGHLIGHTS · 设计亮点</div>
+            <div class="highlight-grid">
+              <div class="highlight-tile" data-glow>
+                <b>长任务 harness</b>
+                sub-agents 并行探索 + plan mode 强制人审，能跑数小时不漂。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>项目级记忆</b>
+                CLAUDE.md / MEMORY.md 注入项目规则，跨会话延续。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>危险命令 Hook</b>
+                rm -rf 等破坏性操作进入 hook 流程，强制确认。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>工具组合</b>
+                Edit / Bash / Read / Glob / Grep 五件套覆盖编程全场景。
+              </div>
+            </div>
+
+            <div class="final-shape">
+              <b>最终形态：</b>terminal-native, project-aware coding agent。装在哪儿就能跑，规则随仓库走，敢长任务。
+            </div>
           </div>
         </div>
 
-        <div class="vendor-facts reveal reveal-d3">
-          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> CLI / Terminal</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> Claude Sonnet / Opus</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> Adaptive + Plan</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> Anthropic · 2021</span>
+        <div class="pitfall reveal">
+          <div class="pitfall-h">PITFALLS · 踩过的坑</div>
+          <ul class="pitfall-list">
+            <li>长任务跑偏后难以重定向 —— 通过 plan mode 强制人审节点缓解</li>
+            <li>危险命令早期靠用户警觉 —— 现在 hook 强制拦截破坏性操作</li>
+            <li>多 sub-agent 并行时上下文成本高 —— 通过模型分层（Opus 规划 + Sonnet 执行）平衡</li>
+          </ul>
         </div>
 
-        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
-          原文：
-          <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Harness design for long-running application development</a>
-          ·
-          <a class="cite" href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank">Claude Code 文档</a>
+        <div class="reveal">
+          <div class="vendor-subh">LIVE DEMO · 可交互演示</div>
+          <div class="vsim" data-vendor-sim="claude-code">
+            <div class="vsim-head">
+              <span class="vsim-title">CLAUDE CODE · 模拟运行</span>
+              <button class="vsim-btn">▶ 模拟运行</button>
+            </div>
+            <div class="vsim-log"></div>
+          </div>
+        </div>
+
+        <p class="prose reveal" style="margin-top: 20px; font-size: 13px; color: var(--gray-500);">
+          一手来源：
+          <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic · Harness design for long-running application development</a>
+          <a class="cite" href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank">Claude Code 官方文档</a>
         </p>
       </section>
 
-      <!-- ==== SEC 3: Codex ==== -->
+      <!-- ============================================================== -->
+      <!-- ==== SEC 2: Codex ==== -->
+      <!-- ============================================================== -->
       <section class="sec" id="codex">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · VENDOR 02</div>
-        <h2 class="sec-title reveal">Co<em>dex</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · OPENAI</div>
+        <h2 class="sec-title reveal"><em>Codex</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          OpenAI 的云端 coding agent。一句话给任务，云上沙箱开容器干活，结果以 PR 形态回到你 GitHub。
+          OpenAI 在 2025-2026 年推出的<mark>云端独立 agent</mark>。"harness engineering"这个词，就是它们在 2026 年 2 月那篇博客里正式命名的。
         </p>
 
-        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
-          <div class="prose">
-            <h3>Harness 设计特色</h3>
-            <ul>
-              <li><strong>云端隔离沙箱</strong> —— 每个任务跑在干净的容器里，Agent 在沙箱内有 root 权限、随便折腾。</li>
-              <li><strong>并行 fan-out</strong> —— 同一个需求可以同时派给多个 Agent，每个出一个候选 PR，你选最好的。</li>
-              <li><strong>PR-style 输出</strong> —— 不直接改你本地，而是输出 diff / branch / PR，强制走 code review 流程。</li>
-              <li><strong>"agent-first" 默认</strong> —— 设计上预设"由 Agent 主驱"，人参与的是 review 不是 driver。</li>
-            </ul>
+        <div class="vendor-tags reveal reveal-d2">
+          <span class="vendor-tag">形态：云端 Web / IDE 集成</span>
+          <span class="vendor-tag">模型：GPT-5 / o-series</span>
+          <span class="vendor-tag is-scale-task">尺度：任务级</span>
+          <span class="vendor-tag">发布：2025 年</span>
+        </div>
+
+        <div class="grid-2 reveal reveal-d3" style="margin-top: 8px;">
+          <div>
+            <div class="vendor-subh">EVOLUTION · 演化路线</div>
+            <div class="evo-timeline">
+              <div class="evo-item">
+                <div class="evo-item-h">1. Copilot Autocomplete 时代</div>
+                <div class="evo-item-d">最初的 Codex 是 GitHub Copilot 背后的补全模型 —— 还不算 agent。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">2. ChatGPT Code Interpreter</div>
+                <div class="evo-item-d">第一次把模型 + 沙箱 + 工具组成完整闭环，雏形已现。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">3. Codex Cloud Agent（2025）</div>
+                <div class="evo-item-d">独立云端工作环境，每个任务一个干净容器。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">4. PR-style Output</div>
+                <div class="evo-item-d">输出标准化为 PR diff，让人审有抓手。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">5. "Harness Engineering"正式命名（2026-02）</div>
+                <div class="evo-item-d">官方博客把这套外圈代码命名为"harness engineering"。</div>
+              </div>
+            </div>
           </div>
-          <div class="tile scenario-tile" data-glow>
-            <h4>选型场景</h4>
-            <ul>
-              <li>有 GitHub workflow、习惯走 PR review</li>
-              <li>不放心让 Agent 直接动本地，要隔离</li>
-              <li>想同时跑多个候选方案做对比</li>
-              <li>愿意按 cloud GPU/CPU 付费换隔离</li>
-            </ul>
+
+          <div>
+            <div class="vendor-subh">DESIGN HIGHLIGHTS · 设计亮点</div>
+            <div class="highlight-grid">
+              <div class="highlight-tile" data-glow>
+                <b>全云端沙箱</b>
+                每次任务一个干净容器，无副作用、可重放。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>干净环境每次</b>
+                没有"上次没清的状态"问题，对外部世界零污染。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>PR diff 输出</b>
+                所有改动收口到 PR 视图，人审节奏稳定。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>时间预算</b>
+                每个任务有明确的 wall-clock / token 预算，跑超就停。
+              </div>
+            </div>
+
+            <div class="final-shape">
+              <b>最终形态：</b>cloud-native autonomous coding agent，产物是 PR。让"派一个任务出去"变成像派工单一样自然。
+            </div>
           </div>
         </div>
 
-        <div class="vendor-facts reveal reveal-d3">
-          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> Cloud + IDE/CLI</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> GPT-5 / Codex series</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> Plan-and-Execute</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> OpenAI · 2015</span>
+        <div class="pitfall reveal">
+          <div class="pitfall-h">PITFALLS · 踩过的坑</div>
+          <ul class="pitfall-list">
+            <li>容器冷启动慢 —— 高频小任务体感比 Cursor / Claude Code 重</li>
+            <li>任务无法跨多容器协作 —— 边界即沙箱，复杂场景需要拆任务</li>
+            <li>纯异步模式让人脱离感强 —— 加了 Slack / 邮件回执后才缓解</li>
+          </ul>
         </div>
 
-        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
-          原文：
-          <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">Harness engineering: leveraging Codex in an agent-first world</a>
-          ·
-          <a class="cite" href="https://openai.com/index/introducing-codex/" target="_blank">Introducing Codex</a>
+        <div class="reveal">
+          <div class="vendor-subh">LIVE DEMO · 可交互演示</div>
+          <div class="vsim" data-vendor-sim="codex">
+            <div class="vsim-head">
+              <span class="vsim-title">CODEX · 模拟运行</span>
+              <button class="vsim-btn">▶ 模拟运行</button>
+            </div>
+            <div class="vsim-log"></div>
+          </div>
+        </div>
+
+        <p class="prose reveal" style="margin-top: 20px; font-size: 13px; color: var(--gray-500);">
+          一手来源：
+          <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI · Harness engineering: leveraging Codex in an agent-first world</a>
+          <a class="cite" href="https://platform.openai.com/docs/codex" target="_blank">Codex 官方文档</a>
         </p>
       </section>
 
-      <!-- ==== SEC 4: Cursor ==== -->
+      <!-- ============================================================== -->
+      <!-- ==== SEC 3: Cursor ==== -->
+      <!-- ============================================================== -->
       <section class="sec" id="cursor">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · VENDOR 03</div>
-        <h2 class="sec-title reveal">Cur<em>sor</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · ANYSPHERE</div>
+        <h2 class="sec-title reveal"><em>Cursor</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          Anysphere 出品的 VS Code fork。把 AI 从"右下角侧边栏"做进 IDE 主舞台 —— inline edit、Composer、多模型可选。
+          Anysphere 出品的<mark>AI 原生 IDE</mark>。从 VS Code fork 出来，把 harness 钉死在编辑器里 —— 同屏可见、即刻反馈。
         </p>
 
-        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
-          <div class="prose">
-            <h3>Harness 设计特色</h3>
-            <ul>
-              <li><strong>Composer / Agent 模式</strong> —— 多文件改写的"作曲模式"，一段需求横扫整个 repo。</li>
-              <li><strong>代码库索引</strong> —— 后台把整库 embed 入向量库，回答前先 RAG。</li>
-              <li><strong>多模型路由</strong> —— Claude、GPT、Gemini 任选；不同任务可挂不同模型。</li>
-              <li><strong>Tab autocomplete</strong> —— 极低延迟的预测式补全，IDE 体验主线。</li>
-            </ul>
+        <div class="vendor-tags reveal reveal-d2">
+          <span class="vendor-tag">形态：IDE (VS Code fork)</span>
+          <span class="vendor-tag">模型：多模型可选（Claude / GPT / 自研）</span>
+          <span class="vendor-tag is-scale-comp">尺度：组件级</span>
+          <span class="vendor-tag">发布：2023 年</span>
+        </div>
+
+        <div class="grid-2 reveal reveal-d3" style="margin-top: 8px;">
+          <div>
+            <div class="vendor-subh">EVOLUTION · 演化路线</div>
+            <div class="evo-timeline">
+              <div class="evo-item">
+                <div class="evo-item-h">1. VS Code Fork</div>
+                <div class="evo-item-d">从 VS Code 拉出一支，专门重写 AI 集成层。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">2. Tab Completion</div>
+                <div class="evo-item-d">智能补全 + 多行预测，最初的"组件级 harness"。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">3. @ Context References</div>
+                <div class="evo-item-d">@文件、@符号、@文档 —— 让上下文管理变成键盘动作。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">4. Composer Agent Mode</div>
+                <div class="evo-item-d">多文件批量改动，从"裹一次调用"扩展到"裹一个小任务"。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">5. Inline Lint + Diff Review</div>
+                <div class="evo-item-d">所有改动都进 diff 视图，人审是默认动作。</div>
+              </div>
+            </div>
           </div>
-          <div class="tile scenario-tile" data-glow>
-            <h4>选型场景</h4>
-            <ul>
-              <li>已经用 VS Code、不想换工作台</li>
-              <li>需要在 IDE 里"边看边改"，不是把活全甩给 Agent</li>
-              <li>想自由切换模型供应商，避免单一锁定</li>
-              <li>个人开发者 / 小团队，按月订阅可承受</li>
-            </ul>
+
+          <div>
+            <div class="vendor-subh">DESIGN HIGHLIGHTS · 设计亮点</div>
+            <div class="highlight-grid">
+              <div class="highlight-tile" data-glow>
+                <b>仓库级索引</b>
+                打开项目就自动建索引，@-context 秒级响应。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>Composer 多文件改</b>
+                一个意图，跨多个文件一致性修改。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>@ Context 系统</b>
+                文件、符号、文档、Web 都能 @，上下文管理用户主导。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>Inline Lint</b>
+                改完即刻显示 lint / 类型错误，反馈环最短。
+              </div>
+            </div>
+
+            <div class="final-shape">
+              <b>最终形态：</b>IDE-native agent IDE。把 harness 嵌进编辑器的每个键位，人和 agent 共享一个屏幕。
+            </div>
           </div>
         </div>
 
-        <div class="vendor-facts reveal reveal-d3">
-          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> IDE (VS Code fork)</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> Claude / GPT / Gemini</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> ReAct + Composer</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> Anysphere · 2022</span>
+        <div class="pitfall reveal">
+          <div class="pitfall-h">PITFALLS · 踩过的坑</div>
+          <ul class="pitfall-list">
+            <li>多文件改动一致性早期依赖人审 —— Composer 之前容易"改一处忘一处"</li>
+            <li>Context window 用满后效果断崖式下跌 —— 大仓库需要手动管理 @ 引用</li>
+            <li>IDE 形态注定难承长任务 —— 用户合上电脑就停了</li>
+          </ul>
         </div>
 
-        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
-          产品：
-          <a class="cite" href="https://www.cursor.com/" target="_blank">Cursor 官网</a>
-          ·
-          <a class="cite" href="https://docs.cursor.com/agent/overview" target="_blank">Agent 文档</a>
+        <div class="reveal">
+          <div class="vendor-subh">LIVE DEMO · 可交互演示</div>
+          <div class="vsim" data-vendor-sim="cursor">
+            <div class="vsim-head">
+              <span class="vsim-title">CURSOR · 模拟运行</span>
+              <button class="vsim-btn">▶ 模拟运行</button>
+            </div>
+            <div class="vsim-log"></div>
+          </div>
+        </div>
+
+        <p class="prose reveal" style="margin-top: 20px; font-size: 13px; color: var(--gray-500);">
+          一手来源：
+          <a class="cite" href="https://docs.cursor.com/" target="_blank">Cursor 官方文档</a>
+          <a class="cite" href="https://www.cursor.com/" target="_blank">cursor.com</a>
         </p>
       </section>
 
-      <!-- ==== SEC 5: Windsurf ==== -->
+      <!-- ============================================================== -->
+      <!-- ==== SEC 4: Windsurf ==== -->
+      <!-- ============================================================== -->
       <section class="sec" id="windsurf">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · VENDOR 04</div>
-        <h2 class="sec-title reveal">Wind<em>surf</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · CODEIUM</div>
+        <h2 class="sec-title reveal"><em>Windsurf</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          Codeium 推出的 IDE Agent（也是 VS Code fork）。差异点是 Cascade：链式工作流 + 跨步骤的"flow state"记忆。
+          Codeium 出品的<mark>"流模式"IDE</mark>。最独特的发明是 <b style="color:var(--cream-text);">Flow Memories</b> —— 让 agent 跨会话记住跟你的协作历史。
         </p>
 
-        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
-          <div class="prose">
-            <h3>Harness 设计特色</h3>
-            <ul>
-              <li><strong>Cascade（级联工作流）</strong> —— 把多步改动串成一条链路，AI 主动接管下一步，不需要每步点确认。</li>
-              <li><strong>Flow state 记忆</strong> —— 跨步骤维持上下文与意图，包括"为什么改这里"。</li>
-              <li><strong>Agent / Chat 双模</strong> —— 想全自动选 Agent，想保持手动选 Chat。</li>
-              <li><strong>企业版自托管</strong> —— Codeium 历来强调企业自部署、本地不出网。</li>
-            </ul>
+        <div class="vendor-tags reveal reveal-d2">
+          <span class="vendor-tag">形态：IDE (Codeium IDE / 插件)</span>
+          <span class="vendor-tag">模型：多模型可选 + 自研 SWE-1</span>
+          <span class="vendor-tag is-scale-task">尺度：任务级（强记忆）</span>
+          <span class="vendor-tag">发布：2024 年</span>
+        </div>
+
+        <div class="grid-2 reveal reveal-d3" style="margin-top: 8px;">
+          <div>
+            <div class="vendor-subh">EVOLUTION · 演化路线</div>
+            <div class="evo-timeline">
+              <div class="evo-item">
+                <div class="evo-item-h">1. Codeium 补全（前身）</div>
+                <div class="evo-item-d">VS Code 等多 IDE 插件，对标 Copilot 的补全产品。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">2. Windsurf IDE 发布</div>
+                <div class="evo-item-d">2024 年推出独立 IDE，重做整个 AI 集成层。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">3. Cascade Flow 模式</div>
+                <div class="evo-item-d">把"补全→对话→多步执行"统一成一条流，长链条原生支持。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">4. Flow Memories（核心创新）</div>
+                <div class="evo-item-d">跨会话持久记忆，agent 记得你的偏好和上周改过什么。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">5. Write-Action Review</div>
+                <div class="evo-item-d">写操作（改文件、跑命令）默认进入 review，读操作直接放行。</div>
+              </div>
+            </div>
           </div>
-          <div class="tile scenario-tile" data-glow>
-            <h4>选型场景</h4>
-            <ul>
-              <li>长 session 编辑，希望少点确认按钮</li>
-              <li>需要 Agent 接住"上一步是什么、为什么"</li>
-              <li>对企业部署、数据不出网有硬要求</li>
-              <li>从 Codeium 老用户升级</li>
-            </ul>
+
+          <div>
+            <div class="vendor-subh">DESIGN HIGHLIGHTS · 设计亮点</div>
+            <div class="highlight-grid">
+              <div class="highlight-tile" data-glow>
+                <b>Cascade 流程模式</b>
+                补全 / 对话 / 任务执行统一成流，链条原生支持长。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>Flow Memories 跨会话</b>
+                合上电脑明天再开，agent 还记得你们昨天到哪儿。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>写操作 Review</b>
+                读操作放行，写操作弹审 —— 边界按"破坏力"分级。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>自研 SWE-1 模型</b>
+                配合 harness 一起 co-design，模型层和外圈同步演化。
+              </div>
+            </div>
+
+            <div class="final-shape">
+              <b>最终形态：</b>long-flow IDE agent with persistent memory。区别于 Cursor 的"会话即生命周期"，Windsurf 让记忆跨越关机。
+            </div>
           </div>
         </div>
 
-        <div class="vendor-facts reveal reveal-d3">
-          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> IDE (VS Code fork)</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> 多模型 + 自研</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> Cascade chain</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> Codeium · 2021</span>
+        <div class="pitfall reveal">
+          <div class="pitfall-h">PITFALLS · 踩过的坑</div>
+          <ul class="pitfall-list">
+            <li>Cascade 流程跨度长，需要明确"完成"信号 —— 否则容易越跑越远</li>
+            <li>Memories 累积污染：早期会"记住错的"，需要主动清理机制</li>
+            <li>"流"形态对新手有学习成本：不像 Cursor 那样所见即所得</li>
+          </ul>
         </div>
 
-        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
-          产品：
-          <a class="cite" href="https://windsurf.com/" target="_blank">Windsurf 官网</a>
-          ·
-          <a class="cite" href="https://docs.windsurf.com/windsurf/cascade" target="_blank">Cascade 文档</a>
+        <div class="reveal">
+          <div class="vendor-subh">LIVE DEMO · 可交互演示</div>
+          <div class="vsim" data-vendor-sim="windsurf">
+            <div class="vsim-head">
+              <span class="vsim-title">WINDSURF · 模拟运行</span>
+              <button class="vsim-btn">▶ 模拟运行</button>
+            </div>
+            <div class="vsim-log"></div>
+          </div>
+        </div>
+
+        <p class="prose reveal" style="margin-top: 20px; font-size: 13px; color: var(--gray-500);">
+          一手来源：
+          <a class="cite" href="https://docs.codeium.com/windsurf" target="_blank">Windsurf 官方文档</a>
+          <a class="cite" href="https://codeium.com/" target="_blank">codeium.com</a>
         </p>
       </section>
 
-      <!-- ==== SEC 6: Devin ==== -->
+      <!-- ============================================================== -->
+      <!-- ==== SEC 5: Devin ==== -->
+      <!-- ============================================================== -->
       <section class="sec" id="devin">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>06 · VENDOR 05</div>
-        <h2 class="sec-title reveal">De<em>vin</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · COGNITION AI</div>
+        <h2 class="sec-title reveal"><em>Devin</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          Cognition AI 发布的"自主软件工程师"。给 Agent 一整套虚拟工位 —— shell + 浏览器 + 编辑器 + 长程规划。
+          Cognition AI 出品的<mark>"AI 软件工程师"</mark>。2024 年那段震撼演示视频后，第一个真把"agent 像同事一样在 Slack 收到工单"做成产品的团队。
         </p>
 
-        <div class="grid-2 reveal reveal-d2" style="margin-bottom: 24px;">
-          <div class="prose">
-            <h3>Harness 设计特色</h3>
-            <ul>
-              <li><strong>Full virtual workstation</strong> —— shell + 浏览器 + 文件管理 + 编辑器，Agent 像真实工程师那样开网页查文档。</li>
-              <li><strong>长程 plan + 重规划</strong> —— 自动拆任务、跑得不顺会主动改 plan。</li>
-              <li><strong>Slack / Linear 接入</strong> —— 不只在 IDE 里，可以被你在协作工具里 @ 出来。</li>
-              <li><strong>Session 录屏</strong> —— 任务可回看像视频；可暂停、修正、续跑。</li>
-            </ul>
+        <div class="vendor-tags reveal reveal-d2">
+          <span class="vendor-tag">形态：云端工作台</span>
+          <span class="vendor-tag">模型：多模型混合</span>
+          <span class="vendor-tag is-scale-org">尺度：组织级雏形</span>
+          <span class="vendor-tag">发布：2024-03</span>
+        </div>
+
+        <div class="grid-2 reveal reveal-d3" style="margin-top: 8px;">
+          <div>
+            <div class="vendor-subh">EVOLUTION · 演化路线</div>
+            <div class="evo-timeline">
+              <div class="evo-item">
+                <div class="evo-item-h">1. 概念演示（2024-03）</div>
+                <div class="evo-item-d">震撼视频：Shell + 浏览器 + 编辑器三件套，一镜到底跑 Upwork 任务。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">2. 公测开放</div>
+                <div class="evo-item-d">从 demo 到付费产品，第一批用户开始压测真实场景。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">3. 团队版（Team）</div>
+                <div class="evo-item-d">多用户共享同一个 Devin，权限 / 审计 / 计费分层。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">4. Slack / Linear 集成</div>
+                <div class="evo-item-d">从 web 工作台外溢到工作流：Slack 派单、Linear 跟进。</div>
+              </div>
+              <div class="evo-item">
+                <div class="evo-item-h">5. 实时回放（Playback）</div>
+                <div class="evo-item-d">每一步动作录像回放，可观测性是组织级 harness 的入场券。</div>
+              </div>
+            </div>
           </div>
-          <div class="tile scenario-tile" data-glow>
-            <h4>选型场景</h4>
-            <ul>
-              <li>想用 "AI 同事" 范式，不只是 IDE 助手</li>
-              <li>任务要查外部资料 / 调外部服务</li>
-              <li>团队接 Slack / Linear，希望工具内 @ Agent</li>
-              <li>容忍高单价、换"端到端自主"</li>
-            </ul>
+
+          <div>
+            <div class="vendor-subh">DESIGN HIGHLIGHTS · 设计亮点</div>
+            <div class="highlight-grid">
+              <div class="highlight-tile" data-glow>
+                <b>完整工程师工作台</b>
+                Shell + Browser + Editor，跟人类用的一模一样。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>长任务 1-8 小时</b>
+                单次任务可跑大半天，是当前公开产品里最长的。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>Slack 通信</b>
+                派单、追问、确认都在 Slack 里，agent 像异步同事。
+              </div>
+              <div class="highlight-tile" data-glow>
+                <b>实时回放</b>
+                录像 + trace，事后可审，是组织级可观测的基础。
+              </div>
+            </div>
+
+            <div class="final-shape">
+              <b>最终形态：</b>cloud-based autonomous software engineer。不是助手、不是工具 —— 是产品定位上的"一名独立工程师"。
+            </div>
           </div>
         </div>
 
-        <div class="vendor-facts reveal reveal-d3">
-          <span class="vendor-fact"><span class="vendor-fact-label">FORM</span> Cloud workstation</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">MODEL</span> 多模型组合</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">LOOP</span> Plan + Replan</span>
-          <span class="vendor-fact"><span class="vendor-fact-label">FOUNDED</span> Cognition · 2023</span>
+        <div class="pitfall reveal">
+          <div class="pitfall-h">PITFALLS · 踩过的坑</div>
+          <ul class="pitfall-list">
+            <li>早期演示效果难复现 —— 真实任务的成功率远低于 demo 暗示的水平</li>
+            <li>长任务漂移：跑到第 5、6 小时容易钻牛角尖，需要中段强制人审</li>
+            <li>公开评测（SWE-Bench）的成绩有过争议 —— 用户对"自主"的期待和现实有差距</li>
+            <li>"AI 工程师"叙事吸引面试官，但落到团队里更像是"高级实习生"</li>
+          </ul>
         </div>
 
-        <p class="prose reveal" style="margin-top:24px;font-size:14px;color:var(--gray-500);">
-          原文：
-          <a class="cite" href="https://www.cognition.ai/blog/introducing-devin" target="_blank">Introducing Devin, the first AI software engineer</a>
-          ·
-          <a class="cite" href="https://devin.ai/" target="_blank">Devin 官网</a>
+        <div class="reveal">
+          <div class="vendor-subh">LIVE DEMO · 可交互演示</div>
+          <div class="vsim" data-vendor-sim="devin">
+            <div class="vsim-head">
+              <span class="vsim-title">DEVIN · 模拟运行</span>
+              <button class="vsim-btn">▶ 模拟运行</button>
+            </div>
+            <div class="vsim-log"></div>
+          </div>
+        </div>
+
+        <p class="prose reveal" style="margin-top: 20px; font-size: 13px; color: var(--gray-500);">
+          一手来源：
+          <a class="cite" href="https://www.cognition.ai/blog/introducing-devin" target="_blank">Cognition · Introducing Devin</a>
+          <a class="cite" href="https://docs.devin.ai/" target="_blank">Devin 官方文档</a>
         </p>
       </section>
 
-      <!-- ==== SEC 7: 5 维度对照表 ==== -->
+      <!-- ============================================================== -->
+      <!-- ==== SEC 6: 对照表 ==== -->
+      <!-- ============================================================== -->
       <section class="sec" id="matrix">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>07 · COMPARISON MATRIX</div>
-        <h2 class="sec-title reveal">5 维度<em>对照表</em></h2>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>06 · COMPARISON MATRIX</div>
+        <h2 class="sec-title reveal">5 维<em>对照表</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          把上面五家放在同一张表里，按 harness 工程的 5 个关键维度横切。<strong style="color:var(--cream-text);">字段越短，越能 grep 到差异。</strong>
+          同一套 harness 结构（主循环 · 工具 · 上下文 · 边界 · 评测 · 尺度），看五款各自怎么填。
         </p>
 
-        <div class="compare-wrap reveal reveal-d2">
-          <table class="compare">
+        <div class="reveal reveal-d2" style="overflow-x: auto;">
+          <table class="matrix-table">
             <thead>
               <tr>
-                <th>Vendor</th>
-                <th>主循环</th>
+                <th>厂商</th>
+                <th>主循环类型</th>
                 <th>工具集</th>
                 <th>上下文管理</th>
-                <th>安全围栏</th>
-                <th>定价模型</th>
+                <th>执行边界</th>
+                <th>评测 + 可观测</th>
+                <th>所属尺度</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Claude Code</td>
-                <td><span class="tag">Adaptive</span><span class="tag">Plan</span></td>
-                <td><span class="tag">Shell</span><span class="tag">File</span><span class="tag">MCP</span></td>
-                <td><span class="tag">压缩</span><span class="tag">sub-agent</span></td>
-                <td><span class="tag">本地</span><span class="tag">permission</span></td>
-                <td><span class="tag">API</span><span class="tag">Plan</span></td>
+                <td class="vendor-cell">Claude Code</td>
+                <td>Plan + Adaptive ReAct</td>
+                <td>Edit · Bash · Read · Glob · Grep · MCP</td>
+                <td>CLAUDE.md / MEMORY.md 项目记忆</td>
+                <td>Plan mode 人审 + 危险命令 Hook</td>
+                <td>Trace · 可回滚 · token 计量</td>
+                <td>任务级 + 组织级</td>
               </tr>
               <tr>
-                <td>Codex</td>
-                <td><span class="tag">Plan-Exec</span><span class="tag">Fan-out</span></td>
-                <td><span class="tag">Sandbox</span><span class="tag">Git</span><span class="tag">Shell</span></td>
-                <td><span class="tag">PR diff</span><span class="tag">summary</span></td>
-                <td><span class="tag">云沙箱</span><span class="tag">review</span></td>
-                <td><span class="tag">Cloud</span><span class="tag">Sub</span></td>
+                <td class="vendor-cell">Codex</td>
+                <td>Autonomous Plan</td>
+                <td>Shell · Editor · Browser（沙箱内）</td>
+                <td>Repo 索引 + 任务 issue</td>
+                <td>容器隔离 + 时间预算 + PR diff 审</td>
+                <td>容器日志 · 时间 / Token 预算</td>
+                <td>任务级</td>
               </tr>
               <tr>
-                <td>Cursor</td>
-                <td><span class="tag">ReAct</span><span class="tag">Composer</span></td>
-                <td><span class="tag">IDE</span><span class="tag">RAG</span><span class="tag">MCP</span></td>
-                <td><span class="tag">embedding</span><span class="tag">file</span></td>
-                <td><span class="tag">本地</span><span class="tag">diff 审</span></td>
-                <td><span class="tag">Sub</span><span class="tag">月付</span></td>
+                <td class="vendor-cell">Cursor</td>
+                <td>ReAct（短）</td>
+                <td>Edit · Search · Lint · @-context</td>
+                <td>仓库索引 + @ 引用（用户主导）</td>
+                <td>Diff 视图人审（同屏）</td>
+                <td>Inline Lint · 类型检查 · 改动 diff</td>
+                <td>组件级</td>
               </tr>
               <tr>
-                <td>Windsurf</td>
-                <td><span class="tag">Cascade</span><span class="tag">chain</span></td>
-                <td><span class="tag">IDE</span><span class="tag">MCP</span><span class="tag">Term</span></td>
-                <td><span class="tag">flow</span><span class="tag">step memo</span></td>
-                <td><span class="tag">本地</span><span class="tag">企业自托管</span></td>
-                <td><span class="tag">Sub</span><span class="tag">企业版</span></td>
+                <td class="vendor-cell">Windsurf</td>
+                <td>Cascade Flow</td>
+                <td>Edit · Run · Search</td>
+                <td>Flow Memories 跨会话持久</td>
+                <td>写操作 review，读操作放行</td>
+                <td>Cascade 步骤 trace · Memories 审计</td>
+                <td>任务级（强记忆）</td>
               </tr>
               <tr>
-                <td>Devin</td>
-                <td><span class="tag">Plan</span><span class="tag">Replan</span></td>
-                <td><span class="tag">Shell</span><span class="tag">浏览器</span><span class="tag">Editor</span></td>
-                <td><span class="tag">session</span><span class="tag">scratchpad</span></td>
-                <td><span class="tag">云隔离</span><span class="tag">回放</span></td>
-                <td><span class="tag">ACU</span><span class="tag">高单价</span></td>
+                <td class="vendor-cell">Devin</td>
+                <td>Long-horizon Autonomous</td>
+                <td>Shell · Editor · Browser · Slack</td>
+                <td>项目克隆 + 工作台状态 + Slack 历史</td>
+                <td>人类可中断 + Slack 双向通信</td>
+                <td>实时视频回放 · 任务进度 · 团队审计</td>
+                <td>组织级雏形</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <p class="prose reveal reveal-d3" style="margin-top:32px;">
-          这五家在<strong>主循环</strong>形态、<strong>沙箱位置</strong>（本地 vs 云端）、<strong>输出形态</strong>（直接改 repo vs PR）上选择不同 —— 这些选择决定了它适合什么团队。
-          想看到这些 harness 共同遵守的设计原则，去
-          <a class="cite" href="method.html">板块 05 · 怎么做 →</a>
-          ；想看每个组件级特性的术语表，去
-          <a class="cite" href="anatomy.html">板块 03 · 解剖学 →</a>
-          ；一手原始资料汇总在
-          <a class="cite" href="resources.html">资源 →</a>
-          。
+        <p class="reveal" style="font-family: var(--font-mono); font-size: 12px; color: var(--gray-500); text-align: center; margin-top: 8px;">
+          ↑ 同一套结构，五种装法。看哪一列你需要 / 哪一列你做不到，决定你抄谁的作业。
+        </p>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- ==== SEC 7: PM 选型建议 ==== -->
+      <!-- ============================================================== -->
+      <section class="sec" id="takeaway">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>07 · PM TAKEAWAY</div>
+        <h2 class="sec-title reveal">PM <em>选型建议</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          你做的产品落在哪个尺度，就去抄那个尺度上做得最好的厂商的作业。
+        </p>
+
+        <div class="grid-3 reveal reveal-d2">
+          <div class="tile" data-glow>
+            <span class="takeaway-num">1</span>
+            <div class="tile-num">COMPONENT · 组件级</div>
+            <div class="tile-title">你做：in-app 助手、简单问答、SaaS 嵌入</div>
+            <p class="tile-desc">
+              学 <b style="color:var(--cream-text);">Cursor</b> 的 IDE 深度集成思路：同屏、即刻反馈、@-context、用户主导上下文。
+            </p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              关键能力：仓库级索引、@ 引用系统、diff 同屏。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <span class="takeaway-num">2</span>
+            <div class="tile-num">TASK · 任务级</div>
+            <div class="tile-title">你做：自动化工单、bug 修复、独立任务</div>
+            <p class="tile-desc">
+              学 <b style="color:var(--cream-text);">Claude Code</b> 的 plan mode + 工具组合，或 <b style="color:var(--cream-text);">Codex</b> 的云端沙箱模式。
+            </p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              关键能力：plan / sub-agents、强工具组合、PR-style 输出、人审节点。
+            </p>
+          </div>
+          <div class="tile" data-glow>
+            <span class="takeaway-num">3</span>
+            <div class="tile-num">ORG · 组织级</div>
+            <div class="tile-title">你做：多 agent 队伍、长期产品、平台</div>
+            <p class="tile-desc">
+              学 <b style="color:var(--cream-text);">Devin</b> 的工作台思路 + <b style="color:var(--cream-text);">Anthropic</b> 的治理框架。
+            </p>
+            <p style="font-size: 12px; color: var(--gray-500); margin-top: 12px;">
+              关键能力：实时回放、Slack 集成、分层记忆、组织审计、长任务断点。
+            </p>
+          </div>
+        </div>
+
+        <div class="concept-pill reveal reveal-d3">
+          <p>
+            <strong>没有完美的 harness，只有匹配你产品阶段的 harness。</strong>
+            选型不看技术多酷，看你的用户在哪个尺度上需要 agent —— 用户在 IDE 里就抄 Cursor，用户在工单系统里就抄 Claude Code，用户要一名"虚拟同事"就抄 Devin。
+          </p>
+        </div>
+
+        <p class="prose reveal" style="margin-top: 32px; font-size: 14px; color: var(--gray-500);">
+          下一站：看看这五家是怎么把 harness 做出来的 ——
+          <a class="cite" href="method.html">板块 · 方法论 →</a>
         </p>
       </section>
 
@@ -573,15 +1173,15 @@
     <div class="footer-links">
       <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
       <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
-      <a class="cite" href="https://www.cursor.com/" target="_blank">Cursor</a>
-      <a class="cite" href="https://windsurf.com/" target="_blank">Windsurf</a>
-      <a class="cite" href="https://www.cognition.ai/blog/introducing-devin" target="_blank">Cognition</a>
-      <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+      <a class="cite" href="https://docs.cursor.com/" target="_blank">Cursor</a>
+      <a class="cite" href="https://codeium.com/" target="_blank">Windsurf</a>
+      <a class="cite" href="https://www.cognition.ai/blog/introducing-devin" target="_blank">Devin</a>
     </div>
     <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
   </footer>
 
   <script src="../assets/shared.js"></script>
   <script src="../assets/page.js"></script>
+  <script src="../assets/simulator.js"></script>
 </body>
 </html>

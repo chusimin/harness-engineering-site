@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实战 · Harness Engineering</title>
+  <meta name="description" content="PM 能上手做的事 —— 真实可 fork 的 harness 模板仓库">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/page.css">
+
+  <style>
+    /* ============================================
+       本页可视化专用样式（仅 ⑥ 实战 用）
+       ============================================ */
+
+    /* ---- Viz: 两层 harness 分层图 ---- */
+    .v-layers {
+      display: grid;
+      gap: 0;
+    }
+    .v-layer {
+      padding: var(--sp-6);
+      position: relative;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-layer:hover { transform: translateX(4px); }
+    .v-layer-platform {
+      background: var(--he-bg-muted);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md) var(--he-radius-md) 0 0;
+    }
+    .v-layer-app {
+      background: rgba(94, 106, 210, 0.06);
+      border: 2px solid var(--he-accent);
+      border-radius: 0 0 var(--he-radius-md) var(--he-radius-md);
+      border-top: none;
+    }
+    .v-layer-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--sp-3);
+      padding: 3px 10px;
+      border-radius: var(--he-radius-pill);
+    }
+    .v-layer-platform .v-layer-tag {
+      background: var(--he-bg-subtle);
+      color: var(--he-text-muted);
+      border: 1px solid var(--he-border);
+    }
+    .v-layer-app .v-layer-tag {
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-layer-title {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-2);
+    }
+    .v-layer-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-snug);
+    }
+    .v-layer-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+      margin-top: var(--sp-3);
+    }
+    .v-layer-chip {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-pill);
+      color: var(--he-text-muted);
+    }
+    .v-layer-chip.is-you {
+      background: var(--he-accent-soft);
+      border-color: var(--c-indigo-a24);
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-layer-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-2) 0;
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      color: var(--he-text-subtle);
+      letter-spacing: 0.06em;
+    }
+
+    /* ---- Viz: 文件树 ---- */
+    .v-tree {
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      line-height: 2;
+      color: var(--he-text-body);
+      background: var(--he-text-display);
+      color: var(--he-text-inverse);
+      padding: var(--sp-6);
+      border-radius: var(--he-radius-md);
+      overflow-x: auto;
+    }
+    .v-tree-root {
+      color: var(--he-accent);
+      font-weight: var(--he-weight-bold);
+      font-size: 14px;
+    }
+    .v-tree-line {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      padding: 2px 0;
+      transition: background var(--he-dur-fast);
+      border-radius: var(--he-radius-xs);
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+    .v-tree-line:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .v-tree-indent {
+      color: rgba(255,255,255,0.2);
+      user-select: none;
+    }
+    .v-tree-name {
+      flex-shrink: 0;
+    }
+    .v-tree-badge {
+      font-size: 10px;
+      padding: 1px 8px;
+      border-radius: var(--he-radius-pill);
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+    }
+    .v-tree-badge.is-zhi {
+      background: rgba(59, 130, 246, 0.25);
+      color: #93c5fd;
+    }
+    .v-tree-badge.is-zuo {
+      background: rgba(34, 197, 94, 0.25);
+      color: #86efac;
+    }
+    .v-tree-badge.is-jian {
+      background: rgba(251, 146, 60, 0.25);
+      color: #fdba74;
+    }
+
+    /* ---- Viz: 文档卡片（4 个 Skill） ---- */
+    .v-docs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-doc-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .v-doc-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-3px);
+      box-shadow: var(--he-shadow-md);
+    }
+    .v-doc-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--he-accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-doc-card:hover::before { transform: scaleX(1); }
+    .v-doc-num {
+      font-family: var(--he-font-mono);
+      font-size: 36px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-accent);
+      opacity: 0.15;
+      line-height: 1;
+      margin-bottom: var(--sp-2);
+    }
+    .v-doc-card:hover .v-doc-num { opacity: 0.4; }
+    .v-doc-name {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-1);
+    }
+    .v-doc-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: var(--he-leading-snug);
+      margin-bottom: var(--sp-3);
+    }
+    .v-doc-flow {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: var(--he-text-subtle);
+      padding-top: var(--sp-2);
+      border-top: 1px dashed var(--he-border);
+    }
+    @media (max-width: 1024px) {
+      .v-docs { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .v-docs { grid-template-columns: 1fr; }
+    }
+
+    /* ---- 文档链条流 ---- */
+    .v-chain {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      padding: var(--sp-4) 0;
+      flex-wrap: wrap;
+    }
+    .v-chain-node {
+      font-family: var(--he-font-mono);
+      font-size: 12px;
+      font-weight: var(--he-weight-semibold);
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-sm);
+      color: var(--he-text-strong);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-chain-node:hover {
+      border-color: var(--he-accent);
+      background: var(--he-accent-soft);
+    }
+    .v-chain-arrow {
+      font-family: var(--he-font-mono);
+      font-size: 14px;
+      color: var(--he-accent);
+      animation: v-chain-pulse 2s ease-in-out infinite;
+    }
+    @keyframes v-chain-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ---- Viz: 工作流（PRD 到执行到评测） ---- */
+    .v-workflow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--sp-2);
+      position: relative;
+    }
+    .v-wf-step {
+      padding: var(--sp-4) var(--sp-3);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      position: relative;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-wf-step:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-wf-step:not(:last-child)::after {
+      content: '\2192';
+      position: absolute;
+      right: calc(-1 * var(--sp-2) + 2px);
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--he-font-mono);
+      color: var(--he-accent);
+      font-size: 14px;
+      z-index: 1;
+    }
+    .v-wf-icon {
+      font-size: 24px;
+      margin-bottom: var(--sp-1);
+    }
+    .v-wf-num {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .v-wf-name {
+      font-size: var(--he-text-xs);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      line-height: 1.3;
+    }
+    .v-wf-sub {
+      font-size: 10px;
+      color: var(--he-text-muted);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    @media (max-width: 768px) {
+      .v-workflow {
+        grid-template-columns: 1fr;
+        gap: var(--sp-3);
+      }
+      .v-wf-step:not(:last-child)::after {
+        content: '\2193';
+        right: 50%;
+        top: auto;
+        bottom: calc(-1 * var(--sp-3) + 4px);
+        transform: translateX(50%);
+      }
+    }
+
+    /* ---- Viz: 评测管线 ---- */
+    .v-eval-pipe {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-eval-stage {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      position: relative;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-eval-stage:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-eval-stage:not(:last-child)::after {
+      content: '\2192';
+      position: absolute;
+      right: calc(-1 * var(--sp-3) + 2px);
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--he-font-mono);
+      color: var(--he-accent);
+      font-size: 16px;
+      z-index: 1;
+    }
+    .v-eval-icon {
+      font-size: 28px;
+      margin-bottom: var(--sp-2);
+    }
+    .v-eval-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: 4px;
+    }
+    .v-eval-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.5;
+    }
+    .v-eval-loop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      margin-top: var(--sp-4);
+      padding: var(--sp-3);
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-md);
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-sm);
+      color: var(--he-accent);
+    }
+    .v-eval-loop svg { animation: v-eval-spin 4s linear infinite; }
+    @keyframes v-eval-spin { to { transform: rotate(360deg); } }
+    @media (max-width: 768px) {
+      .v-eval-pipe { grid-template-columns: repeat(2, 1fr); }
+      .v-eval-stage:nth-child(2)::after { display: none; }
+    }
+    @media (max-width: 480px) {
+      .v-eval-pipe { grid-template-columns: 1fr; }
+      .v-eval-stage:not(:last-child)::after { display: none; }
+    }
+
+    /* ---- Viz: Before / After 对比 ---- */
+    .v-compare-ba {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+    .v-ba-col {
+      padding: var(--sp-6);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-ba-col:hover { transform: translateY(-2px); }
+    .v-ba-before {
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+    }
+    .v-ba-after {
+      background: rgba(94, 106, 210, 0.04);
+      border: 2px solid var(--he-accent);
+      box-shadow: 0 8px 32px var(--c-indigo-a16);
+    }
+    .v-ba-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--sp-4);
+      padding: 3px 10px;
+      border-radius: var(--he-radius-pill);
+    }
+    .v-ba-before .v-ba-tag {
+      background: var(--he-bg-muted);
+      color: var(--he-text-muted);
+    }
+    .v-ba-after .v-ba-tag {
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-ba-title {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-4);
+    }
+    .v-ba-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .v-ba-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-2);
+      padding: var(--sp-2) 0;
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-snug);
+      border-bottom: 1px dashed var(--he-border);
+    }
+    .v-ba-list li:last-child { border-bottom: none; }
+    .v-ba-icon {
+      flex-shrink: 0;
+      font-size: 14px;
+      margin-top: 1px;
+    }
+    .v-ba-before .v-ba-icon { color: var(--he-text-subtle); }
+    .v-ba-after .v-ba-icon { color: var(--he-accent); }
+    @media (max-width: 640px) {
+      .v-compare-ba { grid-template-columns: 1fr; }
+    }
+
+    /* ---- Viz: 6 零件分工表 ---- */
+    .v-parts-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--he-text-sm);
+    }
+    .v-parts-table th,
+    .v-parts-table td {
+      padding: var(--sp-3) var(--sp-4);
+      text-align: left;
+      border-bottom: 1px solid var(--he-border);
+    }
+    .v-parts-table th {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-muted);
+      background: var(--he-bg-subtle);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-parts-table td {
+      color: var(--he-text-body);
+    }
+    .v-parts-table .v-pt-part {
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+    }
+    .v-parts-table .v-pt-check {
+      color: var(--he-accent);
+      font-size: 16px;
+    }
+    .v-parts-table .v-pt-you {
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-parts-table tr:hover td {
+      background: var(--he-accent-soft);
+    }
+
+    /* ---- Viz: Skill 解剖 ---- */
+    .v-skill-anatomy {
+      display: grid;
+      gap: var(--sp-3);
+      counter-reset: anatomy;
+    }
+    .v-sa-block {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: var(--sp-4);
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      counter-increment: anatomy;
+    }
+    .v-sa-block:hover {
+      border-color: var(--he-accent);
+      transform: translateX(4px);
+    }
+    .v-sa-num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      font-weight: var(--he-weight-bold);
+    }
+    .v-sa-title {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: 3px;
+    }
+    .v-sa-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: var(--he-leading-snug);
+    }
+    .v-sa-code {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      color: var(--he-accent);
+      background: var(--he-accent-soft);
+      padding: 2px 8px;
+      border-radius: var(--he-radius-xs);
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    /* ---- 步骤进度条 ---- */
+    .v-steps-progress {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-1);
+      margin-bottom: var(--sp-8);
+    }
+    .v-sp-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-family: var(--he-font-mono);
+      font-size: 12px;
+      font-weight: var(--he-weight-bold);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      flex-shrink: 0;
+    }
+    .v-sp-dot.is-active {
+      background: var(--he-accent);
+      color: var(--he-text-inverse);
+      box-shadow: 0 0 0 4px var(--c-indigo-a16);
+    }
+    .v-sp-dot.is-done {
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+    }
+    .v-sp-dot.is-todo {
+      background: var(--he-bg-muted);
+      color: var(--he-text-subtle);
+      border: 1px solid var(--he-border);
+    }
+    .v-sp-line {
+      flex: 1;
+      height: 2px;
+      background: var(--he-border);
+    }
+    .v-sp-line.is-done {
+      background: var(--c-indigo-a24);
+    }
+
+    /* ---- 面试话术卡 ---- */
+    .v-speech {
+      position: relative;
+      padding: var(--sp-6);
+      background: var(--he-text-display);
+      color: var(--he-text-inverse);
+      border-radius: var(--he-radius-lg);
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .v-speech-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      margin-bottom: var(--sp-4);
+      padding: 3px 10px;
+      background: rgba(94, 106, 210, 0.2);
+      border-radius: var(--he-radius-pill);
+    }
+    .v-speech strong {
+      color: #a5acea;
+    }
+    .v-speech-time {
+      position: absolute;
+      top: var(--sp-6);
+      right: var(--sp-6);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.06em;
+    }
+
+    /* ---- 面试 Q&A 卡片 ---- */
+    .v-qa-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-qa-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-qa-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-qa-q {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-3);
+      padding-bottom: var(--sp-3);
+      border-bottom: 1px dashed var(--he-border);
+    }
+    .v-qa-q::before {
+      content: 'Q';
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      font-weight: var(--he-weight-bold);
+      margin-right: var(--sp-2);
+    }
+    .v-qa-a {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+    }
+    @media (max-width: 640px) {
+      .v-qa-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---- 扩展场景卡 ---- */
+    .v-extend-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-extend-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-extend-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-extend-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-2);
+    }
+    .v-extend-changes {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .v-extend-changes li {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.8;
+      padding-left: var(--sp-4);
+      position: relative;
+    }
+    .v-extend-changes li::before {
+      content: '+';
+      position: absolute;
+      left: 0;
+      color: var(--he-accent);
+      font-family: var(--he-font-mono);
+      font-weight: var(--he-weight-bold);
+    }
+    @media (max-width: 768px) {
+      .v-extend-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---- 通用小组件 ---- */
+    .callout {
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border-left: 3px solid var(--he-accent);
+      border-radius: 0 var(--he-radius-md) var(--he-radius-md) 0;
+      margin: var(--sp-6) 0;
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .callout strong { color: var(--he-text-display); }
+
+    /* ---- 构建步骤标签 ---- */
+    .step-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      padding: 3px 10px;
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-pill);
+      margin-bottom: var(--sp-3);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-hero">
+    <div class="page-hero-inner">
+      <a class="page-back" href="../index.html">&larr; 回首页</a>
+      <div class="page-eyebrow">
+        <span class="page-eyebrow-num">04 / 05</span>
+        <span class="page-eyebrow-group">实战 &middot; PRACTICE</span>
+      </div>
+      <h1 class="he-h1 page-title">PM 能<span class="he-text-accent">上手做的事</span>。</h1>
+      <p class="he-lead page-lead">
+        看完概念，PM 能动什么手？一个真实可 fork 的 PRD-Harness 模板仓库，
+        让你能在面试中说"我做过 harness 工程"，并拿出证据。
+      </p>
+      <div class="page-meta">
+        <span class="page-meta-item">1 个板块 + 1 个仓库</span>
+        <span class="page-meta-item">阅读 30 分钟</span>
+        <span class="page-meta-item">动手另算</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <main class="page-main">
+
+      <div class="group-intro">
+        <div class="group-intro-q">这一组要回答的核心问题</div>
+        <p class="group-intro-a">
+          PM 没有工程背景，能在 Harness 这件事上做出什么"摸得到"的产出？
+          答：一份高完成度的 PRD 模板仓库 + 一套配套的评测流程。
+        </p>
+      </div>
+
+      <!-- CHAPTER 1: 实战 (OPEN BY DEFAULT) -->
+      <div class="page-chapter is-open" id="chapter-06">
+        <div class="page-chapter-header">
+          <div class="page-chapter-num">06</div>
+          <div class="page-chapter-info">
+            <div class="page-chapter-title">实战</div>
+            <div class="page-chapter-desc">pm-docs-harness 模板讲解 + 一个完整案例：从写 PRD 到 agent 执行到评测产出</div>
+            <div class="page-chapter-pills">
+              <span class="page-chapter-pill">13 个可视化</span>
+              <span class="page-chapter-pill">约 30 分钟</span>
+            </div>
+          </div>
+          <svg class="page-chapter-chevron" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
+          </svg>
+        </div>
+        <div class="page-chapter-body">
+          <div class="page-chapter-content">
+
+      <!-- ===== §1 你会得到什么 ===== -->
+      <section class="page-section he-reveal" id="sec-06-1" data-toc="你会得到什么">
+        <div class="page-section-eyebrow">&sect;1 &middot; 你会得到什么</div>
+        <h2>走完这一节，<br>你拿走 <span class="he-text-accent">3 个东西</span>。</h2>
+
+        <p>
+          不是笔记，不是"了解一下"。是<strong>真东西</strong> ——
+        </p>
+
+        <!-- Viz #1: Before / After 对比 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 01 &middot; before vs after</div>
+            <h3 class="viz-title">有 harness 和没 harness 的 PM，差别在哪</h3>
+            <p class="viz-sub">同一个 PM，同一个 Claude，差的是"有没有搭过 harness"。</p>
+          </div>
+
+          <div class="viz-stage v-compare-ba">
+            <div class="v-ba-col v-ba-before">
+              <div class="v-ba-tag">BEFORE &middot; Solo 裸用</div>
+              <div class="v-ba-title">没搭 harness 的 PM</div>
+              <ul class="v-ba-list">
+                <li><span class="v-ba-icon">&times;</span>每次对话从零开始，重复喂背景</li>
+                <li><span class="v-ba-icon">&times;</span>PRD 一口气甩出，漂亮但空</li>
+                <li><span class="v-ba-icon">&times;</span>没追问，假装懂了就开始写</li>
+                <li><span class="v-ba-icon">&times;</span>不知道产出好不好，只能肉眼看</li>
+                <li><span class="v-ba-icon">&times;</span>面试说"我用过 AI 写文档"</li>
+                <li><span class="v-ba-icon">&times;</span>没有可复用的工件</li>
+              </ul>
+            </div>
+            <div class="v-ba-col v-ba-after">
+              <div class="v-ba-tag">AFTER &middot; Full Harness</div>
+              <div class="v-ba-title">搭过 harness 的 PM</div>
+              <ul class="v-ba-list">
+                <li><span class="v-ba-icon">&check;</span>项目背景常驻记忆，不用重复喂</li>
+                <li><span class="v-ba-icon">&check;</span>PRD 分 Phase 产出，10 模块齐全</li>
+                <li><span class="v-ba-icon">&check;</span>一次只问一个问题，主动追问</li>
+                <li><span class="v-ba-icon">&check;</span>10 个 golden set 任务 + 独立 Reviewer 打分</li>
+                <li><span class="v-ba-icon">&check;</span>面试说"我搭过一个 harness，在我 GitHub 上"</li>
+                <li><span class="v-ba-icon">&check;</span>fork 一份改身份段就能起步</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>Solo 写出"漂亮但空"的文档，Harness 写出"具体到可执行"的规范。</strong>
+            这就是 Anthropic Solo vs Full Harness 实验在 PM 文档场景下的复现。
+          </p>
+          <div class="viz-source">SOURCE &middot; Anthropic《Harness design for long-running application development》</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §2 两层 harness 速记 ===== -->
+      <section class="page-section he-reveal" id="sec-06-2" data-toc="两层 harness">
+        <div class="page-section-eyebrow">&sect;2 &middot; 速记</div>
+        <h2>两层 harness：<br>你造的是<span class="he-text-accent">上面那层</span>。</h2>
+
+        <p>
+          Claude Code / Cursor 这些产品 = <strong>平台层 harness</strong>（厂商已经建好）。
+          你的活 = 在平台层之上，<strong>填自己项目专属的应用层</strong>。
+        </p>
+
+        <!-- Viz #2: 两层分层图 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02 &middot; two layers</div>
+            <h3 class="viz-title">平台层 + 应用层 = 完整 harness</h3>
+            <p class="viz-sub">平台层是"底盘"，应用层是"你装上去的改装件"。</p>
+          </div>
+
+          <div class="viz-stage v-layers">
+            <div class="v-layer v-layer-app">
+              <div class="v-layer-tag">应用层 &middot; 你来造</div>
+              <div class="v-layer-title">你的项目专属配置</div>
+              <div class="v-layer-desc">记忆 / 边界 / Skill / 评测 &mdash;&mdash; 让"通用 Claude Code"变成"我这个产品专属的 agent"</div>
+              <div class="v-layer-chips">
+                <span class="v-layer-chip is-you">CLAUDE.md</span>
+                <span class="v-layer-chip is-you">docs/</span>
+                <span class="v-layer-chip is-you">settings.json</span>
+                <span class="v-layer-chip is-you">hooks/</span>
+                <span class="v-layer-chip is-you">skills/</span>
+                <span class="v-layer-chip is-you">evals/</span>
+              </div>
+            </div>
+            <div class="v-layer-arrow">&darr;&darr;&darr; 搭在平台层之上 &darr;&darr;&darr;</div>
+            <div class="v-layer v-layer-platform">
+              <div class="v-layer-tag">平台层 &middot; 厂商已建好</div>
+              <div class="v-layer-title">Claude Code / Cursor / ...</div>
+              <div class="v-layer-desc">主循环 / 沙箱 / 默认工具 / 默认上下文管理 &mdash;&mdash; 你不用造</div>
+              <div class="v-layer-chips">
+                <span class="v-layer-chip">主循环</span>
+                <span class="v-layer-chip">沙箱</span>
+                <span class="v-layer-chip">默认工具</span>
+                <span class="v-layer-chip">默认上下文</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>你做 agent 产品 PM，99% 的时间在做应用层。</strong>
+            这一节搭的就是应用层 harness。
+          </p>
+        </figure>
+
+        <!-- Viz: 6 零件分工表 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02b &middot; parts allocation</div>
+            <h3 class="viz-title">6 零件分工：哪些平台层包了，哪些你要造</h3>
+            <p class="viz-sub">右边带色的 = 你这一节要亲手搭的东西。</p>
+          </div>
+
+          <div class="viz-stage">
+            <table class="v-parts-table">
+              <thead>
+                <tr>
+                  <th>零件</th>
+                  <th>平台层</th>
+                  <th>你应用层要造</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="v-pt-part">主循环</td>
+                  <td class="v-pt-check">&check;</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td class="v-pt-part">默认工具</td>
+                  <td class="v-pt-check">&check;</td>
+                  <td class="v-pt-you">settings.json 裁剪</td>
+                </tr>
+                <tr>
+                  <td class="v-pt-part">默认上下文管理</td>
+                  <td class="v-pt-check">&check;</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td class="v-pt-part">记忆</td>
+                  <td>&times;</td>
+                  <td class="v-pt-you">CLAUDE.md + docs/</td>
+                </tr>
+                <tr>
+                  <td class="v-pt-part">沙箱</td>
+                  <td class="v-pt-check">&check;</td>
+                  <td>&mdash;</td>
+                </tr>
+                <tr>
+                  <td class="v-pt-part">权限 / 审批 / Hook</td>
+                  <td>默认薄</td>
+                  <td class="v-pt-you">settings.json + hooks/</td>
+                </tr>
+                <tr>
+                  <td class="v-pt-part">评测</td>
+                  <td>&times;</td>
+                  <td class="v-pt-you">evals/</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="viz-caption">
+            <strong>6 零件全到位才叫 harness；少一件，你做的是 demo。</strong>
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §3 模板仓库全景 ===== -->
+      <section class="page-section he-reveal" id="sec-06-3" data-toc="模板仓库结构">
+        <div class="page-section-eyebrow">&sect;3 &middot; 模板</div>
+        <h2><code>pm-docs-harness</code><br>长什么样？</h2>
+
+        <p>
+          这不是 demo，是<strong>真东西</strong> &mdash;&mdash;
+          学员 fork 走真用，覆盖 BRD / MRD / PRD / 设计规范四个 PM 文档场景。
+        </p>
+
+        <!-- Viz #3: 文件树 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03 &middot; repo structure</div>
+            <h3 class="viz-title">pm-docs-harness 文件树</h3>
+            <p class="viz-sub">每个文件对应板块③ 的一个零件。颜色标注：蓝=知 / 绿=做 / 橙=检。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-tree">
+              <div class="v-tree-line">
+                <span class="v-tree-root">pm-docs-harness/</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">CLAUDE.md</span>
+                <span class="v-tree-badge is-zhi">知 &middot; 常驻记忆</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">docs/</span>
+                <span class="v-tree-badge is-zhi">知 &middot; 上下文资料</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">product.md</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">users.md</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">conventions.md</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxur;&boxh;&boxh;</span>
+                <span class="v-tree-name">decisions/</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">.claude/</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">settings.json</span>
+                <span class="v-tree-badge is-zuo">做 &middot; 工具白名单</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">hooks/</span>
+                <span class="v-tree-badge is-zuo">做 &middot; 硬规则</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">pre_tool_use.sh</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxv;&nbsp;&nbsp;&boxur;&boxh;&boxh;</span>
+                <span class="v-tree-name">post_tool_use.sh</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxur;&boxh;&boxh;</span>
+                <span class="v-tree-name">skills/</span>
+                <span class="v-tree-badge is-zhi">知 &middot; 任务记忆</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">brd-writing/</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">mrd-writing/</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">prd-writing/</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&boxur;&boxh;&boxh;</span>
+                <span class="v-tree-name">design-spec/</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">evals/</span>
+                <span class="v-tree-badge is-jian">检 &middot; 评测</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">golden_set.md</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">rubric.md</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">runs/</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxv;&nbsp;&nbsp;&boxur;&boxh;&boxh;</span>
+                <span class="v-tree-name">reviewer/</span>
+                <span class="v-tree-badge is-jian">检 &middot; 独立评测</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxvr;&boxh;&boxh;</span>
+                <span class="v-tree-name">README.md</span>
+              </div>
+              <div class="v-tree-line">
+                <span class="v-tree-indent">&boxur;&boxh;&boxh;</span>
+                <span class="v-tree-name">.gitignore</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>学员每搭一个文件，就是在亲手实现板块③ 的一个零件。</strong>
+            6 零件全到位 &mdash;&mdash; 这才是 harness，不是 demo。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §4 Step 1 · CLAUDE.md ===== -->
+      <section class="page-section he-reveal" id="sec-06-4" data-toc="Step 1 · CLAUDE.md">
+        <div class="page-section-eyebrow">&sect;4 &middot; 构建 Step 1</div>
+
+        <!-- 步骤进度条 -->
+        <div class="v-steps-progress">
+          <div class="v-sp-dot is-done">0</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-active">1</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">2</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">3</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">4</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">5</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">6</div>
+        </div>
+
+        <h2>写 <code>CLAUDE.md</code><br>&mdash;&mdash; <span class="he-text-accent">知 &middot; 记忆</span></h2>
+
+        <p>
+          CLAUDE.md 是 agent 的<strong>"常驻记忆"</strong> &mdash;&mdash;
+          每次对话开始，Claude 都会读它，把里面的内容当作"我是谁、这是什么项目、我要遵守什么"的硬底色。
+        </p>
+
+        <!-- Viz #4: CLAUDE.md 结构 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 04 &middot; claude.md anatomy</div>
+            <h3 class="viz-title">CLAUDE.md 模板的 6 段结构</h3>
+            <p class="viz-sub">每段的角色不一样 &mdash;&mdash; 两段必改，四段主要是 reference 指向。</p>
+          </div>
+
+          <div class="viz-stage v-skill-anatomy">
+            <div class="v-sa-block">
+              <div class="v-sa-num">1</div>
+              <div>
+                <div class="v-sa-title">我是谁</div>
+                <div class="v-sa-desc">身份 / 调性 / 说话方式。这段<strong>必改</strong> &mdash;&mdash; 写你这个 agent 的身份。</div>
+                <div class="v-sa-code">## Identity &amp; Tone</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">2</div>
+              <div>
+                <div class="v-sa-title">项目背景</div>
+                <div class="v-sa-desc">不写在这里，指向 <code>docs/product.md</code>。按需加载，不挤占上下文。</div>
+                <div class="v-sa-code">&rarr; docs/product.md</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">3</div>
+              <div>
+                <div class="v-sa-title">用户</div>
+                <div class="v-sa-desc">目标用户 / 痛点 / 谁不是我们的用户，指向 <code>docs/users.md</code>。</div>
+                <div class="v-sa-code">&rarr; docs/users.md</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">4</div>
+              <div>
+                <div class="v-sa-title">项目规约</div>
+                <div class="v-sa-desc">写作风格 / 命名 / 文件结构，指向 <code>docs/conventions.md</code>。</div>
+                <div class="v-sa-code">&rarr; docs/conventions.md</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">5</div>
+              <div>
+                <div class="v-sa-title">关键决策</div>
+                <div class="v-sa-desc">只追加不重写的"决策考古"，指向 <code>docs/decisions/</code>。</div>
+                <div class="v-sa-code">&rarr; docs/decisions/</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">6</div>
+              <div>
+                <div class="v-sa-title">边界（硬规则）</div>
+                <div class="v-sa-desc">绝对不能做的事。这段<strong>必改</strong> &mdash;&mdash; 跟 hook 双保险。</div>
+                <div class="v-sa-code">## Hard Boundaries</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>为什么"指向"而不是"塞进来"？</strong>
+            CLAUDE.md 每轮常驻加载到上下文窗口 &mdash;&mdash; 不能太长，否则挤占 context。
+            <code>docs/*.md</code> 是按需加载。这是板块③ "上下文是稀缺资源"的活实例。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §5 Step 2 · docs/ + Step 3 · settings ===== -->
+      <section class="page-section he-reveal" id="sec-06-5" data-toc="Step 2-3 · docs + 权限">
+        <div class="page-section-eyebrow">&sect;5 &middot; 构建 Step 2–3</div>
+
+        <div class="v-steps-progress">
+          <div class="v-sp-dot is-done">0</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">1</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-active">2</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-active">3</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">4</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">5</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">6</div>
+        </div>
+
+        <h2>写 <code>docs/</code> + 配 <code>settings.json</code><br>&mdash;&mdash; <span class="he-text-accent">知 + 做</span></h2>
+
+        <h3>docs/ 三件套</h3>
+        <p>
+          三个 markdown 文件 + 一个决策追加目录 &mdash;&mdash; 每个都有 placeholder 结构，学员填空即可。
+        </p>
+
+        <div class="callout">
+          <strong><code>docs/decisions/</code> &mdash;&mdash; "只追加不重写"的决策考古</strong>：
+          每次有重大决策（改方向 / 砍 feature / 换技术栈），追加一份日期文件。
+          永不重写历史决策 &mdash;&mdash; 新 agent 接手项目，翻一遍就能复盘"为什么走到了今天"。
+          这是 OpenAI "环境比模型重要"的应用层实现。
+        </div>
+
+        <h3>settings.json 配三件事</h3>
+
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 05 &middot; permissions</div>
+            <h3 class="viz-title">settings.json = 白名单 + 黑名单 + 钩子</h3>
+            <p class="viz-sub">三件事，三行配置，管住 agent 的手。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-skill-anatomy">
+              <div class="v-sa-block">
+                <div class="v-sa-num" style="background:rgba(34,197,94,0.12);color:#16a34a;">&check;</div>
+                <div>
+                  <div class="v-sa-title">permissions.allow &mdash;&mdash; 白名单</div>
+                  <div class="v-sa-desc">哪些工具 / 命令可以直接用。默认 6-10 件够用，少而精胜过多而杂。</div>
+                  <div class="v-sa-code">Read, Edit, Write, Grep, Glob, Bash(git:status) ...</div>
+                </div>
+              </div>
+              <div class="v-sa-block">
+                <div class="v-sa-num" style="background:rgba(239,68,68,0.12);color:#dc2626;">&times;</div>
+                <div>
+                  <div class="v-sa-title">permissions.deny &mdash;&mdash; 黑名单</div>
+                  <div class="v-sa-desc">绝对不能做的动作，比 hook 更早一道拦截。</div>
+                  <div class="v-sa-code">Bash(rm -rf*), Bash(git push --force*) ...</div>
+                </div>
+              </div>
+              <div class="v-sa-block">
+                <div class="v-sa-num" style="background:rgba(251,146,60,0.12);color:#ea580c;">&oplus;</div>
+                <div>
+                  <div class="v-sa-title">hooks &mdash;&mdash; 挂载钩子</div>
+                  <div class="v-sa-desc">PreToolUse / PostToolUse 脚本 &mdash;&mdash; 确定性代码，模型绕不开。</div>
+                  <div class="v-sa-code">PreToolUse &rarr; hooks/pre_tool_use.sh</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>PM 决策问自己三个问题</strong>：
+            这个 agent 需要 Web Search 吗？需要写数据库吗？项目里哪些动作绝对禁止？
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §6 Step 4 · Skill ===== -->
+      <section class="page-section he-reveal" id="sec-06-6" data-toc="Step 4 · Skill">
+        <div class="page-section-eyebrow">&sect;6 &middot; 构建 Step 4 &mdash;&mdash; 核心</div>
+
+        <div class="v-steps-progress">
+          <div class="v-sp-dot is-done">0</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">1</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">2</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">3</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-active">4</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">5</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-todo">6</div>
+        </div>
+
+        <h2>写一个 Skill<br>&mdash;&mdash; <span class="he-text-accent">整个板块的高光时刻</span></h2>
+
+        <p>
+          Skill 是把"PM 专业流程"灌给 agent 的核心机制 &mdash;&mdash;
+          <strong>"按需上桌的任务专家"</strong>。
+          Agent 接到任务，觉得匹配某个 Skill，就把它全文加载进上下文，跟着流程走。
+        </p>
+
+        <!-- Viz #6: 4 个 Skill 文档卡片 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06 &middot; skill chain</div>
+            <h3 class="viz-title">模板默认 4 个 Skill &mdash;&mdash; 一条 PM 文档工作链</h3>
+            <p class="viz-sub">它们串成链，自动检测上游、继承已确认信息、不重复问。</p>
+          </div>
+
+          <div class="viz-stage">
+            <!-- 链条流 -->
+            <div class="v-chain">
+              <span class="v-chain-node">/mrd</span>
+              <span class="v-chain-arrow">&rarr;</span>
+              <span class="v-chain-node">/brd</span>
+              <span class="v-chain-arrow">&rarr;</span>
+              <span class="v-chain-node">/prd-writing</span>
+              <span class="v-chain-arrow">&rarr;</span>
+              <span class="v-chain-node">/design-spec</span>
+              <span class="v-chain-arrow">&rarr;</span>
+              <span class="v-chain-node" style="opacity:0.5">Claude Code 实现</span>
+            </div>
+
+            <!-- 4 卡片 -->
+            <div class="v-docs" style="margin-top: var(--sp-4);">
+              <div class="v-doc-card">
+                <div class="v-doc-num">01</div>
+                <div class="v-doc-name">mrd-writing</div>
+                <div class="v-doc-desc">从用户数据提炼市场需求</div>
+                <div class="v-doc-flow">&mdash; &rarr; MRD.md</div>
+              </div>
+              <div class="v-doc-card">
+                <div class="v-doc-num">02</div>
+                <div class="v-doc-name">brd-writing</div>
+                <div class="v-doc-desc">判断方向值不值得做</div>
+                <div class="v-doc-flow">MRD.md &rarr; BRD.md</div>
+              </div>
+              <div class="v-doc-card">
+                <div class="v-doc-num">03</div>
+                <div class="v-doc-name">prd-writing</div>
+                <div class="v-doc-desc">产品规范起草（10 模块）</div>
+                <div class="v-doc-flow">BRD/MRD &rarr; PRD/</div>
+              </div>
+              <div class="v-doc-card">
+                <div class="v-doc-num">04</div>
+                <div class="v-doc-name">design-spec</div>
+                <div class="v-doc-desc">视觉规范产出</div>
+                <div class="v-doc-flow">PRD/03 &rarr; DESIGN.md</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>Skill 之间相互知道</strong> &mdash;&mdash;
+            这让模板从"4 个孤立工具"升级成"一条工作流"。
+          </p>
+        </figure>
+
+        <!-- Viz: Skill 解剖 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06b &middot; skill anatomy</div>
+            <h3 class="viz-title">一个 Skill 文件里有什么？</h3>
+            <p class="viz-sub">用 prd-writing 当示例 &mdash;&mdash; 6 个组成部分，每个都有明确职责。</p>
+          </div>
+
+          <div class="viz-stage v-skill-anatomy">
+            <div class="v-sa-block">
+              <div class="v-sa-num">1</div>
+              <div>
+                <div class="v-sa-title">Frontmatter（YAML 块）</div>
+                <div class="v-sa-desc"><code>name</code> = Skill ID；<code>description</code> = 触发条件。必须含丰富的"用户可能怎么说"短语，越具体 trigger 越准。</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">2</div>
+              <div>
+                <div class="v-sa-title">核心理念（5 条短原则）</div>
+                <div class="v-sa-desc">"给 AI 编程 Agent 看的执行文档""继承不重复""一次只问一个问题""说不做什么比说做什么重要"。5 条短原则比 50 行 prompt 管用。</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">3</div>
+              <div>
+                <div class="v-sa-title">Skill 链条声明</div>
+                <div class="v-sa-desc">声明自己在 /mrd &rarr; /brd &rarr; /prd &rarr; /design-spec 链条中的位置。让 Skill 之间相互知道。</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">4</div>
+              <div>
+                <div class="v-sa-title">硬边界声明</div>
+                <div class="v-sa-desc">用 &check; / &times; 列表硬把 agent 的边界圈死。这是高水平 prompt engineering &mdash;&mdash; 用 Skill 当护栏。</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">5</div>
+              <div>
+                <div class="v-sa-title">References 机制 + 加载时机</div>
+                <div class="v-sa-desc">按需加载 + 明确时机。Skill 自己管自己的 references 何时上桌 &mdash;&mdash; "上下文是稀缺资源"的活实例。</div>
+              </div>
+            </div>
+            <div class="v-sa-block">
+              <div class="v-sa-num">6</div>
+              <div>
+                <div class="v-sa-title">多阶段工作流（Phase 0-4+）</div>
+                <div class="v-sa-desc">Phase 0 上游检测 &rarr; Phase 1 需求澄清 &rarr; Phase 2 方案选型 &rarr; ... &rarr; Phase 4 写 PRD。每个 Phase 干一件事，防 agent 一上来啥都想干。</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>写完一个 Skill 大概 30-60 分钟。</strong>
+            写完你就理解为什么 Skill 是 PM 这个职业的真核心工件 &mdash;&mdash;
+            它是把"我专业上知道怎么做的事"灌给 agent 的载体。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §7 Step 5 · Hook + Step 6 · Eval ===== -->
+      <section class="page-section he-reveal" id="sec-06-7" data-toc="Step 5-6 · Hook + 评测">
+        <div class="page-section-eyebrow">&sect;7 &middot; 构建 Step 5-6</div>
+
+        <div class="v-steps-progress">
+          <div class="v-sp-dot is-done">0</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">1</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">2</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">3</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">4</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-active">5</div>
+          <div class="v-sp-line"></div>
+          <div class="v-sp-dot is-active">6</div>
+        </div>
+
+        <h2>写 Hook + 搭评测<br>&mdash;&mdash; <span class="he-text-accent">做 &middot; 硬规则 + 检 &middot; 评测</span></h2>
+
+        <h3>Hook 跟 prompt 的区别</h3>
+        <p>
+          <strong>软提醒写 prompt，硬规矩写 hook</strong>。
+          CLAUDE.md 里的"边界"是软提醒，模型可能忘。
+          <code>hooks/pre_tool_use.sh</code> 是<strong>确定性代码</strong> &mdash;&mdash;
+          由 Claude Code 在工具调用前真去跑，模型绕不开。
+        </p>
+
+        <div class="callout">
+          <strong>Hook 三个关键</strong>：
+          退出码 <code>0</code> = 放行，<code>&ne;0</code> = 阻止；
+          阻止时往 stderr 写 DENIED 信息；
+          脚本必须 <code>chmod +x</code> 可执行。
+        </div>
+
+        <h3>评测：两个文件 + 一个独立 Reviewer</h3>
+
+        <!-- Viz #7: 评测管线 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 07 &middot; eval pipeline</div>
+            <h3 class="viz-title">评测管线：从 golden set 到分数报告</h3>
+            <p class="viz-sub">改一次跑一次，基线在 <code>evals/runs/</code> &mdash;&mdash; 数字摆出来一目了然。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-eval-pipe">
+              <div class="v-eval-stage">
+                <div class="v-eval-icon">&#x1F4CB;</div>
+                <div class="v-eval-name">Golden Set</div>
+                <div class="v-eval-desc">10 个回归测试任务：4 主链路 + 追问 + 拒绝 + 拦截 + 压缩...</div>
+              </div>
+              <div class="v-eval-stage">
+                <div class="v-eval-icon">&#x26A1;</div>
+                <div class="v-eval-name">跑任务</div>
+                <div class="v-eval-desc">用你的 harness 跑这 10 个任务，产出存入 runs/</div>
+              </div>
+              <div class="v-eval-stage">
+                <div class="v-eval-icon">&#x1F50D;</div>
+                <div class="v-eval-name">独立 Reviewer</div>
+                <div class="v-eval-desc">另一个 Claude 会话，没利益关系，按 rubric 评分</div>
+              </div>
+              <div class="v-eval-stage">
+                <div class="v-eval-icon">&#x1F4CA;</div>
+                <div class="v-eval-name">分数报告</div>
+                <div class="v-eval-desc">5 维度 &times; 0-2 分，总分 0-10。&ge;7 才能发版</div>
+              </div>
+            </div>
+
+            <div class="v-eval-loop">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              改 CLAUDE.md / Skills &rarr; 重跑同一套 &rarr; 看分数升降
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>评分 5 个维度</strong>：正确性 &middot; 完整度 &middot; 可执行性 &middot; 不空话 &middot; 风格/调性。
+            每维度 0-2 分，<strong>任何 0 分项 = 不能 ship</strong>。
+          </p>
+          <div class="viz-source">SOURCE &middot; Anthropic "不让做的人当判官"（王婆卖瓜）</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §8 完整工作流 ===== -->
+      <section class="page-section he-reveal" id="sec-06-8" data-toc="完整工作流">
+        <div class="page-section-eyebrow">&sect;8 &middot; 全流程</div>
+
+        <div class="v-steps-progress">
+          <div class="v-sp-dot is-done">0</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">1</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">2</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">3</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">4</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">5</div>
+          <div class="v-sp-line is-done"></div>
+          <div class="v-sp-dot is-done">6</div>
+        </div>
+
+        <h2>一个完整案例的<br><span class="he-text-accent">端到端流程</span></h2>
+
+        <p>
+          假设你的需求是"做一个 AI 周报助手" &mdash;&mdash;
+          从写 PRD 到 agent 执行到评测产出，全流程长这样：
+        </p>
+
+        <!-- Viz #8: 工作流 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 08 &middot; end-to-end workflow</div>
+            <h3 class="viz-title">从需求到评测产出 &mdash;&mdash; 5 步闭环</h3>
+            <p class="viz-sub">用模板起 PRD，跟"普通 Claude 一锤子搞"的差别在每一步都能看到。</p>
+          </div>
+
+          <div class="viz-stage v-workflow">
+            <div class="v-wf-step">
+              <div class="v-wf-icon">&#x1F4DD;</div>
+              <div class="v-wf-num">01</div>
+              <div class="v-wf-name">填 docs/</div>
+              <div class="v-wf-sub">产品背景<br>用户画像</div>
+            </div>
+            <div class="v-wf-step">
+              <div class="v-wf-icon">&#x1F916;</div>
+              <div class="v-wf-num">02</div>
+              <div class="v-wf-name">触发 Skill</div>
+              <div class="v-wf-sub">"帮我写 PRD"<br>&rarr; prd-writing</div>
+            </div>
+            <div class="v-wf-step">
+              <div class="v-wf-icon">&#x1F504;</div>
+              <div class="v-wf-num">03</div>
+              <div class="v-wf-name">分 Phase 执行</div>
+              <div class="v-wf-sub">追问 &rarr; 选型<br>&rarr; 10 模块产出</div>
+            </div>
+            <div class="v-wf-step">
+              <div class="v-wf-icon">&#x2705;</div>
+              <div class="v-wf-num">04</div>
+              <div class="v-wf-name">Hook 拦截</div>
+              <div class="v-wf-sub">危险动作<br>自动阻止</div>
+            </div>
+            <div class="v-wf-step">
+              <div class="v-wf-icon">&#x1F4CA;</div>
+              <div class="v-wf-num">05</div>
+              <div class="v-wf-name">独立评测</div>
+              <div class="v-wf-sub">Reviewer 打分<br>&ge;7 才 ship</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>Full Harness 比 Solo "贵"一些（多了几轮问答），但产出是另一种东西。</strong>
+            Solo 写出"漂亮但空"的文档，Harness 写出"具体到可执行"的规范。
+          </p>
+          <div class="viz-source">SOURCE &middot; Anthropic Solo vs Full Harness 实验在 PM 场景的复现</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §9 扩展到别的 PM 场景 ===== -->
+      <section class="page-section he-reveal" id="sec-06-9" data-toc="扩展到别的场景">
+        <div class="page-section-eyebrow">&sect;9 &middot; 60%-applicable</div>
+        <h2>怎么扩展到<br><span class="he-text-accent">别的 PM 场景</span>？</h2>
+
+        <p>
+          模板叫 <code>pm-docs-harness</code>，但它的骨架适用于任何 PM-flavor AI 产品。
+          <strong>每种新场景 = 加 1-2 个 Skill + 改 1-2 个 docs</strong>。骨架不动。
+        </p>
+
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 09 &middot; extensibility</div>
+            <h3 class="viz-title">三个扩展案例 &mdash;&mdash; 改什么，不改什么</h3>
+            <p class="viz-sub">80% 的 PM-flavored AI 产品需求，这模板能起步。</p>
+          </div>
+
+          <div class="viz-stage v-extend-grid">
+            <div class="v-extend-card">
+              <div class="v-extend-name">数据 PM 工具链</div>
+              <ul class="v-extend-changes">
+                <li>新增 <code>skills/data-spec/</code></li>
+                <li>新增 <code>docs/data-sources.md</code></li>
+                <li>改 CLAUDE.md 身份段</li>
+              </ul>
+            </div>
+            <div class="v-extend-card">
+              <div class="v-extend-name">用户访谈复盘</div>
+              <ul class="v-extend-changes">
+                <li>新增 <code>skills/interview-recap/</code></li>
+                <li>新增 <code>docs/research/</code></li>
+                <li>边界段加"不引用未脱敏身份"</li>
+              </ul>
+            </div>
+            <div class="v-extend-card">
+              <div class="v-extend-name">B 端合同 review</div>
+              <ul class="v-extend-changes">
+                <li>新增 <code>skills/contract-review/</code></li>
+                <li>新增 <code>docs/risk-checklist.md</code></li>
+                <li>hook 加"碰合同必须审批"</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>60%-applicable 的意思</strong>：80% 的 PM-flavored AI 产品需求这模板能起步，
+            留 40% 给场景特殊需求。fork 一份、改身份段 = 起步。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §10 面试时怎么讲 ===== -->
+      <section class="page-section he-reveal" id="sec-06-10" data-toc="面试话术">
+        <div class="page-section-eyebrow">&sect;10 &middot; 面试武器</div>
+        <h2>面试时<br><span class="he-text-accent">2 分钟讲明白</span>。</h2>
+
+        <p>
+          下面这段话术，背下来直接用。120 秒。
+        </p>
+
+        <!-- Viz: 面试话术 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 10 &middot; interview script</div>
+            <h3 class="viz-title">2 分钟话术 &mdash;&mdash; 可以背下来直接用</h3>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-speech">
+              <div class="v-speech-tag">&#x1F3A4; 面试话术</div>
+              <div class="v-speech-time">~120s</div>
+              <p>
+                "我做了一个 <strong>PM 文档工作流 harness 模板</strong>，在我 GitHub 上。
+              </p>
+              <p>
+                它解决一个真实痛点 &mdash;&mdash; PM 用 Claude 帮自己写 BRD / MRD / PRD，<strong>总是写得漂亮但空</strong>：不切产品、不切用户、没边界。
+              </p>
+              <p>
+                我把这个 pain 用 harness engineering 的方法拆成 6 个零件去解 &mdash;&mdash;
+              </p>
+              <p>
+                <strong>知</strong>：身份 / 项目背景 / 用户画像 / 团队约定；<br>
+                <strong>做</strong>：工具白名单 + Hook + 4 个串成链的 Skill（BRD &rarr; MRD &rarr; PRD &rarr; 设计规范）；<br>
+                <strong>检</strong>：10 个回归任务 + 评分维度 + 独立 Reviewer。
+              </p>
+              <p>
+                这套模板我 fork 给过多个项目用，每次替换身份 + 项目背景就能起步。
+                <strong>这套思路来自 OpenAI / Anthropic / Cursor 在 2026 年公开的 harness engineering 文章 &mdash;&mdash; 但我把它落成了一个 PM 视角的应用层模板。</strong>"
+              </p>
+            </div>
+          </div>
+        </figure>
+
+        <!-- Viz: 面试 Q&A -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 10b &middot; interview Q&amp;A</div>
+            <h3 class="viz-title">面试常见追问 + 准备答案</h3>
+            <p class="viz-sub">面试官会问的 4 个高频问题。</p>
+          </div>
+
+          <div class="viz-stage v-qa-grid">
+            <div class="v-qa-card">
+              <div class="v-qa-q">为啥不直接用 ChatGPT / 通用 Claude 写？</div>
+              <div class="v-qa-a">"它每次都从零开始 &mdash;&mdash; 项目背景要重新喂、约束要重新讲、评测靠肉眼。这套模板把这几件事<strong>前置 + 持久化 + 可复用</strong>。"</div>
+            </div>
+            <div class="v-qa-card">
+              <div class="v-qa-q">你的 Skill 跟 prompt 模板有啥区别？</div>
+              <div class="v-qa-a">"prompt 模板是文本；Skill 是<strong>触发条件 + 工作流 + reference 加载时机</strong>的整体。我的 Skill 之间还会自动检测上游、不重复问。"</div>
+            </div>
+            <div class="v-qa-card">
+              <div class="v-qa-q">你这套覆盖率多高？</div>
+              <div class="v-qa-a">"PM 文档场景大概 60%。剩下 40% 主要是非文档型（纯数据分析、推荐策略），需要换一套 Skill 集。"</div>
+            </div>
+            <div class="v-qa-card">
+              <div class="v-qa-q">你怎么知道它真有用？</div>
+              <div class="v-qa-a">"我有 10 个 golden set 任务和一个独立 Reviewer Project。改一次跑一次，基线在 <code>evals/runs/</code>。"</div>
+            </div>
+          </div>
+        </figure>
+      </section>
+
+
+      <!-- ===== 一句话总结 + 来源 ===== -->
+      <section class="page-section he-reveal" id="sec-06-11" data-toc="一句话总结">
+        <div class="page-section-eyebrow">&sect;11 &middot; 一句话总结</div>
+        <blockquote>
+          <strong>板块⑥ 不是"教你用 Claude Code"，是教你搭出自己第一份 harness 工程作品</strong> &mdash;&mdash;
+          一个能 fork 给任何 PM 项目用的模板 + 一个能在面试时讲清楚的故事。<br><br>
+          <strong>这就是 AI PM "harness 工程师"该掌握的最小工件集</strong> &mdash;&mdash;
+          不是写代码，是用文件结构 + Skill + hook + 评测，
+          把一个"通用 Claude Code"配置成"我这个产品专属的 agent"。
+        </blockquote>
+
+        <h3>一手来源（本板块所有论断的出处）</h3>
+        <ul>
+          <li>OpenAI《Harness engineering》&mdash; <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noreferrer">openai.com</a></li>
+          <li>Anthropic《Harness design for long-running application development》&mdash; <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noreferrer">anthropic.com</a></li>
+          <li>LangChain《The Anatomy of an Agent Harness》&mdash; <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noreferrer">langchain.com</a></li>
+        </ul>
+      </section>
+
+          </div>
+        </div>
+      </div>
+
+      <a href="resources.html" class="group-next">
+        <div class="group-next-l">
+          <div class="group-next-meta">读完本组 · 推荐继续</div>
+          <div class="group-next-label">05 / 5 · 资源</div>
+        </div>
+        <span class="group-next-arrow">&rarr;</span>
+      </a>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/spotlight.js"></script>
+</body>
+</html>

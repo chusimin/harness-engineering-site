@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>谱系 · Harness Engineering</title>
-  <meta name="description" content="从 prompt 到 harness 的 4 年命名演化史 —— 谱系、嵌套关系、下一个名字。">
+  <meta name="description" content="从 prompt 到 harness 的 4 年命名演化史 —— 用「修登录页 500 错误」一个案例串联三层，看为什么前一层不够用。">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,134 +12,175 @@
 
   <link rel="stylesheet" href="../assets/shared.css">
   <link rel="stylesheet" href="../assets/page.css">
+  <link rel="stylesheet" href="../assets/simulator.css">
 
   <style>
-    /* ==== history.html · 局部增强(只为本页新增,不动 shared/page) ==== */
-    .timeline {
+    /* ==== history.html · 页面专属样式 ==== */
+
+    .evo-timeline {
       position: relative;
-      padding-left: 40px;
-      margin-top: 32px;
+      padding-left: 32px;
+      margin: 24px 0;
     }
-    .timeline::before {
+    .evo-timeline::before {
       content: '';
       position: absolute;
-      left: 12px;
-      top: 12px;
-      bottom: 12px;
+      left: 6px; top: 6px; bottom: 6px;
       width: 1px;
-      background: linear-gradient(180deg,
-        rgba(222, 219, 200, 0.3) 0%,
-        rgba(222, 219, 200, 0.08) 50%,
-        rgba(222, 219, 200, 0.4) 100%);
+      background: linear-gradient(to bottom, var(--cream), rgba(222,219,200,0.1));
     }
-    .timeline-item {
+    .evo-tl-item {
       position: relative;
-      padding-bottom: 36px;
+      padding: 10px 0 22px;
     }
-    .timeline-item:last-child { padding-bottom: 0; }
-    .timeline-item::before {
+    .evo-tl-item::before {
       content: '';
       position: absolute;
-      left: -32px;
-      top: 14px;
-      width: 9px;
-      height: 9px;
+      left: -32px; top: 14px;
+      width: 12px; height: 12px;
       border-radius: 50%;
-      background: var(--cream);
-      box-shadow: 0 0 0 4px rgba(0,0,0,1), 0 0 0 5px rgba(222,219,200,0.2);
+      border: 2px solid var(--cream);
+      background: var(--bg);
     }
-    .timeline-item.is-current::before {
-      animation: pulseDot 2.4s ease-in-out infinite;
-    }
-    @keyframes pulseDot {
-      0%, 100% { box-shadow: 0 0 0 4px rgba(0,0,0,1), 0 0 0 5px rgba(222,219,200,0.2), 0 0 0 5px rgba(222,219,200,0); }
-      50% { box-shadow: 0 0 0 4px rgba(0,0,0,1), 0 0 0 5px rgba(222,219,200,0.5), 0 0 12px 5px rgba(222,219,200,0.3); }
-    }
-    .timeline-year {
+    .evo-tl-year {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       color: var(--cream);
-      letter-spacing: 0.1em;
-      margin-bottom: 4px;
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
     }
-    .timeline-title {
-      font-size: 22px;
+    .evo-tl-h {
+      font-size: 17px;
       font-weight: 700;
       color: var(--cream-text);
-      letter-spacing: -0.01em;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
     }
-    .timeline-title em {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-weight: 400;
-    }
-    .timeline-body {
-      font-size: 15px;
-      line-height: 1.7;
+    .evo-tl-d {
+      font-size: 13px;
       color: var(--cream-dim);
-      max-width: 60ch;
+      line-height: 1.6;
     }
-    .timeline-body strong { color: var(--cream-text); }
-    .timeline-tag {
-      display: inline-block;
+
+    .can-cant {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .can-cant-card {
+      padding: 18px;
+      background: rgba(222, 219, 200, 0.03);
+      border: 1px solid rgba(222, 219, 200, 0.08);
+      border-radius: 12px;
+    }
+    .can-cant-card.is-can { border-left: 3px solid #4ade80; }
+    .can-cant-card.is-cant { border-left: 3px solid #f87171; }
+    .can-cant-h {
       font-family: var(--font-mono);
       font-size: 10px;
       letter-spacing: 0.1em;
-      padding: 3px 8px;
-      border-radius: 5px;
-      background: rgba(222, 219, 200, 0.08);
-      color: var(--cream);
-      border: 1px solid rgba(222,219,200,0.15);
-      margin-bottom: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
     }
-    .timeline-cite-row {
-      margin-top: 12px;
+    .can-cant-card.is-can .can-cant-h { color: #4ade80; }
+    .can-cant-card.is-cant .can-cant-h { color: #f87171; }
+    .can-cant-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .can-cant-list li {
+      font-size: 13px;
+      color: var(--cream-dim);
+      padding: 4px 0;
+      line-height: 1.5;
+    }
+
+    .gap-explain {
+      margin: 20px 0;
+      padding: 16px 20px;
+      background: rgba(248, 113, 113, 0.04);
+      border-left: 3px solid #f87171;
+      border-radius: 0 12px 12px 0;
+    }
+    .gap-explain-h {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #f87171;
+      margin-bottom: 6px;
+    }
+    .gap-explain-text {
+      font-size: 14px;
+      color: var(--cream-text);
+      line-height: 1.6;
+    }
+    .gap-explain.is-success {
+      background: rgba(74, 222, 128, 0.05);
+      border-left-color: #4ade80;
+    }
+    .gap-explain.is-success .gap-explain-h { color: #4ade80; }
+
+    .speculation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin: 24px 0;
+    }
+    .spec-card {
+      padding: 20px;
+      background: rgba(222, 219, 200, 0.03);
+      border: 1px dashed rgba(222, 219, 200, 0.18);
+      border-radius: 12px;
+      transition: all 0.3s var(--ease-out);
+    }
+    .spec-card:hover {
+      border-color: rgba(222, 219, 200, 0.35);
+      background: rgba(222, 219, 200, 0.05);
+    }
+    .spec-card-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .spec-card-zh {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--cream-text);
+      margin-bottom: 8px;
+    }
+    .spec-card-d {
+      font-size: 13px;
+      color: var(--cream-dim);
+      line-height: 1.6;
+    }
+
+    .whats-next-cta {
+      margin-top: 32px;
+      padding: 24px;
+      background: rgba(222, 219, 200, 0.03);
+      border: 1px solid rgba(222, 219, 200, 0.1);
+      border-radius: 16px;
+      text-align: center;
+    }
+    .whats-next-cta-title {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 24px;
+      color: var(--cream-text);
+      margin-bottom: 6px;
+    }
+    .whats-next-cta-sub {
       font-size: 13px;
       color: var(--gray-500);
     }
 
-    .rename-tile-flow {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--cream);
-      letter-spacing: 0.04em;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-    .rename-tile-flow .from { color: var(--gray-500); }
-    .rename-tile-flow .arrow { color: var(--cream); opacity: 0.6; }
-    .rename-tile-flow .to { color: var(--cream-text); font-weight: 700; }
-
-    .speculation-callout {
-      margin-top: 28px;
-      padding: 20px 24px;
-      background: rgba(222, 219, 200, 0.03);
-      border: 1px dashed rgba(222, 219, 200, 0.18);
-      border-radius: 14px;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-    .speculation-tag {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      padding: 4px 10px;
-      border-radius: 5px;
-      background: rgba(222, 219, 200, 0.06);
-      color: var(--cream);
-      border: 1px solid rgba(222,219,200,0.18);
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
-    .speculation-text {
-      font-size: 14px;
-      color: var(--cream-dim);
-      line-height: 1.65;
+    @media (max-width: 768px) {
+      .can-cant { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -154,11 +195,11 @@
       <span class="topnav-brand-text">驾驭工程</span>
     </a>
     <a href="what.html" class="topnav-link">是什么</a>
+    <a href="history.html" class="topnav-link">谱系</a>
     <a href="why.html" class="topnav-link">为什么</a>
     <a href="anatomy.html" class="topnav-link">解剖</a>
     <a href="vendors.html" class="topnav-link">厂商</a>
     <a href="method.html" class="topnav-link">方法</a>
-    <a href="history.html" class="topnav-link">谱系</a>
     <a href="resources.html" class="topnav-link">资源</a>
   </nav>
 
@@ -167,34 +208,42 @@
     <!-- LEFT TOC -->
     <aside class="toc">
       <div class="toc-inner">
-        <div class="toc-label">06 · BOARD</div>
+        <div class="toc-label">04 · BOARD</div>
         <div class="toc-board">谱<em>系</em></div>
         <nav class="toc-list">
-          <a href="#timeline" class="toc-link">
+          <a href="#overview" class="toc-link">
             <span class="toc-num">01</span>
-            <span>时间线</span>
+            <span>4 年演化</span>
           </a>
-          <a href="#why-rename" class="toc-link">
+          <a href="#layer-1" class="toc-link">
             <span class="toc-num">02</span>
-            <span>每次重命名的逻辑</span>
+            <span>提示词工程时代 (2022-2023)</span>
+          </a>
+          <a href="#layer-2" class="toc-link">
+            <span class="toc-num">03</span>
+            <span>上下文工程时代 (2024)</span>
+          </a>
+          <a href="#layer-3" class="toc-link">
+            <span class="toc-num">04</span>
+            <span>驾驭工程时代 (2025-2026)</span>
           </a>
           <a href="#nesting" class="toc-link">
-            <span class="toc-num">03</span>
+            <span class="toc-num">05</span>
             <span>三层嵌套关系</span>
           </a>
           <a href="#whats-next" class="toc-link">
-            <span class="toc-num">04</span>
-            <span>下一个名字</span>
+            <span class="toc-num">06</span>
+            <span>下一个名字会是什么</span>
           </a>
         </nav>
         <div class="toc-bottom">
-          <a href="resources.html" class="toc-nav-link">
+          <a href="why.html" class="toc-nav-link">
             <span>下一个板块</span>
-            <span class="toc-nav-link-arrow">07 · 资源 →</span>
+            <span class="toc-nav-link-arrow">03 · 为什么 →</span>
           </a>
-          <a href="../index.html" class="toc-nav-link">
-            <span>← 返回首页</span>
-            <span class="toc-nav-link-arrow"></span>
+          <a href="what.html" class="toc-nav-link">
+            <span>← 上一个板块</span>
+            <span class="toc-nav-link-arrow">01 · 是什么</span>
           </a>
         </div>
       </div>
@@ -204,146 +253,297 @@
     <main class="page-main">
 
       <header class="page-header reveal">
-        <div class="page-header-num">06 · GENEALOGY</div>
+        <div class="page-header-num">04 · LINEAGE</div>
         <h1 class="page-title">谱<em>系</em></h1>
         <p class="page-lead">
-          从 prompt 到 harness 的 4 年命名演化史 —— 每一次重命名,都是上一层"管不动了"的信号。
+          从 prompt 到 harness 的 4 年命名演化史 —— 用一个具体案例「修登录页 500 错误」串联三层，看为什么前一层不够用。
         </p>
       </header>
 
-      <!-- ==== SEC 1: 时间线 ==== -->
-      <section class="sec" id="timeline">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · TIMELINE</div>
-        <h2 class="sec-title reveal">4 年,4 次<em>改名</em></h2>
+      <!-- ==== SEC 1: 4 年演化概览 ==== -->
+      <section class="sec" id="overview">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>01 · 4-YEAR EVOLUTION</div>
+        <h2 class="sec-title reveal">4 年<em>演化</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          每一次"重命名",都是因为上一层名字罩不住新出现的工程问题了。
+          每一层都比上一层管得更多。从「怎么问得好」→「给什么上下文」→「怎么包一整套能跑能管的系统」。
         </p>
 
-        <div class="timeline reveal reveal-d2">
-
-          <div class="timeline-item">
-            <span class="timeline-tag">ERA 01 · 2022</span>
-            <div class="timeline-year">2022</div>
-            <h3 class="timeline-title"><em>Prompt</em> Engineering · 起点</h3>
-            <div class="timeline-body">
-              GPT-3 出圈,人们发现<strong>同一个模型,换一种问法,答案差天差地</strong>。"prompt engineering" 一词在社区流行起来 —— 重点是怎么<strong>措辞</strong>:few-shot 示例、chain-of-thought、role play。这一阶段的"工程",几乎全部发生在一个文本框里。
-              <div class="timeline-cite-row">
-                代表文献:<a class="cite" href="https://arxiv.org/abs/2005.14165" target="_blank">GPT-3 paper (Brown et al., 2020)</a>、社区指南 <a class="cite" href="https://www.promptingguide.ai/" target="_blank">Prompt Engineering Guide</a>。
-              </div>
+        <div class="evo-timeline reveal reveal-d2">
+          <div class="evo-tl-item">
+            <div class="evo-tl-year">2022 · PROMPT ENGINEERING</div>
+            <div class="evo-tl-h">提示词工程起点</div>
+            <div class="evo-tl-d">
+              GPT-3 时代。研究怎么写好一条 prompt 让模型回答得更好 —— few-shot、CoT、角色扮演。
+              <a class="cite" href="https://arxiv.org/abs/2005.14165" target="_blank">Brown et al. 2020 (GPT-3)</a>
             </div>
           </div>
-
-          <div class="timeline-item">
-            <span class="timeline-tag">ERA 02 · 2023</span>
-            <div class="timeline-year">2023</div>
-            <h3 class="timeline-title"><em>Tool Use</em> / Function Calling 引入</h3>
-            <div class="timeline-body">
-              ReAct 论文把"推理-行动"循环写清楚,OpenAI 推出 function calling API。模型第一次能<strong>"输出 → 调一个真实函数 → 拿结果接着想"</strong>。"prompt" 一词开始不够用 —— 现在还要管工具集、工具描述、错误重试,这些都不是"措辞"问题了。
-              <div class="timeline-cite-row">
-                代表文献:<a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct (Yao et al., 2022)</a>、<a class="cite" href="https://openai.com/blog/function-calling-and-other-api-updates" target="_blank">OpenAI Function Calling (2023-06)</a>。
-              </div>
+          <div class="evo-tl-item">
+            <div class="evo-tl-year">2023 · TOOL USE</div>
+            <div class="evo-tl-h">ReAct + Function calling 引入</div>
+            <div class="evo-tl-d">
+              模型开始"动手" —— 推理-行动循环、函数调用。仍是 prompt-centric，但已经有了 agent 的雏形。
+              <a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">Yao et al. (ReAct)</a>
             </div>
           </div>
-
-          <div class="timeline-item">
-            <span class="timeline-tag">ERA 03 · 2024</span>
-            <div class="timeline-year">2024</div>
-            <h3 class="timeline-title"><em>Context</em> Engineering 命名出现</h3>
-            <div class="timeline-body">
-              长上下文(100k+)、RAG 普及、记忆系统兴起。Andrej Karpathy、Anthropic、Cohere 等人在 2024 反复用 <strong>"context engineering"</strong> 来概括:与其调 prompt,不如重新设计"给模型看什么"。这一阶段把<strong>RAG、记忆、工具描述、系统提示</strong>都包了进来。
-              <div class="timeline-cite-row">
-                代表文献:<a class="cite" href="https://www.anthropic.com/news/contextual-retrieval" target="_blank">Anthropic · Contextual Retrieval (2024-09)</a>、<a class="cite" href="https://docs.cohere.com/docs/rag" target="_blank">Cohere RAG docs</a>。
-              </div>
+          <div class="evo-tl-item">
+            <div class="evo-tl-year">2024 · CONTEXT ENGINEERING</div>
+            <div class="evo-tl-h">"上下文工程"命名出现</div>
+            <div class="evo-tl-d">
+              RAG、长上下文、记忆系统成熟。社区开始把"装桌面"这件事看成独立学问。
+              <a class="cite" href="https://blog.langchain.com/the-rise-of-context-engineering/" target="_blank">LangChain · Context Engineering</a>
             </div>
           </div>
-
-          <div class="timeline-item is-current">
-            <span class="timeline-tag">ERA 04 · 2025–2026</span>
-            <div class="timeline-year">2025 — 2026</div>
-            <h3 class="timeline-title"><em>Harness</em> Engineering 正式定义</h3>
-            <div class="timeline-body">
-              <strong>Anthropic、OpenAI 同一季度,独立提出 "harness" 这个词</strong>。上下文工程罩不住"8 小时长任务、多 agent 协作、组织级运行"这种新问题 —— 需要一个更外层的概念。harness = 主循环 + 上下文 + 工具 + 评测 + 沙箱 + 可观测,一整圈包出来,把模型变成可运行、可治理、可迭代的 Agent 产品。
-              <div class="timeline-cite-row">
-                代表文献:<a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI · Harness Engineering (2026-02-11)</a>、<a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic · Harness Design (2026-03-24)</a>。
-              </div>
+          <div class="evo-tl-item">
+            <div class="evo-tl-year">2025–2026 · HARNESS ENGINEERING</div>
+            <div class="evo-tl-h">Harness 工程正式定义</div>
+            <div class="evo-tl-d">
+              Anthropic 与 OpenAI 在同一时间窗口先后撰文，正式把"包在模型外的一整圈代码"立成工程领域。
+              <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic 2026</a>
+              <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI 2026</a>
             </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ==== SEC 2: 每次重命名的逻辑 ==== -->
-      <section class="sec" id="why-rename">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>02 · RENAMING LOGIC</div>
-        <h2 class="sec-title reveal">每一次重命名,<em>背后的逻辑</em></h2>
-        <p class="sec-lead reveal reveal-d1">
-          不是术语炒作。每次都是因为上一个名字罩不住一类<strong style="color:var(--cream-text);">新出现的工程问题</strong>。
-        </p>
-
-        <div class="grid-3 reveal reveal-d2">
-          <div class="tile" data-glow>
-            <div class="rename-tile-flow">
-              <span class="from">Prompt</span>
-              <span class="arrow">→</span>
-              <span class="to">Tool Use</span>
-            </div>
-            <div class="tile-title">从"措辞"到"动手"</div>
-            <p class="tile-desc">
-              触发:模型只能输出文字,做不了实事。
-              新增问题:工具注册、参数 schema、错误重试、安全围栏。
-              <strong>关键词从 "怎么说" 变成 "怎么做"</strong>。
-            </p>
-            <p class="reason-cite" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(222,219,200,0.08); font-size: 12px; color: var(--gray-500);">
-              里程碑:<a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct 论文</a> + <a class="cite" href="https://openai.com/blog/function-calling-and-other-api-updates" target="_blank">OpenAI function calling</a>。
-            </p>
-          </div>
-
-          <div class="tile" data-glow>
-            <div class="rename-tile-flow">
-              <span class="from">Tool Use</span>
-              <span class="arrow">→</span>
-              <span class="to">Context Eng.</span>
-            </div>
-            <div class="tile-title">从"单次调用"到"整套上下文"</div>
-            <p class="tile-desc">
-              触发:工具一多,上下文塞不下;模型读不准了。
-              新增问题:RAG 检索、记忆压缩、上下文窗口预算、相关性排序。
-              <strong>关键词从 "调哪个工具" 变成 "塞什么进去"</strong>。
-            </p>
-            <p class="reason-cite" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(222,219,200,0.08); font-size: 12px; color: var(--gray-500);">
-              里程碑:<a class="cite" href="https://www.anthropic.com/news/contextual-retrieval" target="_blank">Anthropic contextual retrieval</a>。
-            </p>
-          </div>
-
-          <div class="tile" data-glow>
-            <div class="rename-tile-flow">
-              <span class="from">Context Eng.</span>
-              <span class="arrow">→</span>
-              <span class="to">Harness Eng.</span>
-            </div>
-            <div class="tile-title">从"一次对话"到"长任务 + 治理"</div>
-            <p class="tile-desc">
-              触发:8 小时长任务、多 agent、生产环境治理来了。
-              新增问题:状态机、retry/rollback、评测集、沙箱、成本治理、可观测。
-              <strong>关键词从 "怎么答好" 变成 "怎么跑得稳"</strong>。
-            </p>
-            <p class="reason-cite" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(222,219,200,0.08); font-size: 12px; color: var(--gray-500);">
-              里程碑:<a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI 2026</a> + <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic 2026</a>。
-            </p>
           </div>
         </div>
 
-        <p class="prose reveal reveal-d3" style="margin-top: 28px;">
-          注意:<strong>这不是"取代",而是"包裹"</strong>。harness 工程师该会的 prompt 技巧、context 设计,一个都不能少;它只是把这些都放进了更大的工程上下文。这一点很重要 ——下一节专门讲。
-        </p>
+        <div class="concept-pill reveal reveal-d3">
+          <p>
+            <strong>同一个案例「修登录页 500 错误」</strong> —— 下面分别用三层的能力去试着干，看每一层在哪儿掉链子、下一层为什么必须出现。
+          </p>
+        </div>
       </section>
 
-      <!-- ==== SEC 3: 三层嵌套 ==== -->
+      <!-- ==== SEC 2: LAYER 1 · 提示词工程 ==== -->
+      <section class="sec" id="layer-1">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>2022—2023 · LAYER 1</div>
+        <h2 class="sec-title reveal">提示词工程 · <em>能问，但只能问</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          这一层只研究"怎么写好一条 prompt 让模型回答得更好"。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2">
+          <div class="prose">
+            <p>
+              提示词工程是大模型时代第一个被命名的工程实践。它把"和模型对话"当成一门可以打磨的手艺，研究内容主要包括：
+            </p>
+            <ul>
+              <li><b>Few-shot examples</b> —— 在 prompt 里给几个示例，让模型照葫芦画瓢。</li>
+              <li><b>Chain-of-thought</b> —— 让模型"分步想"，提高复杂推理的准确率。<a class="cite" href="https://arxiv.org/abs/2201.11903" target="_blank">Wei et al. 2022</a></li>
+              <li><b>角色扮演 prompt</b> —— "你是一个资深工程师 / 律师 / 心理咨询师…"</li>
+              <li><b>ReAct 模式</b> —— 让模型边推理边输出动作，开启了工具调用的雏形。<a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">Yao et al. 2023</a></li>
+            </ul>
+            <p>
+              这一时期的研究主线是<mark>"输入 → 输出"</mark>这单次调用怎么调得更好。模型还<b>没有持续状态</b>、<b>不能调用工具</b>、<b>不能改外部世界</b>。
+            </p>
+          </div>
+
+          <div>
+            <div class="can-cant">
+              <div class="can-cant-card is-can" data-glow>
+                <div class="can-cant-h">✓ 能干什么</div>
+                <ul class="can-cant-list">
+                  <li>· 让模型回答问题</li>
+                  <li>· 解释概念</li>
+                  <li>· 生成草稿</li>
+                  <li>· 单次推理任务</li>
+                </ul>
+              </div>
+              <div class="can-cant-card is-cant" data-glow>
+                <div class="can-cant-h">✗ 不能干什么</div>
+                <ul class="can-cant-list">
+                  <li>· 读你的代码库</li>
+                  <li>· 跑你的测试</li>
+                  <li>· 改你的文件</li>
+                  <li>· 跨调用记得上一轮</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="reveal" style="font-size: 14px; color: var(--gray-500); margin: 12px 0;">
+          ↓ 用提示词工程去试着干「修登录页 500 错误」——
+        </p>
+
+        <div class="reveal">
+          <div class="sim evo-sim" id="hist-prompt" data-glow>
+            <div class="sim-head">
+              <div class="sim-head-left">
+                <div class="sim-dots">
+                  <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
+                </div>
+                <span class="sim-tag">提示词工程 · 修登录页 500 错误</span>
+              </div>
+              <button class="sim-btn">▶ 启动模拟</button>
+            </div>
+            <div class="evo-steps"></div>
+          </div>
+        </div>
+
+        <div class="gap-explain reveal">
+          <div class="gap-explain-h">⚠ 为什么这一层不够</div>
+          <div class="gap-explain-text">
+            提示词工程让模型变成了一个聪明的"答题机器"，但它<b>没有手、没有眼睛、没有记忆</b>。修一个真实 bug 需要的不只是聪明的回答 —— 它需要去读代码、跑日志、试改、验证。这正是<b>下一层「上下文工程」</b>要解决的事。
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== SEC 3: LAYER 2 · 上下文工程 ==== -->
+      <section class="sec" id="layer-2">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>2024 · LAYER 2</div>
+        <h2 class="sec-title reveal">上下文工程 · <em>能看见，但还是只能建议</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          这一层研究"给模型什么上下文" —— 从 RAG 检索到记忆系统，让模型"看见"它本来不知道的东西。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2">
+          <div class="prose">
+            <p>
+              "Context Engineering" 这个词在 2024 年正式被社区命名。它的研究内容比提示词工程外扩了一圈：
+            </p>
+            <ul>
+              <li><b>RAG 检索</b> —— 把外部知识库切片、向量化，运行时检索相关片段拼进上下文。</li>
+              <li><b>文档分块策略</b> —— chunk size、重叠、metadata 过滤…</li>
+              <li><b>对话记忆</b> —— 短期 / 长期记忆、摘要压缩、用户偏好持久化。</li>
+              <li><b>工具结果反馈</b> —— Function calling 拿到结果后，怎么塞回 context、怎么让模型继续推理。<a class="cite" href="https://platform.openai.com/docs/guides/function-calling" target="_blank">OpenAI Function Calling</a></li>
+            </ul>
+            <p>
+              换句话说，这一层的关注点从"<mark>怎么问</mark>"变成了"<mark>把什么塞到模型桌面上</mark>"。模型有了"眼睛"，但还是只能<b>看见 + 输出建议</b>。
+              <a class="cite" href="https://blog.langchain.com/the-rise-of-context-engineering/" target="_blank">LangChain · The Rise of Context Engineering</a>
+            </p>
+          </div>
+
+          <div>
+            <div class="can-cant">
+              <div class="can-cant-card is-can" data-glow>
+                <div class="can-cant-h">✓ 能干什么</div>
+                <ul class="can-cant-list">
+                  <li>· 根据真实代码库给答案</li>
+                  <li>· 引用历史对话和文档</li>
+                  <li>· 调用工具获取数据</li>
+                  <li>· 多轮对话保持连贯</li>
+                </ul>
+              </div>
+              <div class="can-cant-card is-cant" data-glow>
+                <div class="can-cant-h">✗ 不能干什么</div>
+                <ul class="can-cant-list">
+                  <li>· 真的去执行修改</li>
+                  <li>· 跑测试验证</li>
+                  <li>· 回滚错误的尝试</li>
+                  <li>· 自主完成多步任务</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="reveal" style="font-size: 14px; color: var(--gray-500); margin: 12px 0;">
+          ↓ 用上下文工程再试一次「修登录页 500 错误」——
+        </p>
+
+        <div class="reveal">
+          <div class="sim evo-sim" id="hist-context" data-glow>
+            <div class="sim-head">
+              <div class="sim-head-left">
+                <div class="sim-dots">
+                  <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
+                </div>
+                <span class="sim-tag">上下文工程 · 修登录页 500 错误</span>
+              </div>
+              <button class="sim-btn">▶ 启动模拟</button>
+            </div>
+            <div class="evo-steps"></div>
+          </div>
+        </div>
+
+        <div class="gap-explain reveal">
+          <div class="gap-explain-h">⚠ 为什么这一层还不够</div>
+          <div class="gap-explain-text">
+            上下文工程让模型"<b>能看见</b>"你的代码，但还是只能给建议。修一个真实 bug 需要它<b>真的去动手、试错、验证、回滚</b>。光靠"装桌面"没有"<b>循环 + 边界 + 评测</b>"，模型永远停在"我建议你…"。这正是<b>下一层「驾驭工程」</b>要解决的事。
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== SEC 4: LAYER 3 · 驾驭工程 ==== -->
+      <section class="sec" id="layer-3">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>2025—2026 · LAYER 3</div>
+        <h2 class="sec-title reveal">驾驭工程 · <em>能真的把活干完</em></h2>
+        <p class="sec-lead reveal reveal-d1">
+          这一层研究"怎么包出一个能跑、能管、能评的 Agent 产品" —— 完整的 agent 循环 + 工具执行 + 沙箱 + 评测 + 多 agent 编排。
+        </p>
+
+        <div class="grid-2 reveal reveal-d2">
+          <div class="prose">
+            <p>
+              2026 年初，Anthropic 与 OpenAI 在<b>同一时间窗口</b>先后撰文，正式把这个工程领域立名。它在上下文工程外面再包了一圈，把所有"<mark>让 agent 真的能跑起来</mark>"的东西都拢进来：
+            </p>
+            <ul>
+              <li><b>Agent 主循环</b> —— 模型 → 工具调用 → 结果回流 → 再来一圈，直到任务完成或触发停机。</li>
+              <li><b>工具执行 + 沙箱</b> —— 真的去改文件、跑命令，但在隔离环境里、有审批 hook。</li>
+              <li><b>评测 + 可观测</b> —— Trace、token 计账、回放、AB 测试、监控告警。</li>
+              <li><b>多 agent 编排</b> —— 子任务调度、专家路由、协作记忆。</li>
+              <li><b>长周期治理</b> —— 跨周/跨月任务、记忆分层、组织级策略。<a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic · Harness Design</a> <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI · Harness Engineering</a></li>
+            </ul>
+            <p>
+              到了这一层，关注点从"<mark>怎么让一次推理更好</mark>"变成了"<mark>怎么让一支 agent 队伍长期、安全、可观测地干活</mark>"。
+            </p>
+          </div>
+
+          <div>
+            <div class="can-cant">
+              <div class="can-cant-card is-can" data-glow>
+                <div class="can-cant-h">✓ 能干什么</div>
+                <ul class="can-cant-list">
+                  <li>· 自主完成多步任务</li>
+                  <li>· 调用工具、执行命令</li>
+                  <li>· 自我验证、试错回滚</li>
+                  <li>· 全程可观测、可回放</li>
+                </ul>
+              </div>
+              <div class="can-cant-card is-cant" data-glow>
+                <div class="can-cant-h">→ 下一个边界</div>
+                <ul class="can-cant-list">
+                  <li>· 多组织 agent 协作</li>
+                  <li>· 跨产品长期治理</li>
+                  <li>· 可证明安全</li>
+                  <li>· 见 §06 ↓</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="reveal" style="font-size: 14px; color: var(--gray-500); margin: 12px 0;">
+          ↓ 用驾驭工程再试一次「修登录页 500 错误」——
+        </p>
+
+        <div class="reveal">
+          <div class="sim evo-sim" id="hist-harness" data-glow>
+            <div class="sim-head">
+              <div class="sim-head-left">
+                <div class="sim-dots">
+                  <span class="sim-dot is-r"></span><span class="sim-dot is-y"></span><span class="sim-dot is-g"></span>
+                </div>
+                <span class="sim-tag">驾驭工程 · 修登录页 500 错误</span>
+              </div>
+              <button class="sim-btn">▶ 启动模拟</button>
+            </div>
+            <div class="evo-steps"></div>
+          </div>
+        </div>
+
+        <div class="gap-explain is-success reveal">
+          <div class="gap-explain-h">✓ 任务真的修完了</div>
+          <div class="gap-explain-text">
+            从"<b>看见</b>"到"<b>动手</b>" —— 这才是 harness 工程的能力。同一个 bug，前两层只能给建议，到了这一层，模型自主完成了 read → diff → edit → test → lint 全流程，并留下了可回放的 trace。这就是 <b>Agent = Model + Harness</b> 的真正含义。
+          </div>
+        </div>
+      </section>
+
+      <!-- ==== SEC 5: 三层嵌套 ==== -->
       <section class="sec" id="nesting">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>03 · NESTED LAYERS</div>
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>05 · NESTED LAYERS</div>
         <h2 class="sec-title reveal">三层<em>嵌套</em></h2>
         <p class="sec-lead reveal reveal-d1">
-          这不是术语革命,而是<strong style="color:var(--cream-text);">同心圆扩张</strong>。新名字把旧名字包在里面,而不是取代。
+          三层嵌套 —— 不是替代，是包含。做 harness 工程的人，同时也在做上下文工程、提示词工程。
         </p>
 
         <div class="reveal reveal-d2" style="display: flex; flex-direction: column; gap: 12px; max-width: 720px;">
@@ -351,7 +551,7 @@
             <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cream); padding: 4px 10px; background: rgba(222,219,200,0.08); border-radius: 6px; min-width: 80px; text-align: center;">最内层</span>
             <div style="flex: 1;">
               <div style="font-size: 17px; font-weight: 700; color: var(--cream-text);">提示词工程 · Prompt Engineering</div>
-              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究 "怎么写好一条 prompt"</div>
+              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究"怎么写好一条 prompt"</div>
             </div>
           </div>
           <div style="text-align: center; color: var(--gray-600); font-family: var(--font-mono); font-size: 18px;">⊂</div>
@@ -359,7 +559,7 @@
             <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cream); padding: 4px 10px; background: rgba(222,219,200,0.08); border-radius: 6px; min-width: 80px; text-align: center;">中间层</span>
             <div style="flex: 1;">
               <div style="font-size: 17px; font-weight: 700; color: var(--cream-text);">上下文工程 · Context Engineering</div>
-              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究 "给模型什么上下文"(含 RAG、记忆、工具)</div>
+              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究"给模型什么上下文"（含 RAG、记忆、工具）</div>
             </div>
           </div>
           <div style="text-align: center; color: var(--gray-600); font-family: var(--font-mono); font-size: 18px;">⊂</div>
@@ -367,44 +567,81 @@
             <span style="font-family: var(--font-mono); font-size: 11px; color: #000; padding: 4px 10px; background: var(--cream); border-radius: 6px; min-width: 80px; text-align: center; font-weight: 700;">最外层</span>
             <div style="flex: 1;">
               <div style="font-size: 17px; font-weight: 700; color: var(--cream-text);">Harness 工程 · Harness Engineering</div>
-              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究 "包出一个能跑、能管、能评的 Agent 产品"</div>
+              <div style="font-size: 13px; color: var(--gray-500); margin-top: 2px;">研究"包出一个能跑、能管、能评的 Agent 产品"</div>
             </div>
           </div>
         </div>
 
-        <div class="concept-pill reveal reveal-d3" style="margin-top: 28px;">
-          <p>
-            <strong>每一次外扩,都是因为前一层"控制面积"不够了。</strong>外层包内层,谁也没消失。一个合格的 harness 工程师,必然是合格的 context 工程师、prompt 工程师 —— 反过来不成立。
-          </p>
-        </div>
-      </section>
-
-      <!-- ==== SEC 4: 下一个名字 ==== -->
-      <section class="sec" id="whats-next">
-        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>04 · WHAT'S NEXT</div>
-        <h2 class="sec-title reveal">下一个名字<em>会是什么</em>?</h2>
-        <p class="sec-lead reveal reveal-d1">
-          顺着同一套逻辑外推 —— 当 harness 也罩不住的那一天,新词会指向什么?
+        <p class="prose reveal reveal-d3" style="margin-top: 28px; text-align: center; font-size: 14px; color: var(--cream-dim); font-style: italic;">
+          三层嵌套 —— 不是替代，是包含。
         </p>
 
-        <div class="prose reveal reveal-d2">
+        <p class="prose reveal reveal-d3" style="margin-top: 12px; font-size: 14px; color: var(--gray-500);">
+          每一次外扩，都是因为前一层"控制面积"不够了。
+          <a class="cite" href="what.html#nesting">回到「是什么 · 嵌套关系」 →</a>
+        </p>
+      </section>
+
+      <!-- ==== SEC 6: 下一个名字 ==== -->
+      <section class="sec" id="whats-next">
+        <div class="sec-eyebrow"><span class="sec-eyebrow-mark"></span>06 · WHAT'S NEXT</div>
+        <h2 class="sec-title reveal">下一个<em>名字</em>会是什么</h2>
+        <p class="sec-lead reveal reveal-d1">
+          下一个名字会是什么？没人知道。但如果历史规律成立，它一定是因为 harness 工程的"控制面积"不够了 —— 而要管的东西又多了一圈。
+        </p>
+
+        <div class="concept-pill reveal reveal-d2" style="margin: 24px 0;">
           <p>
-            "harness 工程" 罩住了 <strong>一个产品 + 一支 agent 队伍</strong> 的工程边界。但当 agent 跨产品、跨组织、彼此协议化对话(MCP 已经在做),问题就会再次溢出:<strong>不再是"我家这一支队伍跑得好不好",而是"agent 与 agent 之间的协议、信任、市场怎么定"。</strong>
-          </p>
-          <p>
-            合理的下一个名字,可能是 <strong>Agent Society Engineering(智能体社会工程)</strong>或者 <strong>Agent Economy Engineering(智能体经济工程)</strong>。研究对象会从"一个 harness"扩到"<strong>多个 harness 之间的协议、市场、声誉、争议解决</strong>"。<a class="cite" href="https://modelcontextprotocol.io/" target="_blank">MCP</a>、<a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a> 已经是这一层的雏形。
-          </p>
-          <p>
-            如果这条线是对的,那今天投资在 harness 上的工程范式,会自然过渡进去 —— 就像 prompt 技巧没在 context 时代消失,context 技巧也不会在 harness 时代消失。<strong>名字一直在向外扩,工具栈一直在向下兼容</strong>。
+            <strong style="color: #f87171;">推测，非定论。</strong>
+            下面三个名字都是社区讨论中出现过的候选概念，没有任何一个是"已被锁定的下一层"。把它们列出来，是为了帮你<b>提前感受 harness 工程的下一个边界在哪</b>。
           </p>
         </div>
 
-        <div class="speculation-callout reveal reveal-d3">
-          <span class="speculation-tag">SPECULATION</span>
-          <div class="speculation-text">
-            <strong style="color: var(--cream-text);">推测,非定论。</strong>"Agent Society Engineering" 这个词目前未被头部实验室正式命名,这里只是顺着 prompt → context → harness 的扩张轨迹做的外推。读者请把它当作思考方向,而非已成事实。
+        <div class="speculation-grid reveal reveal-d3">
+          <div class="spec-card" data-glow>
+            <div class="spec-card-name">AGENT SOCIETY<br>ENGINEERING</div>
+            <div class="spec-card-zh">智能体社会工程</div>
+            <div class="spec-card-d">
+              多组织、多 agent 网络的治理 —— 当一家公司的 agent 要和另一家公司的 agent 协商、谈判、签合同，单一组织的 harness 就不够用了。
+            </div>
+          </div>
+          <div class="spec-card" data-glow>
+            <div class="spec-card-name">AI SYSTEM<br>ENGINEERING</div>
+            <div class="spec-card-zh">AI 系统工程</div>
+            <div class="spec-card-d">
+              模型 + harness + 产品的统一系统观 —— 把模型训练、harness 编排、产品上线、用户运营当成一个不可分割的系统去设计。
+            </div>
+          </div>
+          <div class="spec-card" data-glow>
+            <div class="spec-card-name">TRUSTLESS AGENT<br>ENGINEERING</div>
+            <div class="spec-card-zh">无信任智能体工程</div>
+            <div class="spec-card-d">
+              加密验证、可证明安全的 agent —— 在不信任前提下让多 agent 协作的工程。可能借鉴零知识证明、TEE、形式化验证等思路。
+            </div>
           </div>
         </div>
+
+        <div class="prose reveal" style="margin-top: 24px;">
+          <p style="font-size: 14px; color: var(--gray-500);">
+            历史告诉我们：每一层新名字的出现，<b>不是因为发明了新东西，是因为旧名字管不住了</b>。Prompt Engineering 管不住"装桌面"，于是有了 Context Engineering；Context Engineering 管不住"循环 + 边界 + 评测"，于是有了 Harness Engineering。
+          </p>
+          <p style="font-size: 14px; color: var(--gray-500);">
+            下一个名字也一样 —— 它会在<b>当前的 harness 工程管不住某件事</b>的那一刻自然涌现。你只需要保持观察：什么时候开始有人抱怨"harness 工程也不够用了"。
+          </p>
+        </div>
+
+        <div class="whats-next-cta reveal" data-glow>
+          <div class="whats-next-cta-title">你怎么看？</div>
+          <div class="whats-next-cta-sub">
+            把你认为"下一层应该叫什么"留在心里 ——<br>
+            5 年后回来对照，看看自己是不是先嗅到了气味。
+          </div>
+        </div>
+
+        <p class="prose reveal" style="margin-top: 32px; font-size: 14px; color: var(--gray-500);">
+          搞清楚谱系，接下来看驱动力 ——
+          <a class="cite" href="why.html">板块 · 为什么需要 harness 工程 →</a>
+        </p>
       </section>
 
     </main>
@@ -415,15 +652,16 @@
     <div class="footer-links">
       <a class="cite" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">Anthropic</a>
       <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI</a>
-      <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
-      <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler</a>
-      <a class="cite" href="https://metr.org/blog/2024-03-15-guidelines-for-capability-elicitation/" target="_blank">METR</a>
-      <a class="cite" href="https://agents.md/" target="_blank">AGENTS.md</a>
+      <a class="cite" href="https://blog.langchain.com/the-rise-of-context-engineering/" target="_blank">LangChain</a>
+      <a class="cite" href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct</a>
+      <a class="cite" href="https://arxiv.org/abs/2201.11903" target="_blank">CoT</a>
+      <a class="cite" href="https://arxiv.org/abs/2005.14165" target="_blank">GPT-3</a>
     </div>
     <div class="footer-copy">© 2026 思敏出品 · 所有论断挂一手来源 · CC BY 4.0</div>
   </footer>
 
   <script src="../assets/shared.js"></script>
   <script src="../assets/page.js"></script>
+  <script src="../assets/simulator.js"></script>
 </body>
 </html>

@@ -1,0 +1,2751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>全景 · Harness Engineering</title>
+  <meta name="description" content="一眼看清这个领域：5 家主流厂商 + 中国 AI 圈现状">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/page.css">
+
+  <style>
+    /* ============================================
+       04-vendors.html 可视化专用样式
+       ============================================ */
+
+    /* ---- 厂商色系 ---- */
+    :root {
+      --v-openai:       #10a37f;
+      --v-openai-soft:  rgba(16, 163, 127, 0.10);
+      --v-openai-mid:   rgba(16, 163, 127, 0.20);
+      --v-anthropic:    #d97706;
+      --v-anthropic-soft: rgba(217, 119, 6, 0.10);
+      --v-anthropic-mid: rgba(217, 119, 6, 0.20);
+      --v-cursor:       #8b5cf6;
+      --v-cursor-soft:  rgba(139, 92, 246, 0.10);
+      --v-cursor-mid:   rgba(139, 92, 246, 0.20);
+    }
+
+    /* ---- Viz 1: 三条赛道 ---- */
+    .v-tracks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-4);
+    }
+    .v-track {
+      position: relative;
+      border-radius: var(--he-radius-lg);
+      padding: var(--sp-6) var(--sp-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      overflow: hidden;
+    }
+    .v-track::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      border-radius: var(--he-radius-lg) var(--he-radius-lg) 0 0;
+    }
+    .v-track:hover { transform: translateY(-3px); }
+
+    .v-track.is-openai {
+      background: var(--v-openai-soft);
+      border: 1px solid rgba(16, 163, 127, 0.25);
+    }
+    .v-track.is-openai::before { background: var(--v-openai); }
+    .v-track.is-openai:hover { border-color: var(--v-openai); box-shadow: 0 8px 32px rgba(16, 163, 127, 0.15); }
+
+    .v-track.is-anthropic {
+      background: var(--v-anthropic-soft);
+      border: 1px solid rgba(217, 119, 6, 0.25);
+    }
+    .v-track.is-anthropic::before { background: var(--v-anthropic); }
+    .v-track.is-anthropic:hover { border-color: var(--v-anthropic); box-shadow: 0 8px 32px rgba(217, 119, 6, 0.15); }
+
+    .v-track.is-cursor {
+      background: var(--v-cursor-soft);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+    }
+    .v-track.is-cursor::before { background: var(--v-cursor); }
+    .v-track.is-cursor:hover { border-color: var(--v-cursor); box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15); }
+
+    .v-track-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-track.is-openai .v-track-badge { color: var(--v-openai); }
+    .v-track.is-anthropic .v-track-badge { color: var(--v-anthropic); }
+    .v-track.is-cursor .v-track-badge { color: var(--v-cursor); }
+
+    .v-track-badge-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      animation: v-dot-pulse 2.5s ease-in-out infinite;
+    }
+    .v-track.is-openai .v-track-badge-dot { background: var(--v-openai); }
+    .v-track.is-anthropic .v-track-badge-dot { background: var(--v-anthropic); }
+    .v-track.is-cursor .v-track-badge-dot { background: var(--v-cursor); }
+    @keyframes v-dot-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .v-track-name {
+      font-size: var(--he-text-h3);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .v-track-scale {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-bg);
+      border-radius: var(--he-radius-sm);
+      display: inline-block;
+      width: fit-content;
+    }
+    .v-track-quote {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+      font-style: italic;
+      border-left: 2px solid;
+      padding-left: var(--sp-3);
+    }
+    .v-track.is-openai .v-track-quote { border-color: var(--v-openai); }
+    .v-track.is-anthropic .v-track-quote { border-color: var(--v-anthropic); }
+    .v-track.is-cursor .v-track-quote { border-color: var(--v-cursor); }
+
+    /* ---- Viz 2: OpenAI 实验仪表盘 ---- */
+    .v-dashboard {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-stat {
+      text-align: center;
+      padding: var(--sp-5) var(--sp-3);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-stat:hover {
+      border-color: var(--v-openai);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(16, 163, 127, 0.12);
+    }
+    .v-stat-num {
+      font-family: var(--he-font-mono);
+      font-size: 28px;
+      font-weight: var(--he-weight-bold);
+      color: var(--v-openai);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .v-stat-label {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      margin-top: var(--sp-2);
+      line-height: 1.4;
+    }
+    .v-stat.is-highlight {
+      border-color: var(--v-openai);
+      background: var(--v-openai-soft);
+    }
+
+    .v-optim-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+      margin-top: var(--sp-6);
+    }
+    .v-optim {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      position: relative;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-optim:hover {
+      border-color: var(--v-openai);
+      transform: translateY(-2px);
+    }
+    .v-optim-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--v-openai-soft);
+      display: grid; place-items: center;
+      font-size: 18px;
+      margin-bottom: var(--sp-3);
+    }
+    .v-optim-title {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-2);
+    }
+    .v-optim-problem {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-bg-subtle);
+      border-radius: var(--he-radius-sm);
+      margin-bottom: var(--sp-3);
+      line-height: 1.5;
+    }
+    .v-optim-problem::before {
+      content: 'PROBLEM';
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: #ef4444;
+      margin-bottom: 2px;
+    }
+    .v-optim-fix {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+    }
+    .v-optim-fix::before {
+      content: 'FIX';
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--v-openai);
+      margin-bottom: 2px;
+      font-weight: var(--he-weight-semibold);
+    }
+
+    /* ---- Viz 3: Anthropic P/G/E 流程 ---- */
+    .v-pge {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      align-items: center;
+    }
+    .v-pge-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      width: 100%;
+      justify-content: center;
+    }
+    .v-pge-node {
+      padding: var(--sp-4) var(--sp-6);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      min-width: 160px;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-pge-node:hover {
+      transform: scale(1.04);
+    }
+    .v-pge-node.is-planner {
+      background: var(--v-anthropic-soft);
+      border: 1.5px solid var(--v-anthropic);
+    }
+    .v-pge-node.is-generator {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1.5px solid #3b82f6;
+    }
+    .v-pge-node.is-evaluator {
+      background: rgba(168, 85, 247, 0.08);
+      border: 1.5px solid #a855f7;
+    }
+    .v-pge-node-label {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .v-pge-node.is-planner .v-pge-node-label { color: var(--v-anthropic); }
+    .v-pge-node.is-generator .v-pge-node-label { color: #3b82f6; }
+    .v-pge-node.is-evaluator .v-pge-node-label { color: #a855f7; }
+    .v-pge-node-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+    }
+    .v-pge-node-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      margin-top: 4px;
+    }
+
+    .v-pge-arrow {
+      font-family: var(--he-font-mono);
+      font-size: 20px;
+      color: var(--he-text-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .v-pge-arrow-label {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-muted);
+    }
+
+    .v-pge-loop-indicator {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding: var(--sp-3) var(--sp-5);
+      background: rgba(168, 85, 247, 0.06);
+      border: 1px dashed rgba(168, 85, 247, 0.3);
+      border-radius: var(--he-radius-md);
+      font-size: var(--he-text-sm);
+      color: #a855f7;
+      font-weight: var(--he-weight-medium);
+    }
+    .v-pge-loop-indicator svg {
+      animation: v-pge-spin 3s linear infinite;
+    }
+    @keyframes v-pge-spin { to { transform: rotate(360deg); } }
+
+    /* Solo vs Full 对比 */
+    .v-solo-vs {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--sp-4);
+      align-items: stretch;
+    }
+    .v-solo-card {
+      padding: var(--sp-6);
+      border-radius: var(--he-radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-solo-card:hover { transform: translateY(-2px); }
+    .v-solo-card.is-solo {
+      background: var(--he-bg-subtle);
+      border: 1px solid var(--he-border);
+    }
+    .v-solo-card.is-full {
+      background: var(--v-anthropic-soft);
+      border: 1.5px solid var(--v-anthropic);
+      box-shadow: 0 4px 20px rgba(217, 119, 6, 0.1);
+    }
+    .v-solo-tag {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-solo-card.is-solo .v-solo-tag { color: var(--he-text-muted); }
+    .v-solo-card.is-full .v-solo-tag { color: var(--v-anthropic); }
+    .v-solo-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-2);
+    }
+    .v-solo-metric {
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-bg);
+      border-radius: var(--he-radius-sm);
+    }
+    .v-solo-metric-num {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+    }
+    .v-solo-metric-label {
+      font-size: 10px;
+      color: var(--he-text-muted);
+    }
+    .v-solo-verdict {
+      font-size: var(--he-text-sm);
+      line-height: 1.5;
+      padding: var(--sp-3);
+      border-radius: var(--he-radius-sm);
+    }
+    .v-solo-card.is-solo .v-solo-verdict {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.06);
+    }
+    .v-solo-card.is-full .v-solo-verdict {
+      color: var(--v-openai);
+      background: rgba(16, 163, 127, 0.06);
+    }
+    .v-solo-vs-divider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+    }
+    .v-solo-vs-badge {
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-muted);
+      writing-mode: vertical-rl;
+      letter-spacing: 0.1em;
+    }
+
+    /* ---- Viz 4: Cursor 功能栈 ---- */
+    .v-stack {
+      display: grid;
+      gap: var(--sp-2);
+    }
+    .v-stack-layer {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      align-items: center;
+      gap: var(--sp-4);
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .v-stack-layer::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--v-cursor);
+      opacity: 0;
+      transition: opacity var(--he-dur-base);
+    }
+    .v-stack-layer:hover {
+      border-color: var(--v-cursor);
+      transform: translateX(4px);
+    }
+    .v-stack-layer:hover::before { opacity: 1; }
+    .v-stack-name {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--v-cursor);
+    }
+    .v-stack-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.4;
+    }
+    .v-stack-trait {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      padding: var(--sp-1) var(--sp-3);
+      background: var(--v-cursor-soft);
+      border-radius: var(--he-radius-pill);
+      white-space: nowrap;
+    }
+
+    /* 模型路由分支图 */
+    .v-routing {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--sp-4);
+      align-items: center;
+      margin-top: var(--sp-6);
+    }
+    .v-routing-source {
+      text-align: center;
+      padding: var(--sp-5);
+      background: var(--v-cursor-soft);
+      border: 1.5px solid var(--v-cursor);
+      border-radius: var(--he-radius-md);
+    }
+    .v-routing-source-label {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--v-cursor);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-routing-source-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      margin-top: 4px;
+    }
+    .v-routing-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-1);
+      font-family: var(--he-font-mono);
+      font-size: 18px;
+      color: var(--he-text-subtle);
+    }
+    .v-routing-targets {
+      display: grid;
+      gap: var(--sp-3);
+    }
+    .v-routing-target {
+      padding: var(--sp-3) var(--sp-4);
+      border-radius: var(--he-radius-md);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-routing-target:hover { transform: translateX(4px); }
+    .v-routing-target.is-cheap {
+      background: rgba(16, 163, 127, 0.06);
+      border: 1px solid rgba(16, 163, 127, 0.2);
+    }
+    .v-routing-target.is-premium {
+      background: rgba(239, 68, 68, 0.04);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+    .v-routing-target-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 14px;
+    }
+    .v-routing-target.is-cheap .v-routing-target-icon {
+      background: rgba(16, 163, 127, 0.12);
+    }
+    .v-routing-target.is-premium .v-routing-target-icon {
+      background: rgba(239, 68, 68, 0.08);
+    }
+    .v-routing-target-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+    }
+    .v-routing-target-model {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-xs);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+    }
+
+    /* ---- Viz 5: 三方对比网格 ---- */
+    .v-grid {
+      display: grid;
+      grid-template-columns: 140px repeat(3, 1fr);
+      gap: 1px;
+      background: var(--he-border);
+      border-radius: var(--he-radius-md);
+      overflow: hidden;
+    }
+    .v-grid-cell {
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--he-bg);
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.5;
+      transition: background var(--he-dur-base);
+    }
+    .v-grid-cell.is-head {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: var(--he-weight-semibold);
+      background: var(--he-bg-subtle);
+      color: var(--he-text-muted);
+    }
+    .v-grid-cell.is-label {
+      font-size: var(--he-text-xs);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+      background: var(--he-bg-subtle);
+    }
+    .v-grid-cell.is-openai-head {
+      background: var(--v-openai-soft);
+      color: var(--v-openai);
+    }
+    .v-grid-cell.is-anthropic-head {
+      background: var(--v-anthropic-soft);
+      color: var(--v-anthropic);
+    }
+    .v-grid-cell.is-cursor-head {
+      background: var(--v-cursor-soft);
+      color: var(--v-cursor);
+    }
+    .v-grid-cell:hover {
+      background: var(--he-bg-subtle);
+    }
+    .v-grid-highlight {
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+    }
+    .v-grid-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--he-radius-pill);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-grid-tag.is-openai { background: var(--v-openai-soft); color: var(--v-openai); }
+    .v-grid-tag.is-anthropic { background: var(--v-anthropic-soft); color: var(--v-anthropic); }
+    .v-grid-tag.is-cursor { background: var(--v-cursor-soft); color: var(--v-cursor); }
+
+    /* ---- Viz 6: 选型地图 ---- */
+    .v-select {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-4);
+    }
+    .v-select-card {
+      padding: var(--sp-6);
+      border-radius: var(--he-radius-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .v-select-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      opacity: 0;
+      transition: opacity var(--he-dur-base);
+    }
+    .v-select-card:hover { transform: translateY(-4px); }
+    .v-select-card:hover::after { opacity: 1; }
+
+    .v-select-card.is-cursor-pick {
+      background: var(--v-cursor-soft);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    .v-select-card.is-cursor-pick::after { background: var(--v-cursor); }
+    .v-select-card.is-cursor-pick:hover { border-color: var(--v-cursor); box-shadow: 0 8px 32px rgba(139, 92, 246, 0.12); }
+
+    .v-select-card.is-anthropic-pick {
+      background: var(--v-anthropic-soft);
+      border: 1px solid rgba(217, 119, 6, 0.2);
+    }
+    .v-select-card.is-anthropic-pick::after { background: var(--v-anthropic); }
+    .v-select-card.is-anthropic-pick:hover { border-color: var(--v-anthropic); box-shadow: 0 8px 32px rgba(217, 119, 6, 0.12); }
+
+    .v-select-card.is-openai-pick {
+      background: var(--v-openai-soft);
+      border: 1px solid rgba(16, 163, 127, 0.2);
+    }
+    .v-select-card.is-openai-pick::after { background: var(--v-openai); }
+    .v-select-card.is-openai-pick:hover { border-color: var(--v-openai); box-shadow: 0 8px 32px rgba(16, 163, 127, 0.12); }
+
+    .v-select-scenario {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+      padding: var(--sp-3);
+      background: var(--he-bg);
+      border-radius: var(--he-radius-sm);
+      position: relative;
+    }
+    .v-select-scenario::before {
+      content: 'YOUR PRODUCT';
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--he-text-subtle);
+      margin-bottom: 4px;
+    }
+    .v-select-arrow {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-xs);
+      color: var(--he-text-subtle);
+      text-align: center;
+    }
+    .v-select-rec {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+    .v-select-rec-badge {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      font-weight: var(--he-weight-bold);
+    }
+    .v-select-card.is-cursor-pick .v-select-rec-badge { color: var(--v-cursor); }
+    .v-select-card.is-anthropic-pick .v-select-rec-badge { color: var(--v-anthropic); }
+    .v-select-card.is-openai-pick .v-select-rec-badge { color: var(--v-openai); }
+    .v-select-rec-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-strong);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-select-detail {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.6;
+    }
+
+    /* ---- 通用 callout (04) ---- */
+    .callout {
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border-left: 3px solid var(--he-accent);
+      border-radius: 0 var(--he-radius-md) var(--he-radius-md) 0;
+      margin: var(--sp-6) 0;
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .callout strong { color: var(--he-text-display); }
+    .callout.is-openai { background: var(--v-openai-soft); border-left-color: var(--v-openai); }
+    .callout.is-anthropic { background: var(--v-anthropic-soft); border-left-color: var(--v-anthropic); }
+    .callout.is-cursor { background: var(--v-cursor-soft); border-left-color: var(--v-cursor); }
+
+    /* ---- PM 落点卡片 ---- */
+    .v-pm-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-pm-card {
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-pm-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-pm-card-n {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--sp-2);
+    }
+    .v-pm-card-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.6;
+    }
+    .v-pm-card-text strong { color: var(--he-text-display); }
+
+    /* ---- 04 响应式 ---- */
+    @media (max-width: 1024px) {
+      .v-tracks { grid-template-columns: 1fr; }
+      .v-dashboard { grid-template-columns: repeat(3, 1fr); }
+      .v-optim-cards { grid-template-columns: 1fr; }
+      .v-solo-vs { grid-template-columns: 1fr; }
+      .v-solo-vs-divider { flex-direction: row; padding: var(--sp-2) 0; }
+      .v-solo-vs-badge { writing-mode: horizontal-tb; }
+      .v-grid { grid-template-columns: 100px repeat(3, 1fr); }
+      .v-select { grid-template-columns: 1fr; }
+      .v-routing { grid-template-columns: 1fr; gap: var(--sp-3); }
+      .v-routing-branch { flex-direction: row; }
+    }
+    @media (max-width: 640px) {
+      .v-dashboard { grid-template-columns: repeat(2, 1fr); }
+      .v-pge-row { flex-direction: column; }
+      .v-pge-arrow { transform: rotate(90deg); }
+      .v-stack-layer { grid-template-columns: 1fr; gap: var(--sp-2); }
+      .v-stack-name { order: -1; }
+      .v-grid { grid-template-columns: 80px repeat(3, 1fr); font-size: 11px; }
+      .v-pm-cards { grid-template-columns: 1fr; }
+    }
+
+
+    /* ============================================
+       07-chinese.html 可视化专用样式
+       ============================================ */
+
+    /* ---- Viz 1: 时间差对比 ---- */
+    .v-timediff {
+      display: grid;
+      grid-template-columns: 1fr 80px 1fr;
+      gap: 0;
+      align-items: stretch;
+    }
+    .v-timediff-col {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-timediff-col:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-timediff-col.is-en {
+      border-color: var(--he-accent);
+      background: rgba(94, 106, 210, 0.03);
+    }
+    .v-timediff-col.is-zh {
+      border-style: dashed;
+    }
+    .v-timediff-vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      color: var(--he-text-subtle);
+      letter-spacing: 0.08em;
+    }
+    .v-timediff-label {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      margin-bottom: var(--sp-3);
+    }
+    .v-timediff-status {
+      font-size: 28px;
+      margin-bottom: var(--sp-2);
+      line-height: 1;
+    }
+    .v-timediff-title {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-2);
+    }
+    .v-timediff-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.5;
+    }
+    .v-timediff-items {
+      list-style: none;
+      padding: 0;
+      margin: var(--sp-3) 0 0;
+    }
+    .v-timediff-items li {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      padding: var(--sp-1) 0;
+      border-bottom: 1px dashed var(--he-border);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+    .v-timediff-items li:last-child { border-bottom: none; }
+    .v-timediff-items .v-check {
+      color: var(--he-accent);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .v-timediff-items .v-pending {
+      color: var(--he-text-subtle);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .v-timediff-bottom {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-5);
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-md);
+      font-size: var(--he-text-sm);
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-timediff-bottom svg {
+      flex-shrink: 0;
+    }
+
+    /* ---- Viz 2: 术语景观卡片 ---- */
+    .v-terms {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-term-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+    }
+    .v-term-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-term-card.is-pick {
+      border-color: var(--he-accent);
+      box-shadow: 0 0 0 1px var(--c-indigo-a24), 0 8px 24px var(--c-indigo-a16);
+    }
+    .v-term-badge {
+      position: absolute;
+      top: var(--sp-3);
+      right: var(--sp-3);
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: var(--he-radius-pill);
+      background: var(--he-accent);
+      color: var(--he-text-inverse);
+    }
+    .v-term-badge.is-warn {
+      background: #e8590c;
+    }
+    .v-term-zh {
+      font-size: var(--he-text-h3);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-1);
+      letter-spacing: -0.02em;
+    }
+    .v-term-en {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      color: var(--he-text-muted);
+      margin-bottom: var(--sp-3);
+      letter-spacing: 0.06em;
+    }
+    .v-term-who {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      margin-bottom: var(--sp-2);
+    }
+    .v-term-pros,
+    .v-term-cons {
+      font-size: var(--he-text-xs);
+      line-height: 1.6;
+      padding: var(--sp-2) var(--sp-3);
+      border-radius: var(--he-radius-sm);
+      margin-bottom: var(--sp-2);
+    }
+    .v-term-pros {
+      background: rgba(34, 197, 94, 0.08);
+      color: #15803d;
+    }
+    .v-term-cons {
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+    }
+    .v-term-pros::before { content: '+ '; font-weight: 700; }
+    .v-term-cons::before { content: '- '; font-weight: 700; }
+    .v-term-decision {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-top: var(--sp-4);
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-md);
+      border: 1px solid rgba(94, 106, 210, 0.2);
+    }
+    .v-term-decision-label {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-subtle);
+    }
+    .v-term-decision-val {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-accent);
+      letter-spacing: -0.01em;
+    }
+    .v-term-decision-note {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      text-align: center;
+      max-width: 50ch;
+    }
+
+    /* ---- Viz 3: SDD 光谱 ---- */
+    .v-spectrum {
+      position: relative;
+      padding: var(--sp-6) 0;
+    }
+    .v-spectrum-track {
+      position: relative;
+      height: 8px;
+      background: linear-gradient(to right,
+        rgba(34, 197, 94, 0.3) 0%,
+        rgba(94, 106, 210, 0.2) 50%,
+        rgba(239, 68, 68, 0.3) 100%);
+      border-radius: var(--he-radius-pill);
+      margin: var(--sp-8) var(--sp-5);
+    }
+    .v-spectrum-labels {
+      display: flex;
+      justify-content: space-between;
+      margin: var(--sp-2) var(--sp-5) var(--sp-8);
+    }
+    .v-spectrum-label {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-muted);
+    }
+    .v-spectrum-marker {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-1);
+    }
+    .v-spectrum-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 3px solid var(--he-bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: transform var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-spectrum-marker:hover .v-spectrum-dot {
+      transform: scale(1.3);
+    }
+    .v-spectrum-dot.is-openai { background: #10b981; }
+    .v-spectrum-dot.is-harness { background: var(--he-accent); }
+    .v-spectrum-dot.is-sdd { background: #f59e0b; }
+    .v-spectrum-dot.is-anti { background: #ef4444; }
+    .v-spectrum-tag {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-strong);
+      white-space: nowrap;
+      padding: 2px 6px;
+      background: var(--he-bg);
+      border-radius: var(--he-radius-sm);
+      border: 1px solid var(--he-border);
+      position: absolute;
+      top: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* SDD 场景卡片 */
+    .v-sdd-scenes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-3);
+      margin-top: var(--sp-6);
+    }
+    .v-sdd-scene {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-sdd-scene:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-sdd-scene-head {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-3);
+    }
+    .v-sdd-scene-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--he-radius-sm);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .v-sdd-scene-icon.is-harness {
+      background: rgba(94, 106, 210, 0.1);
+    }
+    .v-sdd-scene-icon.is-sdd {
+      background: rgba(245, 158, 11, 0.12);
+    }
+    .v-sdd-scene-icon.is-mix {
+      background: rgba(139, 92, 246, 0.1);
+    }
+    .v-sdd-scene-title {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+    }
+    .v-sdd-scene-tag {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-muted);
+    }
+    .v-sdd-scene-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.6;
+    }
+    .v-sdd-scene-rec {
+      margin-top: var(--sp-3);
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-bg-subtle);
+      border-radius: var(--he-radius-sm);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: var(--he-accent);
+      letter-spacing: 0.04em;
+    }
+
+    /* ---- Viz 4: 嵌套关系 ---- */
+    .v-nesting {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .v-nesting-ring {
+      padding: var(--sp-5) var(--sp-5) var(--sp-3);
+      border-radius: var(--he-radius-lg);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-nesting-ring:hover {
+      transform: translateX(4px);
+    }
+    .v-nesting-ring.is-outer {
+      background: rgba(94, 106, 210, 0.04);
+      border: 1px solid rgba(94, 106, 210, 0.25);
+      padding-bottom: var(--sp-5);
+    }
+    .v-nesting-ring.is-mid {
+      background: rgba(94, 106, 210, 0.08);
+      border: 1px solid rgba(94, 106, 210, 0.35);
+      margin: var(--sp-3) var(--sp-5) 0;
+      padding-bottom: var(--sp-5);
+    }
+    .v-nesting-ring.is-inner {
+      background: rgba(94, 106, 210, 0.14);
+      border: 1px solid rgba(94, 106, 210, 0.5);
+      margin: var(--sp-3) var(--sp-5) 0;
+    }
+    .v-nesting-head {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-1);
+    }
+    .v-nesting-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+    }
+    .v-nesting-heat {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: var(--he-radius-pill);
+    }
+    .v-nesting-heat.is-hot {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .v-nesting-heat.is-rising {
+      background: rgba(94, 106, 210, 0.1);
+      color: var(--he-accent);
+    }
+    .v-nesting-heat.is-new {
+      background: rgba(34, 197, 94, 0.1);
+      color: #15803d;
+    }
+    .v-nesting-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.5;
+    }
+    .v-nesting-zh {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      margin-top: var(--sp-1);
+    }
+
+    /* ---- Viz 5: 厂商生态地图 ---- */
+    .v-vendors {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-vendor-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .v-vendor-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-vendor-card.is-full {
+      grid-column: 1 / -1;
+    }
+    .v-vendor-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--sp-3);
+    }
+    .v-vendor-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      letter-spacing: -0.01em;
+    }
+    .v-vendor-stance {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: var(--he-radius-pill);
+      white-space: nowrap;
+    }
+    .v-vendor-stance.is-sdd {
+      background: rgba(245, 158, 11, 0.12);
+      color: #92400e;
+    }
+    .v-vendor-stance.is-ctx {
+      background: rgba(94, 106, 210, 0.1);
+      color: var(--he-accent);
+    }
+    .v-vendor-stance.is-model {
+      background: rgba(107, 114, 128, 0.1);
+      color: var(--he-text-muted);
+    }
+    .v-vendor-stance.is-harness {
+      background: rgba(34, 197, 94, 0.1);
+      color: #15803d;
+    }
+    .v-vendor-products {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-3);
+    }
+    .v-vendor-product {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      background: var(--he-bg-muted);
+      border-radius: var(--he-radius-sm);
+      color: var(--he-text-strong);
+      letter-spacing: 0.02em;
+    }
+    .v-vendor-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.6;
+    }
+    .v-vendor-highlight {
+      margin-top: var(--sp-3);
+      padding: var(--sp-2) var(--sp-3);
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-sm);
+      font-size: var(--he-text-xs);
+      color: var(--he-accent);
+      font-weight: var(--he-weight-medium);
+    }
+
+    /* ---- Viz 5b: 社区资源卡片 ---- */
+    .v-community {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-3);
+      margin-top: var(--sp-5);
+    }
+    .v-community-card {
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-community-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-community-type {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-subtle);
+      margin-bottom: var(--sp-2);
+    }
+    .v-community-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-1);
+    }
+    .v-community-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.5;
+    }
+
+    /* ---- Viz 6: 三大缺口 ---- */
+    .v-gaps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-gap-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      position: relative;
+    }
+    .v-gap-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-gap-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .v-gap-n {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+      font-family: var(--he-font-mono);
+      font-size: 14px;
+      font-weight: var(--he-weight-bold);
+    }
+    .v-gap-status {
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: var(--he-radius-pill);
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+    }
+    .v-gap-title {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      letter-spacing: -0.01em;
+    }
+    .v-gap-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.5;
+      flex-grow: 1;
+    }
+    .v-gap-fill {
+      padding: var(--sp-3);
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-sm);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .v-gap-fill-label {
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      margin-bottom: 3px;
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-gap-fill-text {
+      color: var(--he-text-strong);
+    }
+
+    /* ---- Viz 7: 面试话术卡片 ---- */
+    .v-interview {
+      position: relative;
+      padding: var(--sp-6);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+    }
+    .v-interview-q {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-5);
+    }
+    .v-interview-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--he-bg-muted);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .v-interview-bubble {
+      padding: var(--sp-3) var(--sp-4);
+      border-radius: var(--he-radius-md);
+      font-size: var(--he-text-sm);
+      line-height: 1.5;
+      max-width: 80%;
+    }
+    .v-interview-bubble.is-q {
+      background: var(--he-bg-muted);
+      color: var(--he-text-strong);
+    }
+    .v-interview-a {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-3);
+      flex-direction: row-reverse;
+    }
+    .v-interview-bubble.is-a {
+      background: var(--he-accent-soft);
+      color: var(--he-text-strong);
+      border: 1px solid rgba(94, 106, 210, 0.2);
+    }
+    .v-interview-avatar.is-you {
+      background: var(--he-accent);
+      color: var(--he-text-inverse);
+      font-size: 11px;
+      font-family: var(--he-font-mono);
+      font-weight: var(--he-weight-bold);
+    }
+    .v-interview-key {
+      display: inline;
+      padding: 1px 5px;
+      background: rgba(94, 106, 210, 0.12);
+      border-radius: 3px;
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-accent);
+    }
+
+    /* ---- 07 动画 ---- */
+    @keyframes v-pulse-soft {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.6; }
+    }
+    @keyframes v-slide-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .v-gap-status {
+      animation: v-pulse-soft 3s ease-in-out infinite;
+    }
+
+    /* ---- 07 响应式 ---- */
+    @media (max-width: 1024px) {
+      .v-gaps { grid-template-columns: 1fr; }
+      .v-sdd-scenes { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .v-terms { grid-template-columns: 1fr; }
+      .v-vendors { grid-template-columns: 1fr; }
+      .v-community { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .v-timediff {
+        grid-template-columns: 1fr;
+        gap: var(--sp-3);
+      }
+      .v-timediff-vs {
+        display: none;
+      }
+      .v-gaps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-hero">
+    <div class="page-hero-inner">
+      <a class="page-back" href="../index.html">← 回首页</a>
+      <div class="page-eyebrow">
+        <span class="page-eyebrow-num">02 / 05</span>
+        <span class="page-eyebrow-group">全景 · SURVEY</span>
+      </div>
+      <h1 class="he-h1 page-title">一眼看清<span class="he-text-accent">这个领域</span>。</h1>
+      <p class="he-lead page-lead">
+        概念立住之后，先不急着深挖。
+        这一组给你两张地图 —— 国外 5 家主流厂商对照，国内 AI 圈现状。
+      </p>
+      <div class="page-meta">
+        <span class="page-meta-item">2 个板块</span>
+        <span class="page-meta-item">约 40 分钟</span>
+        <span class="page-meta-item">建议读完入门组再来</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-layout">
+    <main class="page-main">
+
+      <div class="group-intro">
+        <div class="group-intro-q">这一组要回答的核心问题</div>
+        <p class="group-intro-a">
+          OpenAI / Anthropic / Cursor / Cognition / Replit 各自的 harness 长什么样？
+          中文圈在这件事上做到了哪一步？
+        </p>
+      </div>
+
+
+      <!-- ======================================================
+           CHAPTER 1: 厂商全景 (OPEN BY DEFAULT)
+           ====================================================== -->
+      <div class="page-chapter is-open" id="chapter-04">
+        <div class="page-chapter-header">
+          <div class="page-chapter-num">04</div>
+          <div class="page-chapter-info">
+            <div class="page-chapter-title">厂商全景</div>
+            <div class="page-chapter-desc">五款主流 Agent 的 harness 对照：架构差异、设计哲学、典型用例</div>
+            <div class="page-chapter-pills">
+              <span class="page-chapter-pill">6 个可视化</span>
+              <span class="page-chapter-pill">约 20 分钟</span>
+            </div>
+          </div>
+          <svg class="page-chapter-chevron" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
+          </svg>
+        </div>
+        <div class="page-chapter-body">
+          <div class="page-chapter-content">
+
+
+      <!-- ===== S1 三条赛道概览 ===== -->
+      <section class="page-section he-reveal" id="sec-04-1" data-toc="三条赛道">
+        <div class="page-section-eyebrow">S1 · 三家、三条赛道</div>
+        <h2>三家不在同一根赛道上竞速。</h2>
+
+        <p>
+          板块② 讲过这个词怎么火起来的,板块③ 解剖了组件级 harness 的器官。
+          这一板块,把镜头拉远 ——
+          <strong>看真实世界三家头部公司,各自把 harness 做成了什么样</strong>。
+        </p>
+
+        <!-- Viz #1: 三条赛道 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 01 · three tracks</div>
+            <h3 class="viz-title">三家公司、三个尺度、三种哲学</h3>
+            <p class="viz-sub">不是"谁更强"—— 是各占了一条完全不同的赛道。</p>
+          </div>
+
+          <div class="viz-stage v-tracks">
+            <!-- OpenAI -->
+            <div class="v-track is-openai">
+              <div class="v-track-badge">
+                <span class="v-track-badge-dot"></span>
+                OpenAI
+              </div>
+              <div class="v-track-name">组织级</div>
+              <div class="v-track-scale">org-scale harness</div>
+              <div class="v-track-quote">
+                人定方向,agent 经营产品。<br>一支队伍 + 一个长期产品。
+              </div>
+            </div>
+            <!-- Anthropic -->
+            <div class="v-track is-anthropic">
+              <div class="v-track-badge">
+                <span class="v-track-badge-dot"></span>
+                Anthropic
+              </div>
+              <div class="v-track-name">任务级</div>
+              <div class="v-track-scale">task-scale harness</div>
+              <div class="v-track-quote">
+                多个 agent 合力,干成一件大事。<br>Planner + Generator + Evaluator。
+              </div>
+            </div>
+            <!-- Cursor -->
+            <div class="v-track is-cursor">
+              <div class="v-track-badge">
+                <span class="v-track-badge-dot"></span>
+                Cursor
+              </div>
+              <div class="v-track-name">组件级</div>
+              <div class="v-track-scale">component-scale harness</div>
+              <div class="v-track-quote">
+                把工程师 IDE 这一格做到极致。<br>没有自家模型,也能赢。
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            看完这一板块,你能给<strong>任何</strong>一个 agent 产品场景<strong>对号入座</strong>到其中一家。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== S2 OpenAI ===== -->
+      <section class="page-section he-reveal" id="sec-04-2" data-toc="OpenAI · 组织级">
+        <div class="page-section-eyebrow">S2 · OpenAI</div>
+        <h2>五个月、零行手写代码<br>的<span class="he-text-accent">疯狂实验</span>。</h2>
+
+        <p>
+          OpenAI 内部启动了一个实验:
+          <strong>用 AI 从零写一个真实的软件产品,全程不允许工程师手写一行代码</strong>。
+          但一开始进展很不顺利 —— 问题不是"模型不够聪明",
+          而是 agent 经常走错方向、重复犯同样的错误。
+          他们意识到:<strong>真正的功夫,在于把 Harness 设计好</strong>。
+        </p>
+
+        <!-- Viz #2: 实验仪表盘 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02 · experiment dashboard</div>
+            <h3 class="viz-title">OpenAI 实验:关键数字一览</h3>
+            <p class="viz-sub">这不是玩具 —— 真正在线上跑、有真实用户的生产系统。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-dashboard">
+              <div class="v-stat">
+                <div class="v-stat-num">7</div>
+                <div class="v-stat-label">工程师<br>(从 3 人起步)</div>
+              </div>
+              <div class="v-stat">
+                <div class="v-stat-num">5</div>
+                <div class="v-stat-label">个月<br>实验周期</div>
+              </div>
+              <div class="v-stat is-highlight">
+                <div class="v-stat-num">0</div>
+                <div class="v-stat-label">行手写代码<br>全部 AI 生成</div>
+              </div>
+              <div class="v-stat">
+                <div class="v-stat-num">~1M</div>
+                <div class="v-stat-label">行代码<br>产出规模</div>
+              </div>
+              <div class="v-stat">
+                <div class="v-stat-num">~1500</div>
+                <div class="v-stat-label">个 PR<br>合并记录</div>
+              </div>
+            </div>
+
+            <!-- 三类优化 -->
+            <div class="v-optim-cards">
+              <div class="v-optim">
+                <div class="v-optim-icon">&#128218;</div>
+                <div class="v-optim-title">上下文管理</div>
+                <div class="v-optim-problem">
+                  Agent 跟新员工一样 —— 把所有规范全塞进一个超大 AGENTS.md,内容太多反而迷失,文件还会"腐化"。
+                </div>
+                <div class="v-optim-fix">
+                  AGENTS.md 压缩到 ~100 行,变成目录 —— 指向分类好的文档。仓库 = 唯一事实来源。
+                </div>
+              </div>
+              <div class="v-optim">
+                <div class="v-optim-icon">&#9989;</div>
+                <div class="v-optim-title">验证与反馈</div>
+                <div class="v-optim-problem">
+                  Agent 写完代码不自己验证,准确率上不去。
+                </div>
+                <div class="v-optim-fix">
+                  配齐"自验证工具栈" —— Chrome DevTools 自动截图、可观测性工具、linter + 测试自动闭环,全程不用人介入。
+                </div>
+              </div>
+              <div class="v-optim">
+                <div class="v-optim-icon">&#128465;</div>
+                <div class="v-optim-title">技术债清理</div>
+                <div class="v-optim-problem">
+                  大规模 AI 生成代码,必然引入重复、命名不一致、偏离架构。
+                </div>
+                <div class="v-optim-fix">
+                  后台 Codex 任务定期扫整个代码库 + 文档,找出偏离规范处,自动修改并提交。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>核心理念:</strong>Humans steer, Agents execute. ——
+            人定方向、给上下文、定规则;Agent 负责具体实现工作。
+          </p>
+          <div class="viz-source">SOURCE · OpenAI《Harness engineering: leveraging Codex in an agent-first world》</div>
+        </figure>
+
+        <div class="callout is-openai">
+          <strong>PM 落点</strong> ——
+          &#10102; 环境比模型更重要:实验一开始失败不是模型问题,是环境没搭好。
+          &#10103; 仓库 / 唯一事实来源是基础设施。
+          &#10104; 自验证闭环 = 准确率的真正杠杆。
+          &#10105; 预防 + 清扫两手都要。
+        </div>
+      </section>
+
+
+      <!-- ===== S3 Anthropic ===== -->
+      <section class="page-section he-reveal" id="sec-04-3" data-toc="Anthropic · 任务级">
+        <div class="page-section-eyebrow">S3 · Anthropic</div>
+        <h2>Planner / Generator / Evaluator<br>—— <span class="he-text-accent">多 agent 合力</span>。</h2>
+
+        <p>
+          Anthropic 做了个实验:让 agent 去克隆 claude.ai。
+          最初只用一个 agent,结果惨败 ——
+          想一口气做完所有功能,上下文满了,抛下烂摊子,下一个 agent 接手完全不知道发生了啥。
+          <strong>一个 agent 撑不了那么长的任务。</strong>
+        </p>
+
+        <!-- Viz #3: P/G/E 架构 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03 · P/G/E architecture</div>
+            <h3 class="viz-title">Full Harness:三个 Agent 的编排</h3>
+            <p class="viz-sub">Planner 拆需求 → Generator 写代码 ↔ Evaluator 判对错 —— 循环往复直到通过。</p>
+          </div>
+
+          <div class="viz-stage v-pge">
+            <!-- Planner -->
+            <div class="v-pge-row">
+              <div class="v-pge-node is-planner">
+                <div class="v-pge-node-label">PLANNER</div>
+                <div class="v-pge-node-name">规划者</div>
+                <div class="v-pge-node-desc">模糊需求 → 具体功能列表</div>
+              </div>
+            </div>
+
+            <div class="v-pge-arrow">
+              <span>&#8595;</span>
+              <span class="v-pge-arrow-label">功能列表</span>
+            </div>
+
+            <!-- Generator + Evaluator -->
+            <div class="v-pge-row">
+              <div class="v-pge-node is-generator">
+                <div class="v-pge-node-label">GENERATOR</div>
+                <div class="v-pge-node-name">执行者</div>
+                <div class="v-pge-node-desc">一个功能点一个功能点地做</div>
+              </div>
+
+              <div class="v-pge-arrow" style="flex-direction: row; gap: var(--sp-2);">
+                <span>&#8644;</span>
+                <span class="v-pge-arrow-label">商讨标准 / 提交 / 反馈</span>
+              </div>
+
+              <div class="v-pge-node is-evaluator">
+                <div class="v-pge-node-label">EVALUATOR</div>
+                <div class="v-pge-node-name">评判者</div>
+                <div class="v-pge-node-desc">独立第三方,只判分</div>
+              </div>
+            </div>
+
+            <div class="v-pge-loop-indicator">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              不合格 → 发回意见 → 修改 → 再评 → 直到通过 → 下一个功能点
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>关键洞见:</strong>永远别让做的人当判官。
+            Evaluator 必须独立 —— 跟 Generator 没关系,没理由"护短"。
+          </p>
+          <div class="viz-source">SOURCE · Anthropic《Harness design for long-running application development》</div>
+        </figure>
+
+        <!-- Solo vs Full Harness 对比 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03b · Solo vs Full</div>
+            <h3 class="viz-title">决定性实验:Solo vs Full Harness</h3>
+            <p class="viz-sub">同一个任务 —— 做一个游戏制作工具。Full Harness 贵 20 倍、慢 18 倍,但把"做不出来"变成了"做得出来"。</p>
+          </div>
+
+          <div class="viz-stage v-solo-vs">
+            <div class="v-solo-card is-solo">
+              <div class="v-solo-tag">Solo</div>
+              <div class="v-solo-metrics">
+                <div class="v-solo-metric">
+                  <div class="v-solo-metric-num">20 min</div>
+                  <div class="v-solo-metric-label">耗时</div>
+                </div>
+                <div class="v-solo-metric">
+                  <div class="v-solo-metric-num">$9</div>
+                  <div class="v-solo-metric-label">花费</div>
+                </div>
+              </div>
+              <div class="v-solo-verdict">
+                布局乱、逻辑难懂、bug 一堆 —— 基本没法用。
+              </div>
+            </div>
+
+            <div class="v-solo-vs-divider">
+              <div class="v-solo-vs-badge">VS</div>
+            </div>
+
+            <div class="v-solo-card is-full">
+              <div class="v-solo-tag">Full Harness</div>
+              <div class="v-solo-metrics">
+                <div class="v-solo-metric">
+                  <div class="v-solo-metric-num">6 hrs</div>
+                  <div class="v-solo-metric-label">耗时</div>
+                </div>
+                <div class="v-solo-metric">
+                  <div class="v-solo-metric-num">$200</div>
+                  <div class="v-solo-metric-label">花费</div>
+                </div>
+              </div>
+              <div class="v-solo-verdict">
+                布局合理、逻辑清晰 —— 达到可用水准。
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>精雕细琢有代价</strong> ——
+            考 60 分 3 天就够,想考 90 分可能要一个月。有些任务想拿到分,就必须付这个代价。
+          </p>
+        </figure>
+
+        <div class="callout is-anthropic">
+          <strong>一个时间维度上的细节:</strong>Anthropic 一开始在提示词里强制 Generator"一次只做一个功能点"。
+          后来 Opus 4.6 出来,这条约束被去掉了 —— 模型够强,能自己统筹。
+          <em>Harness 是刚好够用,模型变强,harness 该精简。</em>
+        </div>
+
+        <div class="callout is-anthropic">
+          <strong>PM 落点</strong> ——
+          &#10102; 任务超出单 agent 范围 → 上任务级编排。
+          &#10103; 独立 Evaluator 是"王婆卖瓜"的解药。
+          &#10104; Full Harness 有成本 —— PM 要看 ROI 值不值。
+          &#10105; Harness 是动态的 —— 模型升级,你的 harness 可能要减,不是加。
+        </div>
+      </section>
+
+
+      <!-- ===== S4 Cursor ===== -->
+      <section class="page-section he-reveal" id="sec-04-4" data-toc="Cursor · 组件级">
+        <div class="page-section-eyebrow">S4 · Cursor</div>
+        <h2>没有自家模型,<br>把组件级做到<span class="he-text-accent">极致</span>。</h2>
+
+        <p>
+          Cursor 是一个 IDE(由 VSCode fork 而来)。
+          它<strong>没有自家前沿模型</strong> —— 用 Claude、GPT、Gemini。
+          它甚至不做通用 AI 助手 —— 只做一件事:<strong>让工程师在编辑器里写代码</strong>。
+          就这一个聚焦,两年做到最受欢迎的 AI IDE 之一。
+        </p>
+
+        <!-- Viz #4: 功能栈 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 04 · feature stack</div>
+            <h3 class="viz-title">Cursor 的四层功能栈</h3>
+            <p class="viz-sub">不同任务尺度的工具,按需选用 —— 从闪电补全到多步循环。</p>
+          </div>
+
+          <div class="viz-stage v-stack">
+            <div class="v-stack-layer">
+              <div class="v-stack-name">Tab</div>
+              <div class="v-stack-desc">打几个字 → Tab 一按 → 完整代码补出来。P50 延迟 &lt; 100ms,自有小模型 cursor-tab 驱动。</div>
+              <div class="v-stack-trait">闪电速度</div>
+            </div>
+            <div class="v-stack-layer">
+              <div class="v-stack-name">Cmd-K</div>
+              <div class="v-stack-desc">选一段代码 → 自然语言指令 → diff 预览 → 接受 / 拒绝。外科手术式编辑。</div>
+              <div class="v-stack-trait">精准编辑</div>
+            </div>
+            <div class="v-stack-layer">
+              <div class="v-stack-name">Composer</div>
+              <div class="v-stack-desc">跨文件批量改动。"重构这个模块"类任务的主战场。</div>
+              <div class="v-stack-trait">批量改动</div>
+            </div>
+            <div class="v-stack-layer">
+              <div class="v-stack-name">Agent</div>
+              <div class="v-stack-desc">多步循环:读 → 改 → 跑命令 → 看输出 → 继续。从"建议"升级为"动手做"。</div>
+              <div class="v-stack-trait">自主循环</div>
+            </div>
+          </div>
+
+          <!-- 模型路由 -->
+          <div class="v-routing">
+            <div class="v-routing-source">
+              <div class="v-routing-source-label">CURSOR ROUTER</div>
+              <div class="v-routing-source-name">模型路由</div>
+            </div>
+            <div class="v-routing-branch">
+              <span>&#8594;</span>
+              <span>&#8594;</span>
+            </div>
+            <div class="v-routing-targets">
+              <div class="v-routing-target is-cheap">
+                <div class="v-routing-target-icon">&#9889;</div>
+                <div>
+                  <div class="v-routing-target-model">cursor-tab (自有小模型)</div>
+                  <div class="v-routing-target-text">Tab 补全 —— 成本极低、延迟极短</div>
+                </div>
+              </div>
+              <div class="v-routing-target is-premium">
+                <div class="v-routing-target-icon">&#129504;</div>
+                <div>
+                  <div class="v-routing-target-model">Claude / GPT (前沿大模型)</div>
+                  <div class="v-routing-target-text">Agent / Composer —— 质量高、贵</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>成本结构就是产品优势</strong> —— 不同任务匹配不同模型,既保证质量又让单用户成本远低于"全用前沿模型"。
+          </p>
+          <div class="viz-source">SOURCE · Cursor 官方文档 · cursor.com/docs</div>
+        </figure>
+
+        <div class="callout is-cursor">
+          <strong>PM 落点</strong> ——
+          &#10102; 一个场景的极致,胜过十个场景的平庸。
+          &#10103; "无意识好用"(speed)是真护城河 —— 用户迷恋"零等待"。
+          &#10104; 模型路由是成本结构,不是技术细节 —— 没有这个,规模化注定亏钱。
+          &#10105; 没有模型也能赢 —— 只要你的 harness 比对手好。
+        </div>
+      </section>
+
+
+      <!-- ===== S5 三方对比 ===== -->
+      <section class="page-section he-reveal" id="sec-04-5" data-toc="三方对比">
+        <div class="page-section-eyebrow">S5 · 横向对比</div>
+        <h2>把三条赛道<br>摊开对照。</h2>
+
+        <!-- Viz #5: 对比网格 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 05 · comparison grid</div>
+            <h3 class="viz-title">三家横向对比:七个维度</h3>
+            <p class="viz-sub">不是比谁更强 —— 是看清三条完全不同的路。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-grid">
+              <!-- Header -->
+              <div class="v-grid-cell is-head"></div>
+              <div class="v-grid-cell is-head is-openai-head">OpenAI</div>
+              <div class="v-grid-cell is-head is-anthropic-head">Anthropic</div>
+              <div class="v-grid-cell is-head is-cursor-head">Cursor</div>
+
+              <!-- 主战场 -->
+              <div class="v-grid-cell is-label">主战场</div>
+              <div class="v-grid-cell">通用 + 写代码</div>
+              <div class="v-grid-cell">长任务 + 写代码</div>
+              <div class="v-grid-cell">工程师 IDE(垂直)</div>
+
+              <!-- 代表性 harness -->
+              <div class="v-grid-cell is-label">代表性 harness</div>
+              <div class="v-grid-cell">Codex + CI / Doc 闭环</div>
+              <div class="v-grid-cell">P / G / E 三件套</div>
+              <div class="v-grid-cell">Tab + Composer + Agent</div>
+
+              <!-- 尺度 -->
+              <div class="v-grid-cell is-label">尺度</div>
+              <div class="v-grid-cell"><span class="v-grid-tag is-openai">组织级</span></div>
+              <div class="v-grid-cell"><span class="v-grid-tag is-anthropic">任务级</span></div>
+              <div class="v-grid-cell"><span class="v-grid-tag is-cursor">组件级(深)</span></div>
+
+              <!-- 设计哲学 -->
+              <div class="v-grid-cell is-label">设计哲学</div>
+              <div class="v-grid-cell"><span class="v-grid-highlight">Humans steer, Agents execute</span></div>
+              <div class="v-grid-cell"><span class="v-grid-highlight">多 agent 合力 &gt; 单 agent 死撑</span></div>
+              <div class="v-grid-cell"><span class="v-grid-highlight">组件级做到无意识好用</span></div>
+
+              <!-- 模型策略 -->
+              <div class="v-grid-cell is-label">模型策略</div>
+              <div class="v-grid-cell">自有 GPT 系列</div>
+              <div class="v-grid-cell">自有 Claude 系列</div>
+              <div class="v-grid-cell"><strong>不自有 —— 多模型路由</strong></div>
+
+              <!-- 核心打法 -->
+              <div class="v-grid-cell is-label">核心打法</div>
+              <div class="v-grid-cell">全自动 / 长产品 / 大投入</div>
+              <div class="v-grid-cell">多 agent 编排 / 独立 evaluator</div>
+              <div class="v-grid-cell">速度 / 聚焦 / 极致 UX</div>
+
+              <!-- 给 PM 的一课 -->
+              <div class="v-grid-cell is-label">给 PM 的一课</div>
+              <div class="v-grid-cell">环境比模型重要</div>
+              <div class="v-grid-cell">不让做的人当判官</div>
+              <div class="v-grid-cell"><strong>没有模型也能赢</strong></div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>元层启示:</strong>AI 产品不是"模型大战"的副产品 ——
+            它是一个多尺度、多哲学的设计空间。你要选打哪一格、用哪种哲学,然后把那一格做到极致。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== S6 选型地图 ===== -->
+      <section class="page-section he-reveal" id="sec-04-6" data-toc="选型地图">
+        <div class="page-section-eyebrow">S6 · 选型地图</div>
+        <h2>你的产品<br>像<span class="he-text-accent">哪一家</span>？</h2>
+
+        <p>
+          对号入座的本质,是先识别你产品的"尺度" ——
+          你包的是一次模型调用 / 一个长任务 / 一支队伍?
+          <strong>尺度决定 harness 的形态</strong>。
+        </p>
+
+        <!-- Viz #6: 选型地图 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06 · selection map</div>
+            <h3 class="viz-title">你的产品长什么样 → 跟哪条赛道</h3>
+            <p class="viz-sub">先识别尺度,再选路线 —— 这是板块① 那把"尺"的实际用法。</p>
+          </div>
+
+          <div class="viz-stage v-select">
+            <!-- Cursor 路线 -->
+            <div class="v-select-card is-cursor-pick">
+              <div class="v-select-scenario">
+                嵌在用户熟悉的工具里(IDE、文档编辑器、Figma……),实时低延迟给建议
+              </div>
+              <div class="v-select-arrow">&#8595; 匹配</div>
+              <div class="v-select-rec">
+                <div class="v-select-rec-badge">CURSOR 路线</div>
+              </div>
+              <div class="v-select-rec-text">组件级 · 聚焦 + 速度</div>
+              <div class="v-select-detail">
+                一个场景做到极致,速度是真护城河。自有小模型干补全,大模型干难活 —— 控住成本。
+              </div>
+            </div>
+
+            <!-- Anthropic 路线 -->
+            <div class="v-select-card is-anthropic-pick">
+              <div class="v-select-scenario">
+                用户输入一句话 → AI 自动生成完整应用 / 文档 / 设计稿
+              </div>
+              <div class="v-select-arrow">&#8595; 匹配</div>
+              <div class="v-select-rec">
+                <div class="v-select-rec-badge">ANTHROPIC 路线</div>
+              </div>
+              <div class="v-select-rec-text">任务级 · Planner + Generator + Evaluator</div>
+              <div class="v-select-detail">
+                长任务需要拆解、需要独立评判。Full Harness 贵但把"做不出来"变成"做得出来"。
+              </div>
+            </div>
+
+            <!-- OpenAI 路线 -->
+            <div class="v-select-card is-openai-pick">
+              <div class="v-select-scenario">
+                一支队伍长期维护一个产品 / 业务,agent 承担大部分日常实现工作
+              </div>
+              <div class="v-select-arrow">&#8595; 匹配</div>
+              <div class="v-select-rec">
+                <div class="v-select-rec-badge">OPENAI 路线</div>
+              </div>
+              <div class="v-select-rec-text">组织级 · 环境 + 自动闭环 + 技术债清扫</div>
+              <div class="v-select-detail">
+                仓库即唯一事实来源,自验证闭环是准确率杠杆,预防 + 清扫两手都要。
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>你做 agent 产品的第一件事,不是选模型,是选赛道。</strong>
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== S7 一句话总结 ===== -->
+      <section class="page-section he-reveal" id="sec-04-7" data-toc="一句话总结">
+        <div class="page-section-eyebrow">S7 · 一句话总结</div>
+        <blockquote>
+          <strong>三家、三种哲学、三个尺度,各占一格</strong> ——
+          OpenAI 用组织级证明"AI 能经营产品";
+          Anthropic 用任务级证明"多 agent 合力 > 单 agent 死撑";
+          Cursor 用组件级证明"做最好的 harness,可以打败拥有模型的人"。
+          它们不是竞速,是把 AI 产品的设计空间<strong>撑开成了三条赛道</strong>。
+        </blockquote>
+
+        <h3>一手来源(本板块所有论断的出处)</h3>
+        <ul>
+          <li>OpenAI《Harness engineering: leveraging Codex in an agent-first world》— <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noreferrer">openai.com</a></li>
+          <li>Anthropic《Harness design for long-running application development》— <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noreferrer">anthropic.com</a></li>
+          <li>Cursor 官方文档 — <a href="https://cursor.com/docs" target="_blank" rel="noreferrer">cursor.com</a></li>
+          <li>LangChain《The Anatomy of an Agent Harness》— <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noreferrer">langchain.com</a></li>
+        </ul>
+      </section>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ======================================================
+           CHAPTER 2: 中文语境 (COLLAPSED)
+           ====================================================== -->
+      <div class="page-chapter" id="chapter-07">
+        <div class="page-chapter-header">
+          <div class="page-chapter-num">07</div>
+          <div class="page-chapter-info">
+            <div class="page-chapter-title">中文语境</div>
+            <div class="page-chapter-desc">国内厂商最新动作、"驾驭工程" 译法之争、SDD 立场、本土实践</div>
+            <div class="page-chapter-pills">
+              <span class="page-chapter-pill">7 个可视化</span>
+              <span class="page-chapter-pill">约 20 分钟</span>
+            </div>
+          </div>
+          <svg class="page-chapter-chevron" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
+          </svg>
+        </div>
+        <div class="page-chapter-body">
+          <div class="page-chapter-content">
+
+
+      <!-- ===== §1 中文圈和英文圈的时间差 ===== -->
+      <section class="page-section he-reveal" id="sec-07-1" data-toc="时间差">
+        <div class="page-section-eyebrow">§1 · 时间差</div>
+        <h2>中文圈和英文圈，<br>差在哪？</h2>
+
+        <p>
+          Harness Engineering 在 2026 年初英文圈引爆。到目前为止，
+          英文圈已经把"概念 + 实践"都讲透了，
+          中文圈<strong>有零散好文章，但还没有成体系的 PM 视角中文教程</strong>。
+        </p>
+
+        <!-- Viz #1: 中英时间差对比 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 01 · time gap</div>
+            <h3 class="viz-title">中英 Harness 认知对照</h3>
+            <p class="viz-sub">英文圈概念 + 实践全面铺开；中文圈零散、碎片，系统化缺位。</p>
+          </div>
+
+          <div class="viz-stage v-timediff">
+            <div class="v-timediff-col is-en">
+              <div class="v-timediff-label">English · 英文圈</div>
+              <div class="v-timediff-status">&#9632;&#9632;&#9632;&#9632;&#9632;</div>
+              <div class="v-timediff-title">概念 + 实践全覆盖</div>
+              <ul class="v-timediff-items">
+                <li><span class="v-check">&#10003;</span> OpenAI 定义 + AGENTS.md 实践</li>
+                <li><span class="v-check">&#10003;</span> Anthropic harness 设计文章</li>
+                <li><span class="v-check">&#10003;</span> LangChain 解剖学长文</li>
+                <li><span class="v-check">&#10003;</span> Thoughtworks 方法论综述</li>
+                <li><span class="v-check">&#10003;</span> METR 评测框架</li>
+              </ul>
+            </div>
+
+            <div class="v-timediff-vs">VS</div>
+
+            <div class="v-timediff-col is-zh">
+              <div class="v-timediff-label">Chinese · 中文圈</div>
+              <div class="v-timediff-status">&#9632;&#9632;&#9633;&#9633;&#9633;</div>
+              <div class="v-timediff-title">零散 + 碎片化</div>
+              <ul class="v-timediff-items">
+                <li><span class="v-check">&#10003;</span> 社区好文章（知乎 / 公众号 / GitBook）</li>
+                <li><span class="v-check">&#10003;</span> 上下文工程讨论火热</li>
+                <li><span class="v-pending">&#9675;</span> 术语没收敛（三种叫法）</li>
+                <li><span class="v-pending">&#9675;</span> 无 PM 视角的系统教程</li>
+                <li><span class="v-pending">&#9675;</span> 厂商各说各话</li>
+              </ul>
+            </div>
+
+            <div class="v-timediff-bottom">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 3v10m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              窗口期还在 —— 系统化的中文教学，能定义这个领域的中文知识体系
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>对你意味着什么</strong>：谁先在中文圈把 harness 讲成体系，谁就占住认知入口。
+            散落的好内容不缺 —— 缺的是有人把它们串起来。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §2 术语景观 ===== -->
+      <section class="page-section he-reveal" id="sec-07-2" data-toc="术语之争">
+        <div class="page-section-eyebrow">§2 · 术语景观</div>
+        <h2>中文圈到底叫它什么？</h2>
+
+        <p>
+          中文圈对 "Harness Engineering" 的翻译还没收敛。
+          三种候选都在用，各有取舍 ——
+        </p>
+
+        <!-- Viz #2: 术语对比卡片 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02 · terminology</div>
+            <h3 class="viz-title">三种译法，还在赛马</h3>
+            <p class="viz-sub">没有官方定论；不同圈子各用各的。看清每种译法的利弊。</p>
+          </div>
+
+          <div class="viz-stage v-terms">
+            <div class="v-term-card is-pick">
+              <span class="v-term-badge">本站选用</span>
+              <div class="v-term-zh">驾驭工程</div>
+              <div class="v-term-en">Harness Engineering</div>
+              <div class="v-term-who">菜鸟教程 / 36氪 / 知乎多篇专栏</div>
+              <div class="v-term-pros">意译，扣住"马具 / 缰绳"隐喻；中文传播性好</div>
+              <div class="v-term-cons">略文学化，工程味弱</div>
+            </div>
+
+            <div class="v-term-card">
+              <div class="v-term-zh">Harness 工程</div>
+              <div class="v-term-en">Harness Engineering (半译)</div>
+              <div class="v-term-who">yeasy《智能体 Harness 工程指南》(GitBook 开源 14 章)</div>
+              <div class="v-term-pros">保留原词，跟英文文献无缝对接</div>
+              <div class="v-term-cons">中英混用，纯中文读者有门槛</div>
+            </div>
+
+            <div class="v-term-card">
+              <span class="v-term-badge is-warn">不建议</span>
+              <div class="v-term-zh">脚手架</div>
+              <div class="v-term-en">Scaffold (误译)</div>
+              <div class="v-term-who">散见于社区讨论</div>
+              <div class="v-term-pros">短、易懂</div>
+              <div class="v-term-cons">已被 LangChain / LangGraph 等框架占用，严重混淆</div>
+            </div>
+
+            <div class="v-term-decision">
+              <div class="v-term-decision-label">本站 + 课程的命名策略</div>
+              <div class="v-term-decision-val">Harness Engineering（驾驭工程）</div>
+              <div class="v-term-decision-note">
+                标题 / 营销 / 传播 → 「驾驭工程」<br>
+                工程深潜 / 代码注释 / 英文对照 → 「Harness 工程」<br>
+                两种译法并列允许；只要不混进「脚手架」
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>记住核心原则</strong>："驾驭工程"面向传播，"Harness 工程"面向精确对照。
+            无论叫什么，指向的都是"模型外面那一整圈代码"。
+          </p>
+          <div class="viz-source">SOURCE · 菜鸟教程词条 / yeasy《智能体 Harness 工程指南》 / 36氪</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §3 SDD —— 最大的方法论争论 ===== -->
+      <section class="page-section he-reveal" id="sec-07-3" data-toc="SDD 争论">
+        <div class="page-section-eyebrow">§3 · SDD 争论</div>
+        <h2>SDD —— 中文圈<br><span class="he-text-accent">最大的方法论争论</span></h2>
+
+        <p>
+          <strong>SDD = Spec-Driven Development = 规范驱动开发</strong>。
+          核心主张：在让 AI 写代码之前，先写一份完整的 spec（需求、接口、数据结构、测试用例），
+          AI 按 spec "翻译"成代码。
+        </p>
+        <p>
+          SDD 想解决的痛点 —— "AI 输出不可控，需要更强约束" —— 是<strong>真实的</strong>。
+          但争论在于：<strong>它跟 harness 是什么关系？</strong>
+        </p>
+
+        <!-- Viz #3: SDD 光谱 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03 · spectrum</div>
+            <h3 class="viz-title">"先写多少 spec" 是一条光谱，不是二元对立</h3>
+            <p class="viz-sub">OpenAI 推荐地图风格（轻量端），SDD 倾向重前置（重量端）。两者不是打架，是光谱上的不同位置。</p>
+          </div>
+
+          <div class="viz-stage v-spectrum">
+            <div class="v-spectrum-track">
+              <div class="v-spectrum-marker" style="left: 15%">
+                <span class="v-spectrum-tag">OpenAI 推荐</span>
+                <span class="v-spectrum-dot is-openai"></span>
+              </div>
+              <div class="v-spectrum-marker" style="left: 45%">
+                <span class="v-spectrum-tag">Harness 默认</span>
+                <span class="v-spectrum-dot is-harness"></span>
+              </div>
+              <div class="v-spectrum-marker" style="left: 72%">
+                <span class="v-spectrum-tag">SDD 倾向</span>
+                <span class="v-spectrum-dot is-sdd"></span>
+              </div>
+              <div class="v-spectrum-marker" style="left: 95%">
+                <span class="v-spectrum-tag">反模式</span>
+                <span class="v-spectrum-dot is-anti"></span>
+              </div>
+            </div>
+            <div class="v-spectrum-labels">
+              <span class="v-spectrum-label">轻 — 地图风格</span>
+              <span class="v-spectrum-label">重 — 一千页说明书</span>
+            </div>
+
+            <h4>不同场景，选不同位置</h4>
+            <div class="v-sdd-scenes">
+              <div class="v-sdd-scene">
+                <div class="v-sdd-scene-head">
+                  <div class="v-sdd-scene-icon is-harness">&#9881;</div>
+                  <div>
+                    <div class="v-sdd-scene-title">消费级 / 创业期</div>
+                    <div class="v-sdd-scene-tag">探索性高</div>
+                  </div>
+                </div>
+                <div class="v-sdd-scene-desc">
+                  迭代速度是命，AI 改代码的成本接近零。前置重 spec 反而是拖累。
+                </div>
+                <div class="v-sdd-scene-rec">&#8594; Harness 轻量端（本课程默认）</div>
+              </div>
+
+              <div class="v-sdd-scene">
+                <div class="v-sdd-scene-head">
+                  <div class="v-sdd-scene-icon is-sdd">&#128196;</div>
+                  <div>
+                    <div class="v-sdd-scene-title">To-G / 国央企 / 合规重</div>
+                    <div class="v-sdd-scene-tag">留痕 + 可审计</div>
+                  </div>
+                </div>
+                <div class="v-sdd-scene-desc">
+                  合规要求强，spec 留痕可签合同。SDD 自带这层卖点。
+                </div>
+                <div class="v-sdd-scene-rec">&#8594; SDD 路线值得考虑</div>
+              </div>
+
+              <div class="v-sdd-scene">
+                <div class="v-sdd-scene-head">
+                  <div class="v-sdd-scene-icon is-mix">&#8596;</div>
+                  <div>
+                    <div class="v-sdd-scene-title">大企业跨部门协作</div>
+                    <div class="v-sdd-scene-tag">多方预期对齐</div>
+                  </div>
+                </div>
+                <div class="v-sdd-scene-desc">
+                  产品 / 设计 / 工程 / QA 跨部门交付，先 spec 后 code 让各方预期一致。
+                </div>
+                <div class="v-sdd-scene-rec">&#8594; 混合：harness 跑日常 + 关键接口走 SDD 强 spec</div>
+              </div>
+
+              <div class="v-sdd-scene">
+                <div class="v-sdd-scene-head">
+                  <div class="v-sdd-scene-icon is-sdd">&#9888;</div>
+                  <div>
+                    <div class="v-sdd-scene-title">严肃软件（医疗 / 金融 / 航天）</div>
+                    <div class="v-sdd-scene-tag">错误代价极高</div>
+                  </div>
+                </div>
+                <div class="v-sdd-scene-desc">
+                  前置规范有合规价值，值得投入。但 harness 的评测层也要做得特别厚。
+                </div>
+                <div class="v-sdd-scene-rec">&#8594; SDD 路线值得严肃考虑</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>核心判断</strong>：SDD 错的不是"它存在"，而是"被一刀切地推向所有场景"。
+            SDD 是"指定怎么开发"的工作流方法；harness 是"agent 怎么跑"的工程结构。
+            两者可以并存。
+          </p>
+          <div class="viz-source">SOURCE · 综合 OpenAI AGENTS.md 实践 / 阿里通义灵码 SDD 文档 / 社区讨论</div>
+        </figure>
+
+        <div class="callout">
+          <strong>谁在推 SDD？</strong>
+          主要两股力量：❶ <strong>阿里</strong>（通义灵码 + 白皮书 + 培训 + 大厂渠道）—— 中文圈最大推手。
+          ❷ <strong>GitHub Spec-Kit</strong>（社区开源）—— 西方社区也有，影响力相对中性。
+          中国大厂的 to-G / 国央企业务特别愿意采纳 SDD：因为 spec 可留痕、可审计、可签合同。
+        </div>
+
+        <h3>批评派的三个核心声音</h3>
+        <p>中文 PM / 工程圈对 SDD 的常见批评 ——</p>
+        <ol>
+          <li><strong>"为中层经理设计，不是为一线工程师设计"</strong> —— 让管理层有控制感，但跟一线产出力没强相关。</li>
+          <li><strong>"瀑布开发最大的问题被包装成 AI 时代的革新"</strong> —— 过度前置规划在信息不全时做最多决策，敏捷早已证明这是错的。</li>
+          <li><strong>"AI 最大红利是迭代成本接近零，SDD 反而把重文档的痛苦塞回来"</strong> —— 改代码这么便宜，为什么还先写 50 页 spec？</li>
+        </ol>
+        <p>
+          这些批评<strong>有道理</strong>。但前面的场景卡片也说了 —— <strong>要看场景</strong>。
+          二元站队是错的。
+        </p>
+      </section>
+
+
+      <!-- ===== §4 上下文工程在中文圈 ===== -->
+      <section class="page-section he-reveal" id="sec-07-4" data-toc="上下文工程">
+        <div class="page-section-eyebrow">§4 · 上下文工程</div>
+        <h2>上下文工程在中文圈<br>—— 比 harness <span class="he-text-accent">更火</span></h2>
+
+        <p>
+          "上下文工程"在中文圈是 2025 年的爆点，<strong>远比 harness 工程更普及</strong>。
+          Manus 团队的实践文章经多平台转载，
+          "上下文工程 = 新一代提示词工程"的口号几乎人手一份。
+        </p>
+
+        <!-- Viz #4: 嵌套关系（中文圈认知地图） -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 04 · nested concepts</div>
+            <h3 class="viz-title">三层嵌套 × 中文圈热度</h3>
+            <p class="viz-sub">中文圈在中间一层（上下文工程）最热，最外层（harness 工程）刚起步。</p>
+          </div>
+
+          <div class="viz-stage v-nesting">
+            <div class="v-nesting-ring is-outer">
+              <div class="v-nesting-head">
+                <span class="v-nesting-name">Harness 工程（驾驭工程）</span>
+                <span class="v-nesting-heat is-new">中文圈 · 刚起步</span>
+              </div>
+              <div class="v-nesting-desc">
+                模型外面整个运行时 —— 上下文 + 工具执行 + 沙箱 + 循环 + 评测
+              </div>
+              <div class="v-nesting-zh">社区有零散文章，厂商没用这个词，系统教学几乎为零</div>
+
+              <div class="v-nesting-ring is-mid">
+                <div class="v-nesting-head">
+                  <span class="v-nesting-name">上下文工程</span>
+                  <span class="v-nesting-heat is-hot">中文圈 · 过热</span>
+                </div>
+                <div class="v-nesting-desc">
+                  管"每一轮窗口里塞了什么" —— KV-cache、压缩、Memory、检索
+                </div>
+                <div class="v-nesting-zh">Manus 实践文章 / 各家公众号 / 知乎系列文 —— 传播最广</div>
+
+                <div class="v-nesting-ring is-inner">
+                  <div class="v-nesting-head">
+                    <span class="v-nesting-name">提示词工程</span>
+                    <span class="v-nesting-heat is-rising">中文圈 · 已普及</span>
+                  </div>
+                  <div class="v-nesting-desc">
+                    发给模型的那段文字 —— system prompt、指令、few-shot
+                  </div>
+                  <div class="v-nesting-zh">教程遍地，认知基本到位</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>中文圈的问题</strong>：❶ "上下文工程"讨论虽热，但碎片化 —— 各家讲各家 trick，缺统一方法论框架。
+            ❷ 过度炒作 —— 让人以为它是终点，其实上面还有 harness。
+            <strong>会讲上下文工程不够，要会讲 harness</strong> —— 多数候选人卡在前者。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §5 国内厂商动作 ===== -->
+      <section class="page-section he-reveal" id="sec-07-5" data-toc="厂商地图">
+        <div class="page-section-eyebrow">§5 · 厂商动作</div>
+        <h2>国内主要厂商，<br>各走哪条路？</h2>
+
+        <p>
+          国内厂商对 harness / 应用层工具的投入，跟英文圈还有<strong>明显时间差</strong>。
+          下面只罗列，不评价 —— 作为你求职的背景信息。
+        </p>
+
+        <!-- Viz #5: 厂商生态地图 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 05 · china ecosystem</div>
+            <h3 class="viz-title">中国 AI 厂商 harness 版图</h3>
+            <p class="viz-sub">谁走 SDD、谁走上下文工程、谁还在模型层 —— 一张图看清。</p>
+          </div>
+
+          <div class="viz-stage v-vendors">
+            <div class="v-vendor-card">
+              <div class="v-vendor-head">
+                <span class="v-vendor-name">阿里</span>
+                <span class="v-vendor-stance is-sdd">SDD 路线</span>
+              </div>
+              <div class="v-vendor-products">
+                <span class="v-vendor-product">通义灵码</span>
+                <span class="v-vendor-product">Qwen3-Coder</span>
+              </div>
+              <div class="v-vendor-desc">
+                官方主推 SDD 流程：规划智能体、自定义 subagents、Skills、多智能体并行、Repo Wiki。
+                to-G / 国央企 / 大企业是主要市场。
+              </div>
+              <div class="v-vendor-highlight">中文圈 SDD 最大推手</div>
+            </div>
+
+            <div class="v-vendor-card">
+              <div class="v-vendor-head">
+                <span class="v-vendor-name">腾讯</span>
+                <span class="v-vendor-stance is-ctx">上下文工程</span>
+              </div>
+              <div class="v-vendor-products">
+                <span class="v-vendor-product">CodeBuddy</span>
+                <span class="v-vendor-product">混元 + DeepSeek</span>
+              </div>
+              <div class="v-vendor-desc">
+                双模型架构，Craft 编码智能体 + 工程理解智能体 Plus。未见 harness 专题博客。
+              </div>
+              <div class="v-vendor-highlight">中文"上下文工程"重要传播节点（转载 Manus 实践文章）</div>
+            </div>
+
+            <div class="v-vendor-card">
+              <div class="v-vendor-head">
+                <span class="v-vendor-name">字节</span>
+                <span class="v-vendor-stance is-harness">最接近 Harness</span>
+              </div>
+              <div class="v-vendor-products">
+                <span class="v-vendor-product">Trae</span>
+                <span class="v-vendor-product">Trae 2.0 SOLO</span>
+              </div>
+              <div class="v-vendor-desc">
+                SOLO 模式引入"Context Engineer"概念 —— 动态构建全链路上下文，支持 Subagent。
+              </div>
+              <div class="v-vendor-highlight">大厂里离 harness 思想最近的官方表述（但仍叫"上下文工程"）</div>
+            </div>
+
+            <div class="v-vendor-card">
+              <div class="v-vendor-head">
+                <span class="v-vendor-name">模型厂</span>
+                <span class="v-vendor-stance is-model">模型层叙事</span>
+              </div>
+              <div class="v-vendor-products">
+                <span class="v-vendor-product">智谱 GLM</span>
+                <span class="v-vendor-product">DeepSeek V3/R1</span>
+                <span class="v-vendor-product">Kimi K2</span>
+              </div>
+              <div class="v-vendor-desc">
+                主要投在模型层 —— 长程任务规划、工具协同等。文档面向 API 的 tool_use。
+                属于"模型能力"叙事，非"harness 工程"叙事。
+              </div>
+            </div>
+          </div>
+
+          <!-- 社区资源 -->
+          <h4 style="margin-top: var(--sp-8); margin-bottom: var(--sp-3);">社区在补厂商没补的位置</h4>
+          <div class="v-community">
+            <div class="v-community-card">
+              <div class="v-community-type">开源长指南</div>
+              <div class="v-community-name">yeasy《智能体 Harness 工程指南》</div>
+              <div class="v-community-desc">GitBook 14 章 + MiniHarness 实操项目 —— 中文圈最完整、最工程</div>
+            </div>
+            <div class="v-community-card">
+              <div class="v-community-type">入门词条</div>
+              <div class="v-community-name">菜鸟教程《驾驭工程》</div>
+              <div class="v-community-desc">大众入门级 —— Harness Engineering 的中文百科式解释</div>
+            </div>
+            <div class="v-community-card">
+              <div class="v-community-type">媒体报道</div>
+              <div class="v-community-name">36氪「Harness 时代」</div>
+              <div class="v-community-desc">"模型是 CPU，驾驭系统才是操作系统" —— 传播力强的金句出处</div>
+            </div>
+            <div class="v-community-card">
+              <div class="v-community-type">社区讨论</div>
+              <div class="v-community-name">知乎 / 公众号 / 博客园</div>
+              <div class="v-community-desc">各自切入点不同的专栏文章 —— 碎片化但有价值的一手观察</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>整体判断</strong>：厂商层"产品 + 模型卖点"当道，应用层 harness 教学相对薄。
+            上下文工程已经过热，但系统化方法论缺。社区在做厂商没做的事。
+          </p>
+          <div class="viz-source">SOURCE · 各厂商官方文档 / 腾讯云开发者社区 / 菜鸟教程 / 36氪</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §6 中文语境真正缺什么 ===== -->
+      <section class="page-section he-reveal" id="sec-07-6" data-toc="三大缺口">
+        <div class="page-section-eyebrow">§6 · 三大缺口</div>
+        <h2>中文语境<br><span class="he-text-accent">真正缺什么</span>？</h2>
+
+        <p>
+          把前面几节合起来看，中文圈 harness 讨论实际缺<strong>三样东西</strong> ——
+          这恰好是这门课和这个网站存在的理由。
+        </p>
+
+        <!-- Viz #6: 三大缺口 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06 · three gaps</div>
+            <h3 class="viz-title">三大缺口 = 这门课的卡位</h3>
+            <p class="viz-sub">中文圈缺的不是零散文章，是系统化的框架、模板、场景选择指引。</p>
+          </div>
+
+          <div class="viz-stage v-gaps">
+            <div class="v-gap-card">
+              <div class="v-gap-head">
+                <span class="v-gap-n">1</span>
+                <span class="v-gap-status">缺位中</span>
+              </div>
+              <h4 class="v-gap-title">权威定义</h4>
+              <p class="v-gap-desc">
+                "harness 是什么"在中文圈众说纷纭 —— 没有一个 PM 圈认可的、成体系的定义。
+              </p>
+              <div class="v-gap-fill">
+                <span class="v-gap-fill-label">本课程怎么补</span>
+                <span class="v-gap-fill-text">板块① —— 三尺度定义 + 转知做检构成框架</span>
+              </div>
+            </div>
+
+            <div class="v-gap-card">
+              <div class="v-gap-head">
+                <span class="v-gap-n">2</span>
+                <span class="v-gap-status">缺位中</span>
+              </div>
+              <h4 class="v-gap-title">应用层模板教学</h4>
+              <p class="v-gap-desc">
+                大家会讲"原则"，但没人手把手教 PM 如何从零搭一个能用的 harness 模板。
+              </p>
+              <div class="v-gap-fill">
+                <span class="v-gap-fill-label">本课程怎么补</span>
+                <span class="v-gap-fill-text">板块⑥ + pm-docs-harness/ 模板仓库（学员可 fork）</span>
+              </div>
+            </div>
+
+            <div class="v-gap-card">
+              <div class="v-gap-head">
+                <span class="v-gap-n">3</span>
+                <span class="v-gap-status">缺位中</span>
+              </div>
+              <h4 class="v-gap-title">场景化方法论选择</h4>
+              <p class="v-gap-desc">
+                SDD / harness / 上下文工程 —— 该选哪个、什么时候用、怎么混搭？中文圈没有清晰指引。
+              </p>
+              <div class="v-gap-fill">
+                <span class="v-gap-fill-label">本课程怎么补</span>
+                <span class="v-gap-fill-text">板块⑤ + 板块⑦（本页）一起覆盖</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>这三件，就是这门课对中文圈 AI PM 的真实价值</strong>。
+            能在面试和日常工作中系统化地讲清这些，你就比 80% 的候选人更专业。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §7 面试话术 + 一句话总结 ===== -->
+      <section class="page-section he-reveal" id="sec-07-7" data-toc="面试 + 总结">
+        <div class="page-section-eyebrow">§7 · 面试 + 总结</div>
+        <h2>面试时怎么讲 SDD？</h2>
+
+        <p>
+          如果面试官问"你怎么看 SDD？"—— 尤其在阿里系公司面试时 ——
+          下面这种回答比"SDD 是废话文学"或"SDD 是新时代标准"都更专业。
+        </p>
+
+        <!-- Viz #7: 面试话术 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 07 · interview</div>
+            <h3 class="viz-title">面试实战话术：怎么讲 SDD</h3>
+            <p class="viz-sub">不站队，讲场景 —— 这种回答让面试官觉得你有体系。</p>
+          </div>
+
+          <div class="viz-stage v-interview">
+            <div class="v-interview-q">
+              <div class="v-interview-avatar">&#128100;</div>
+              <div class="v-interview-bubble is-q">
+                你怎么看 SDD？在你的项目里会用吗？
+              </div>
+            </div>
+
+            <div class="v-interview-a">
+              <div class="v-interview-avatar is-you">YOU</div>
+              <div class="v-interview-bubble is-a">
+                SDD 跟 Harness <span class="v-interview-key">不是对立</span>，它们是"指定多少"这条<span class="v-interview-key">光谱</span>上的不同位置。
+                SDD 偏前置 / 重 spec，harness 推荐"地图 + 分散 docs"。<br><br>
+                对于<span class="v-interview-key">消费级 / 创业期</span>产品，我默认走 harness 轻量端；<br>
+                对于 <span class="v-interview-key">to-G、合规重、跨部门</span>大型协作，SDD 风格的强 spec 有真实价值。<br><br>
+                <strong>我做产品决策时是看场景选，不站队。</strong>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>为什么这种回答更好</strong>：展示了你知道两种方法论的来源、适用边界、以及场景判断能力。
+            面试官要的不是"你站哪边"，是你有没有思考框架。
+          </p>
+        </figure>
+
+        <hr>
+
+        <h3>一句话总结</h3>
+        <blockquote>
+          <strong>中文圈对 harness 的讨论还没收敛</strong> ——
+          术语三种用法、SDD 争论白热化、厂商各异、上下文工程过热但缺方法论。<br><br>
+          <strong>作为 AI PM，你的位置不是站队，是搞清场景</strong>：
+          消费级 / 创业期默认 harness 轻量；to-G / 合规重场景 SDD 有真实价值；两者不是对立，是光谱。<br><br>
+          <strong>能在中文求职市场系统化地讲清这些，你就比 80% 的候选人更专业。</strong>
+        </blockquote>
+
+        <h3>一手来源（本板块所有论断的出处）</h3>
+        <ul>
+          <li>yeasy《智能体 Harness 工程指南》(14 章) — <a href="https://yeasy.gitbook.io/harness_engineering_guide" target="_blank" rel="noreferrer">GitBook</a></li>
+          <li>菜鸟教程《Harness Engineering(驾驭工程)》— <a href="https://www.runoob.com/ai-agent/harness-engineering.html" target="_blank" rel="noreferrer">runoob.com</a></li>
+          <li>36氪《Harness 时代》— <a href="https://36kr.com/p/3789107286432777" target="_blank" rel="noreferrer">36kr.com</a></li>
+          <li>阿里通义灵码 — <a href="https://lingma.aliyun.com/" target="_blank" rel="noreferrer">lingma.aliyun.com</a></li>
+          <li>腾讯 CodeBuddy — <a href="https://www.codebuddy.cn/" target="_blank" rel="noreferrer">codebuddy.cn</a></li>
+          <li>字节 Trae — <a href="https://docs.trae.cn/ide/solo-coder" target="_blank" rel="noreferrer">docs.trae.cn</a></li>
+          <li>腾讯云社区(Manus 上下文工程实践) — <a href="https://cloud.tencent.com/developer/article/2545989" target="_blank" rel="noreferrer">cloud.tencent.com</a></li>
+        </ul>
+      </section>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ===== Group navigation ===== -->
+      <a href="deep.html" class="group-next">
+        <div class="group-next-l">
+          <div class="group-next-meta">读完本组 · 推荐继续</div>
+          <div class="group-next-label">03 / 5 · 深入</div>
+        </div>
+        <span class="group-next-arrow">→</span>
+      </a>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/spotlight.js"></script>
+</body>
+</html>

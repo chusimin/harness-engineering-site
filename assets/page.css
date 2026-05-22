@@ -29,23 +29,27 @@ body { padding-top: 96px; }
 
 /* ======== Page layout ======== */
 .page-wrap {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 64px;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 40px 32px 80px;
-  align-items: start;
+  padding: 40px 32px 80px 304px;  /* 240 sidebar + 64 gap */
   position: relative;
   z-index: 2;
 }
 
-/* Sidebar (TOC) */
+/* Sidebar (TOC) — fixed, doesn't scroll with page */
 .toc {
-  position: sticky;
+  position: fixed;
   top: 110px;
-  align-self: start;
+  left: max(calc((100vw - 1440px) / 2 + 32px), 32px);
+  width: 240px;
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
+  z-index: 5;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(222,219,200,0.15) transparent;
 }
+.toc::-webkit-scrollbar { width: 4px; }
+.toc::-webkit-scrollbar-thumb { background: rgba(222,219,200,0.15); border-radius: 4px; }
 .toc-inner {
   background: rgba(12, 12, 12, 0.6);
   border: 1px solid rgba(222, 219, 200, 0.06);
@@ -330,13 +334,16 @@ body { padding-top: 96px; }
 @media (max-width: 1024px) {
   body { padding-top: 80px; }
   .page-wrap {
-    grid-template-columns: 1fr;
-    gap: 32px;
     padding: 24px 20px 60px;
   }
   .toc {
     position: static;
     top: auto;
+    left: auto;
+    width: auto;
+    max-height: none;
+    overflow-y: visible;
+    margin-bottom: 24px;
   }
   .toc-inner {
     padding: 16px;

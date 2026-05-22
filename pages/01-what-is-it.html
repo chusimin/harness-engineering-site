@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>① 它是什么 · Harness Engineering</title>
+  <meta name="description" content="Harness 是包在模型外面的那一整圈代码 —— 定义、构成、三个尺度">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/page.css">
+
+  <style>
+    /* ============================================
+       本页可视化专用样式（仅 ① 它是什么 用）
+       ============================================ */
+
+    /* ---- Viz 1: 同模型不同产品（对比图） ---- */
+    .v-compare {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+      position: relative;
+    }
+    .v-compare-col {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-compare-col:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-compare-name {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-muted);
+      margin-bottom: var(--sp-2);
+    }
+    .v-compare-emoji {
+      font-size: 28px;
+      margin-bottom: var(--sp-2);
+      color: var(--he-text-display);
+      font-weight: var(--he-weight-bold);
+    }
+    .v-compare-quote {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: 1.5;
+      font-style: italic;
+    }
+    .v-compare-bridge {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-top: var(--sp-5);
+      padding-top: var(--sp-5);
+      border-top: 1px dashed var(--he-border-strong);
+    }
+    .v-compare-bridge-q {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-muted);
+    }
+    .v-compare-bridge-a {
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-accent);
+      letter-spacing: -0.01em;
+    }
+    .v-compare-bridge-a::before { content: '→ '; opacity: 0.5; }
+
+    /* ---- Viz 2: Agent = Model + Harness 公式 ---- */
+    .v-formula {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: var(--sp-3);
+      flex-wrap: wrap;
+    }
+    .v-formula-block {
+      flex: 1;
+      min-width: 160px;
+      max-width: 220px;
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+    }
+    .v-formula-label {
+      font-family: var(--he-font-mono);
+      font-size: 22px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      letter-spacing: -0.02em;
+      margin-bottom: var(--sp-1);
+    }
+    .v-formula-zh {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.4;
+    }
+    .v-formula-op {
+      display: flex; align-items: center;
+      font-family: var(--he-font-mono);
+      font-size: 28px;
+      color: var(--he-text-subtle);
+    }
+    .v-formula-block.is-harness {
+      border-color: transparent;
+      background: var(--he-bg);
+      box-shadow: 0 0 0 1px var(--c-indigo-a24), 0 8px 32px var(--c-indigo-a16);
+      animation: v-harness-pulse 3s ease-in-out infinite;
+    }
+    .v-formula-block.is-harness .v-formula-label { color: var(--he-accent); }
+    @keyframes v-harness-pulse {
+      0%, 100% { box-shadow: 0 0 0 1px var(--c-indigo-a24), 0 8px 32px var(--c-indigo-a16); }
+      50%      { box-shadow: 0 0 0 1px rgba(94,106,210,.4), 0 16px 48px var(--c-indigo-a24); }
+    }
+
+    /* ---- Viz 3: 转·知·做·检（十字布局） ---- */
+    .v-cross {
+      position: relative;
+      width: min(420px, 100%);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+    }
+    .v-cross-axis {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1px; height: 80%;
+      background: linear-gradient(to bottom, transparent, var(--he-border), transparent);
+    }
+    .v-cross-axis.is-h {
+      width: 80%; height: 1px;
+      background: linear-gradient(to right, transparent, var(--he-border), transparent);
+    }
+    .v-cross-node {
+      position: absolute;
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-cross-node:hover {
+      border-color: var(--he-accent);
+      box-shadow: var(--he-shadow-glow);
+      transform: scale(1.05);
+    }
+    .v-cross-node.is-zh-1 { top: 0;    left: 50%; transform: translateX(-50%); }
+    .v-cross-node.is-zh-2 { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .v-cross-node.is-zh-3 { top: 50%;  left: 0;   transform: translateY(-50%); }
+    .v-cross-node.is-zh-4 { top: 50%;  right: 0;  transform: translateY(-50%); }
+    .v-cross-node.is-zh-1:hover { transform: translateX(-50%) scale(1.05); }
+    .v-cross-node.is-zh-2:hover { transform: translateX(-50%) scale(1.05); }
+    .v-cross-node.is-zh-3:hover { transform: translateY(-50%) scale(1.05); }
+    .v-cross-node.is-zh-4:hover { transform: translateY(-50%) scale(1.05); }
+    .v-cross-char {
+      font-size: 32px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+    .v-cross-node.is-zh-1 .v-cross-char { color: var(--he-accent); }
+    .v-cross-name {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--he-text-muted);
+    }
+    .v-cross-core {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--he-text-display);
+      color: var(--he-text-inverse);
+      display: grid; place-items: center;
+      font-family: var(--he-font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+    }
+
+    /* ---- Viz 4: 主循环 SVG ---- */
+    .v-loop {
+      display: grid;
+      gap: var(--sp-3);
+    }
+    .v-loop-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--sp-2);
+    }
+    .v-loop-step {
+      padding: var(--sp-4) var(--sp-2);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      position: relative;
+    }
+    .v-loop-num {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .v-loop-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-medium);
+      color: var(--he-text-strong);
+      line-height: 1.3;
+    }
+    .v-loop-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: calc(var(--sp-2) * -0.5 - 5px);
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--he-font-mono);
+      color: var(--he-text-subtle);
+      font-size: 14px;
+    }
+    .v-loop-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      padding: var(--sp-3);
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-sm);
+      color: var(--he-accent);
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-md);
+    }
+    .v-loop-arrow svg { animation: v-loop-spin 4s linear infinite; }
+    @keyframes v-loop-spin { to { transform: rotate(360deg); } }
+
+    /* ---- Viz 5: 三尺度同心圆 ---- */
+    .v-scales {
+      position: relative;
+      width: min(480px, 100%);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+    }
+    .v-scales-ring {
+      position: absolute;
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding-top: var(--sp-4);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      cursor: pointer;
+    }
+    .v-scales-ring.is-org {
+      width: 100%; height: 100%;
+      background: rgba(94, 106, 210, 0.05);
+      border: 1.5px dashed rgba(94, 106, 210, 0.4);
+      animation: v-scales-breathe 6s ease-in-out infinite;
+    }
+    .v-scales-ring.is-task {
+      width: 70%; height: 70%;
+      background: rgba(94, 106, 210, 0.10);
+      border: 1.5px dashed rgba(94, 106, 210, 0.5);
+      animation: v-scales-breathe 6s ease-in-out infinite 0.8s;
+    }
+    .v-scales-ring.is-comp {
+      width: 44%; height: 44%;
+      background: rgba(94, 106, 210, 0.18);
+      border: 1.5px dashed rgba(94, 106, 210, 0.7);
+      animation: v-scales-breathe 6s ease-in-out infinite 1.6s;
+    }
+    .v-scales-ring.is-model {
+      width: 22%; height: 22%;
+      background: var(--he-text-display);
+      border: none;
+      display: grid; place-items: center;
+      padding: 0;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.3);
+    }
+    @keyframes v-scales-breathe {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.012); }
+    }
+    .v-scales-label {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+    }
+    .v-scales-desc {
+      font-size: 10px;
+      color: var(--he-text-muted);
+      margin-top: 2px;
+    }
+    .v-scales-ring.is-model .v-scales-label {
+      color: var(--he-text-inverse);
+      font-family: var(--he-font-mono);
+      font-size: var(--he-text-xs);
+      letter-spacing: 0.08em;
+    }
+    .v-scales-cases {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+      margin-top: var(--sp-8);
+    }
+    .v-scales-case {
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+    }
+    .v-scales-case-tag {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      margin-bottom: var(--sp-2);
+    }
+    .v-scales-case-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: 4px;
+    }
+    .v-scales-case-desc {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.5;
+    }
+
+    /* ---- Viz 6: 嵌套关系（提示词 ⊂ 上下文 ⊂ Harness） ---- */
+    .v-nest {
+      display: grid;
+      gap: var(--sp-3);
+    }
+    .v-nest-layer {
+      padding: var(--sp-5);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-nest-layer:hover {
+      transform: translateX(4px);
+      border-color: var(--he-accent);
+    }
+    .v-nest-outer {
+      background: rgba(94, 106, 210, 0.04);
+      border: 1px solid rgba(94, 106, 210, 0.3);
+    }
+    .v-nest-mid {
+      background: rgba(94, 106, 210, 0.08);
+      border: 1px solid rgba(94, 106, 210, 0.4);
+      margin-left: var(--sp-8);
+    }
+    .v-nest-inner {
+      background: rgba(94, 106, 210, 0.14);
+      border: 1px solid rgba(94, 106, 210, 0.5);
+      margin-left: calc(var(--sp-8) * 2);
+    }
+    .v-nest-head {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-2);
+    }
+    .v-nest-year {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-nest-name {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      letter-spacing: -0.01em;
+    }
+    .v-nest-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-snug);
+    }
+
+    /* ---- Viz 3 重做: 4 件事横向卡片（替代十字图） ---- */
+    .v-fourthings {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-fourthings-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+    }
+    .v-fourthings-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-fourthings-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .v-fourthings-n {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      font-weight: var(--he-weight-bold);
+    }
+    .v-fourthings-mnemonic {
+      font-family: var(--he-font-sans);
+      font-size: 28px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      opacity: 0.25;
+      transition: opacity var(--he-dur-base);
+    }
+    .v-fourthings-card:hover .v-fourthings-mnemonic {
+      opacity: 1;
+      color: var(--he-accent);
+    }
+    .v-fourthings-title {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    .v-fourthings-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+      flex-grow: 1;
+    }
+    .v-fourthings-gap {
+      padding: var(--sp-3);
+      background: var(--he-bg-subtle);
+      border-radius: var(--he-radius-sm);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .v-fourthings-gap-label {
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-subtle);
+      margin-bottom: 3px;
+    }
+    .v-fourthings-gap-text {
+      color: var(--he-text-strong);
+    }
+    .v-fourthings-tech {
+      font-family: var(--he-font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+      color: var(--he-text-muted);
+      padding-top: var(--sp-2);
+      border-top: 1px dashed var(--he-border);
+    }
+    @media (max-width: 1024px) {
+      .v-fourthings { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .v-fourthings { grid-template-columns: 1fr; }
+    }
+
+    /* ---- 通用小组件 ---- */
+    .callout {
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border-left: 3px solid var(--he-accent);
+      border-radius: 0 var(--he-radius-md) var(--he-radius-md) 0;
+      margin: var(--sp-6) 0;
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .callout strong { color: var(--he-text-display); }
+
+    @media (max-width: 640px) {
+      .v-compare { grid-template-columns: 1fr; }
+      .v-loop-row { grid-template-columns: repeat(3, 1fr); }
+      .v-loop-step:not(:last-child)::after { display: none; }
+      .v-cross { width: 320px; }
+      .v-cross-node { width: 80px; height: 80px; }
+      .v-cross-char { font-size: 22px; }
+      .v-cross-core { width: 60px; height: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ Page Hero ============ -->
+  <header class="page-hero">
+    <div class="page-hero-inner">
+      <a class="page-back" href="intro.html">← 入门</a>
+      <div class="page-eyebrow">
+        <span class="page-eyebrow-num">板块 01</span>
+        <span class="page-eyebrow-group">入门 · INTRO</span>
+      </div>
+      <h1 class="he-h1 page-title">它<span class="he-text-accent">是什么</span>。</h1>
+      <p class="he-lead page-lead">
+        Harness 是包在模型外面的那一整圈代码 ——
+        把被动的模型变成能干活的 <span class="he-term" data-tip="能主动调工具、循环推理、跨会话记住事情的智能体。和'只会说话'的模型相对。">agent</span>。
+      </p>
+      <div class="page-meta">
+        <span class="page-meta-item">15 分钟阅读</span>
+        <span class="page-meta-item">7 个小节</span>
+        <span class="page-meta-item">6 个可视化</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Page Layout ============ -->
+  <div class="page-layout">
+    <!-- aside.page-side 自动注入 -->
+    <main class="page-main">
+
+
+      <!-- ===== §1 一个被低估的真相 ===== -->
+      <section class="page-section he-reveal" id="sec-1" data-toc="为什么差这么远">
+        <div class="page-section-eyebrow">§1 · 被低估的真相</div>
+        <h2>同一个模型，<br>为什么产品差这么远？</h2>
+
+        <p>
+          2025 年起，AI 产品的胜负手悄悄变了。
+          过去问的是"谁的模型更强"，现在三个截然不同的产品，背后<strong>可能是同一个模型</strong>。
+        </p>
+
+        <!-- Viz #1: 三产品对比 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 01</div>
+            <h3 class="viz-title">同一个 Claude，三个完全不同的产品</h3>
+            <p class="viz-sub">底层调用同一个模型，但能做的事天差地别。</p>
+          </div>
+
+          <div class="viz-stage v-compare">
+            <div class="v-compare-col">
+              <div class="v-compare-name">直接调 API</div>
+              <div class="v-compare-emoji">💬</div>
+              <p class="v-compare-quote">
+                "你应该去找这些文件，删掉这些行。"<br>
+                <em>—— 只会说，不会做</em>
+              </p>
+            </div>
+            <div class="v-compare-col">
+              <div class="v-compare-name">Claude Code</div>
+              <div class="v-compare-emoji">🛠</div>
+              <p class="v-compare-quote">
+                真的去搜索项目、打开文件、改、再跑一遍验证。<br>
+                <em>—— 它做完了</em>
+              </p>
+            </div>
+            <div class="v-compare-col">
+              <div class="v-compare-name">Cursor</div>
+              <div class="v-compare-emoji">⌘</div>
+              <p class="v-compare-quote">
+                在你编辑器里 inline 改，按 ⌘+K 一键补全整段。<br>
+                <em>—— 体验完全不同</em>
+              </p>
+            </div>
+
+            <div class="v-compare-bridge">
+              <div class="v-compare-bridge-q">差距来自哪里？模型一样。差的是 ——</div>
+              <div class="v-compare-bridge-a">模型外面那一整圈代码</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">那一圈代码，就是本文要讲的 <strong>Harness</strong>。</p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §2 一句话定义 ===== -->
+      <section class="page-section he-reveal" id="sec-2" data-toc="一句话定义">
+        <div class="page-section-eyebrow">§2 · 一句话定义</div>
+        <h2>Harness = 那一整圈代码。</h2>
+
+        <p>
+          一个 agent 从来不是"一个很强的模型"。它是 ——
+          <strong>一个模型，加上一套把模型驾驭起来的代码</strong>。
+        </p>
+
+        <!-- Viz #2: Agent = Model + Harness 公式 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02 · the formula</div>
+            <h3 class="viz-title">Agent = Model + Harness</h3>
+            <p class="viz-sub">这是整份资料的"中心公式"。所有 9 个其他板块都从这里展开。</p>
+          </div>
+
+          <div class="viz-stage v-formula">
+            <div class="v-formula-block">
+              <div class="v-formula-label">Agent</div>
+              <div class="v-formula-zh">能干活的智能体</div>
+            </div>
+            <div class="v-formula-op">=</div>
+            <div class="v-formula-block">
+              <div class="v-formula-label">Model</div>
+              <div class="v-formula-zh">被动的文字预测器</div>
+            </div>
+            <div class="v-formula-op">+</div>
+            <div class="v-formula-block is-harness">
+              <div class="v-formula-label">Harness</div>
+              <div class="v-formula-zh">驾驭层</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            "Harness" 直译是<strong>马具</strong> —— 缰绳、马鞍、嚼子。
+            模型像一匹有力气的马，但马本身不会决定往哪跑；是马具，让骑手能驾驭它。
+          </p>
+          <div class="viz-source">SOURCE · LangChain《The Anatomy of an Agent Harness》</div>
+        </figure>
+
+        <div class="callout">
+          <strong>它不是什么</strong> ——
+          ❶ 不是模型本身（模型是引擎，harness 是底盘）。
+          ❷ 不只是提示词（提示词只是 harness 最里面的一层）。
+          ❸ 不是某个框架（LangGraph、Claude Agent SDK 这些是"用来搭 harness 的工具"，不等于 harness 本身）。
+        </div>
+      </section>
+
+
+      <!-- ===== §3 它由什么组成（4 件事 · 大白话） ===== -->
+      <section class="page-section he-reveal" id="sec-3" data-toc="它由 4 件事组成">
+        <div class="page-section-eyebrow">§3 · 构成</div>
+        <h2>它由什么组成？<br>就 <span class="he-text-accent">4 件事</span>。</h2>
+
+        <p>
+          Harness 存在的唯一理由，是<strong>补"模型做不到的事"</strong>。
+          所以"由什么组成"，本质上就是"模型有几种关键的做不到"。
+          用人话讲，一个 harness 就干 4 件事 ——
+        </p>
+
+        <!-- Viz #3 重做：4 件事横向卡片 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03 · the four things</div>
+            <h3 class="viz-title">用人话讲，harness 就干 4 件事</h3>
+            <p class="viz-sub">每件事都对应"模型自己做不到的某一种事"。整份资料的核心脚手架。</p>
+          </div>
+
+          <div class="viz-stage v-fourthings">
+            <div class="v-fourthings-card">
+              <div class="v-fourthings-head">
+                <span class="v-fourthings-n">1</span>
+                <span class="v-fourthings-mnemonic">转</span>
+              </div>
+              <h4 class="v-fourthings-title">让它一直转起来</h4>
+              <p class="v-fourthings-desc">
+                让模型一轮接一轮地推理 → 执行 → 再推理，转到任务完成才停。
+              </p>
+              <div class="v-fourthings-gap">
+                <span class="v-fourthings-gap-label">模型做不到</span>
+                <span class="v-fourthings-gap-text">不会自己一轮一轮转，更不知道什么时候该停。</span>
+              </div>
+              <div class="v-fourthings-tech">主循环 · loop</div>
+            </div>
+
+            <div class="v-fourthings-card">
+              <div class="v-fourthings-head">
+                <span class="v-fourthings-n">2</span>
+                <span class="v-fourthings-mnemonic">知</span>
+              </div>
+              <h4 class="v-fourthings-title">让它知道当下</h4>
+              <p class="v-fourthings-desc">
+                让它"看见"该看见的（上下文）、"记得"该记得的（记忆），别遗漏关键信息。
+              </p>
+              <div class="v-fourthings-gap">
+                <span class="v-fourthings-gap-label">模型做不到</span>
+                <span class="v-fourthings-gap-text">管不住自己该注意什么，窗口一满就糊涂，会话一停就失忆。</span>
+              </div>
+              <div class="v-fourthings-tech">上下文 + 记忆 · context + memory</div>
+            </div>
+
+            <div class="v-fourthings-card">
+              <div class="v-fourthings-head">
+                <span class="v-fourthings-n">3</span>
+                <span class="v-fourthings-mnemonic">做</span>
+              </div>
+              <h4 class="v-fourthings-title">让它能动手</h4>
+              <p class="v-fourthings-desc">
+                让它真的去打开文件、调 API、改数据；同时管住它的手，别瞎搞破坏。
+              </p>
+              <div class="v-fourthings-gap">
+                <span class="v-fourthings-gap-label">模型做不到</span>
+                <span class="v-fourthings-gap-text">只会吐字，不能对世界动手；动手了也不会自己约束。</span>
+              </div>
+              <div class="v-fourthings-tech">工具 + 执行边界 · tools + sandbox</div>
+            </div>
+
+            <div class="v-fourthings-card">
+              <div class="v-fourthings-head">
+                <span class="v-fourthings-n">4</span>
+                <span class="v-fourthings-mnemonic">检</span>
+              </div>
+              <h4 class="v-fourthings-title">让你知道它干得好不好</h4>
+              <p class="v-fourthings-desc">
+                让你能看见每一步它在干什么、出了什么错，整套系统在变好还是变坏。
+              </p>
+              <div class="v-fourthings-gap">
+                <span class="v-fourthings-gap-label">模型做不到</span>
+                <span class="v-fourthings-gap-text">不会告诉你它哪步出问题，也不会自评"这次比上次好"。</span>
+              </div>
+              <div class="v-fourthings-tech">评测与可观测 · eval + observability</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>顺便记个口诀</strong>：上面 4 件事的核心字 ——
+            <strong class="he-text-accent">转 · 知 · 做 · 检</strong>。
+            这只是个方便后面讨论叫得快的记法，
+            <em>"是什么"永远比"叫什么"重要</em>。
+            后面所有板块都会反复回到这 4 件事。
+          </p>
+          <div class="viz-source">SOURCE · Anthropic「每个 harness 部件都编码了一个"模型做不到什么"的假设」</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §4 主循环（独立 section） ===== -->
+      <section class="page-section he-reveal" id="sec-4" data-toc="主循环跑了 5 步">
+        <div class="page-section-eyebrow">§4 · 主循环</div>
+        <h2>第 1 件「让它一直转」 <br>具体长什么样？</h2>
+
+        <p>
+          上面 4 件事里的第 1 件 ——「让它一直转」—— 是 harness 的<strong>骨架</strong>。
+          其他 3 件（知、做、检）都是挂在这个循环上的零件。所以单拎出来看一眼：
+        </p>
+
+        <!-- Viz #4: 主循环 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 04 · main loop</div>
+            <h3 class="viz-title">一轮 loop，跑 5 步</h3>
+            <p class="viz-sub">从「收到输入」到「判断停 or 再循环」—— 这 5 步循环往复，直到任务完成。</p>
+          </div>
+
+          <div class="viz-stage v-loop">
+            <div class="v-loop-row">
+              <div class="v-loop-step"><div class="v-loop-num">01</div><div class="v-loop-name">收到输入</div></div>
+              <div class="v-loop-step"><div class="v-loop-num">02</div><div class="v-loop-name">装配上下文</div></div>
+              <div class="v-loop-step"><div class="v-loop-num">03</div><div class="v-loop-name">模型推理</div></div>
+              <div class="v-loop-step"><div class="v-loop-num">04</div><div class="v-loop-name">执行工具</div></div>
+              <div class="v-loop-step"><div class="v-loop-num">05</div><div class="v-loop-name">回喂结果</div></div>
+            </div>
+            <div class="v-loop-arrow">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              判断：停下，还是再循环一轮？
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>记忆点</strong>：模型本身只会做第 03 步（推理）。
+            其他 4 步 + 判断逻辑，<strong>全部都是 harness 干的</strong>。
+            这就是为什么"同模型不同产品"会差这么远 —— 差的是循环里其他 4 步怎么写。
+          </p>
+          <div class="viz-source">SOURCE · Anthropic《Harness design for long-running application development》</div>
+        </figure>
+      </section>
+
+
+      <!-- ===== §5 它有多大（三尺度）===== -->
+      <section class="page-section he-reveal" id="sec-5" data-toc="三个尺度">
+        <div class="page-section-eyebrow">§5 · 尺度</div>
+        <h2>它有多大？<br>三个尺度，套着的。</h2>
+
+        <p>
+          这是板块① 最重要的一个框架。
+          <strong>Harness 不是固定大小的东西 —— 它有三个尺度，一个套一个。</strong>
+          各家厂商定义看起来打架，其实只是站在这把"尺度尺"的不同刻度上。
+        </p>
+
+        <!-- Viz #5: 三尺度同心圆 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 05 · three scales</div>
+            <h3 class="viz-title">三尺度 = 同心圆 · 一个套一个</h3>
+            <p class="viz-sub">最里面是 Model，往外一圈是组件级，再外是任务级，最外是组织级。每一圈都包住里面所有圈。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-scales">
+              <div class="v-scales-ring is-org">
+                <div class="v-scales-label">组织级</div>
+                <div class="v-scales-desc">一支 agent 队伍 + 长期产品</div>
+              </div>
+              <div class="v-scales-ring is-task">
+                <div class="v-scales-label">任务级</div>
+                <div class="v-scales-desc">多 agent 编排</div>
+              </div>
+              <div class="v-scales-ring is-comp">
+                <div class="v-scales-label">组件级</div>
+                <div class="v-scales-desc">裹一次模型调用</div>
+              </div>
+              <div class="v-scales-ring is-model">
+                <div class="v-scales-label">MODEL</div>
+              </div>
+            </div>
+
+            <div class="v-scales-cases">
+              <div class="v-scales-case">
+                <div class="v-scales-case-tag">组件级 · 例</div>
+                <div class="v-scales-case-name">Claude Code 修一个 bug</div>
+                <p class="v-scales-case-desc">
+                  裹着单模型的主循环、工具、上下文、记忆、沙箱 ——
+                  就是组件级 harness。
+                </p>
+              </div>
+              <div class="v-scales-case">
+                <div class="v-scales-case-tag">任务级 · 例</div>
+                <div class="v-scales-case-name">一句话造一个应用</div>
+                <p class="v-scales-case-desc">
+                  Anthropic 用 planner / generator / evaluator 三个 agent 协作 ——
+                  这是任务级。
+                </p>
+              </div>
+              <div class="v-scales-case">
+                <div class="v-scales-case-tag">组织级 · 例</div>
+                <div class="v-scales-case-name">7 人 / 5 月 / 100 万行代码</div>
+                <p class="v-scales-case-desc">
+                  OpenAI 一个团队 0 行手写、AGENTS.md 当目录、
+                  CI 当反馈 —— 组织级。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>判断在哪个尺度</strong>，只看：用几个 agent？这活有没有终点？
+            <em>不</em>看任务多复杂、多久。复杂度只是"把你往上推的力"。
+          </p>
+          <div class="viz-source">SOURCE · 综合 Anthropic / OpenAI / LangChain 三家定义而成</div>
+        </figure>
+
+        <div class="callout">
+          <strong>Harness 不是越大越好，是"刚好够用"。</strong>
+          模型一升级，本来需要任务级编排的活，可能塌回组件级一个 agent 就能干。
+          —— Anthropic 在官方文章里点出的关键。
+        </div>
+      </section>
+
+
+      <!-- ===== §6 跟提示词、上下文工程的区别 ===== -->
+      <section class="page-section he-reveal" id="sec-6" data-toc="跟提示词、上下文的关系">
+        <div class="page-section-eyebrow">§6 · 边界</div>
+        <h2>跟提示词工程、<br>上下文工程是什么关系？</h2>
+
+        <p>
+          这三个词经常被混用。它们的关系不是并列 —— 是<strong>层层嵌套</strong>。
+        </p>
+
+        <!-- Viz #6: 嵌套关系 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06 · nested concepts</div>
+            <h3 class="viz-title">提示词 ⊂ 上下文 ⊂ Harness</h3>
+            <p class="viz-sub">不是三个并排的学科，是同一件事被三次"发现它比我以为的大"。</p>
+          </div>
+
+          <div class="viz-stage v-nest">
+            <div class="v-nest-layer v-nest-outer">
+              <div class="v-nest-head">
+                <span class="v-nest-year">2026 ↑</span>
+                <span class="v-nest-name">Harness Engineering</span>
+              </div>
+              <p class="v-nest-desc">
+                模型外面整个运行时 —— 工具真实执行、主循环、沙箱、跨会话记忆、子 agent 编排、评测反馈。
+              </p>
+            </div>
+            <div class="v-nest-layer v-nest-mid">
+              <div class="v-nest-head">
+                <span class="v-nest-year">2024–25</span>
+                <span class="v-nest-name">Context Engineering · 上下文工程</span>
+              </div>
+              <p class="v-nest-desc">
+                管理整个上下文窗口里塞了什么 —— 检索资料、工具定义、记忆、对话历史、窗口压缩。
+              </p>
+            </div>
+            <div class="v-nest-layer v-nest-inner">
+              <div class="v-nest-head">
+                <span class="v-nest-year">2022–23</span>
+                <span class="v-nest-name">Prompt Engineering · 提示词工程</span>
+              </div>
+              <p class="v-nest-desc">
+                你能控制的只有发给模型的那段文字 —— system prompt、指令、few-shot 例子。
+              </p>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>关键不是记三个词，是看懂一件事</strong>：
+            每个新词把旧词整个包进去，再补上旧词看不见的部分。
+            提示词工程没有"消失" —— 它变成了 harness 最里面的一层。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §7 一句话总结 ===== -->
+      <section class="page-section he-reveal" id="sec-7" data-toc="一句话总结">
+        <div class="page-section-eyebrow">§7 · 一句话总结</div>
+        <blockquote>
+          <strong>Harness 是包在模型外面的那一整圈代码与结构</strong>，
+          它把被动的模型变成能干活的 agent；
+          它的构成可记成「<strong>转 · 知 · 做 · 检</strong>」；
+          它有「<strong>组件 / 任务 / 组织</strong>」三个尺度；
+          各家定义看似打架，其实只是站在这把"尺度尺"的不同刻度上。
+        </blockquote>
+
+        <h3>一手来源（本板块所有论断的出处）</h3>
+        <ul>
+          <li>Anthropic《Harness design for long-running application development》— <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noreferrer">anthropic.com</a></li>
+          <li>OpenAI《Harness engineering》— <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noreferrer">openai.com</a></li>
+          <li>LangChain《The Anatomy of an Agent Harness》— <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noreferrer">langchain.com</a></li>
+          <li>Thoughtworks / Martin Fowler《Harness Engineering》— <a href="https://martinfowler.com/articles/harness-engineering.html" target="_blank" rel="noreferrer">martinfowler.com</a></li>
+        </ul>
+      </section>
+
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="page-nav" aria-label="板块导航">
+        <a href="intro.html" class="page-nav-link">
+          <span class="page-nav-meta">↩ 返回</span>
+          <span class="page-nav-title">入门 · 本组总览</span>
+        </a>
+        <a href="02-history.html" class="page-nav-link is-next">
+          <span class="page-nav-meta">下一篇 →</span>
+          <span class="page-nav-title">② 它从哪来</span>
+        </a>
+      </nav>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/spotlight.js"></script>
+</body>
+</html>

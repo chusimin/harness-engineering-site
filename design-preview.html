@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>样式参考 · 浅色科技风 3 个方向</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=Source+Serif+Pro:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============ Preview 页面自身样式 ============ */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #ececef; }
+    body {
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      color: #1a1a1a;
+      padding: 48px 24px 96px;
+    }
+
+    .pv-head {
+      max-width: 980px;
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+    .pv-eyebrow {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .pv-title {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .pv-sub {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .pv-sub strong { color: #1a1a1a; }
+    .pv-instr {
+      display: inline-flex;
+      gap: 12px;
+      margin-top: 24px;
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid #d8d8db;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #444;
+    }
+    .pv-instr code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 2px 6px;
+      background: #f4f4f7;
+      border-radius: 4px;
+      color: #1a1a1a;
+    }
+
+    /* ============ 通用：方向卡片框架 ============ */
+    .dir {
+      max-width: 1200px;
+      margin: 0 auto 32px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(15, 23, 42, 0.08);
+      background: #fff;
+    }
+
+    .dir-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: #0f172a;
+      color: #fff;
+      gap: 16px;
+    }
+    .dir-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dir-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      display: grid;
+      place-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+    .dir-name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .dir-tag {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+    }
+    .dir-cite {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .dir-body {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      min-height: 480px;
+    }
+    .dir-stage {
+      position: relative;
+      padding: 56px 48px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .dir-meta {
+      padding: 32px;
+      background: #0a0a0a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .dir-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .dir-meta-label {
+      width: 64px;
+      flex-shrink: 0;
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .dir-meta-val {
+      flex: 1;
+      color: rgba(255,255,255,0.9);
+    }
+    .swatch-row { display: flex; gap: 8px; }
+    .swatch {
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .dir-mood {
+      margin-top: auto;
+      padding: 16px;
+      background: rgba(255,255,255,0.05);
+      border-left: 3px solid #06b6d4;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.9);
+      font-style: italic;
+    }
+    .dir-mood strong {
+      display: block;
+      color: #fff;
+      font-style: normal;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ============================================
+       方向 A · 极简精密派（Linear / Vercel 系）
+       ============================================ */
+    .dir-A .dir-stage {
+      background: #ffffff;
+      color: #0a0a0a;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(10,10,10,0.08) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+    .a-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border: 1px solid #ececec;
+      background: #fff;
+      border-radius: 999px;
+      font-size: 11px;
+      color: #5e6ad2;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    .a-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: #5e6ad2;
+      border-radius: 50%;
+    }
+    .a-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 48px;
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      color: #0a0a0a;
+      margin-bottom: 16px;
+    }
+    .a-sub {
+      font-size: 16px;
+      color: #6e6e6e;
+      line-height: 1.6;
+      margin-bottom: 28px;
+      max-width: 36ch;
+    }
+    .a-cta-row { display: flex; gap: 12px; }
+    .a-btn-primary {
+      padding: 10px 18px;
+      background: #0a0a0a;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+    .a-btn-ghost {
+      padding: 10px 18px;
+      background: transparent;
+      color: #0a0a0a;
+      border: 1px solid #ececec;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .a-card-row {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .a-card {
+      padding: 14px;
+      border: 1px solid #ececec;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 12px;
+    }
+    .a-card-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #5e6ad2;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .a-card-title { color: #0a0a0a; font-weight: 500; }
+
+    /* ============================================
+       方向 B · 学术杂志派（Stripe / Anthropic 系）
+       ============================================ */
+    .dir-B .dir-stage {
+      background: linear-gradient(180deg, #faf9f6 0%, #f5f3ee 100%);
+      color: #1a1a2e;
+      position: relative;
+    }
+    .dir-B .dir-stage::before {
+      content: '';
+      position: absolute;
+      top: -150px; right: -150px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(99,91,255,0.18) 0%, transparent 60%),
+                  radial-gradient(circle at 30% 70%, rgba(0,212,255,0.14) 0%, transparent 60%);
+      filter: blur(40px);
+      z-index: -1;
+    }
+    .b-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(0,0,0,0.06);
+      backdrop-filter: blur(8px);
+      border-radius: 4px;
+      font-family: 'Source Serif Pro', serif;
+      font-style: italic;
+      font-size: 12px;
+      color: #635bff;
+      margin-bottom: 24px;
+    }
+    .b-title {
+      font-family: 'Source Serif Pro', 'Inter', serif;
+      font-size: 52px;
+      font-weight: 700;
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+    .b-title .accent {
+      background: linear-gradient(120deg, #635bff 30%, #00d4ff 70%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-style: italic;
+    }
+    .b-zh {
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      font-size: 18px;
+      color: #635bff;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      margin-bottom: 18px;
+    }
+    .b-sub {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #44403c;
+      margin-bottom: 28px;
+      max-width: 38ch;
+    }
+    .b-cta-row { display: flex; gap: 12px; align-items: center; }
+    .b-btn-primary {
+      padding: 12px 22px;
+      background: linear-gradient(135deg, #635bff, #00d4ff);
+      color: #fff;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(99,91,255,0.32);
+    }
+    .b-arrow {
+      color: #635bff;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 1px;
+    }
+    .b-card-row {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .b-card {
+      padding: 14px;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 10px;
+      font-size: 12px;
+    }
+    .b-card-num {
+      font-family: 'Source Serif Pro', serif;
+      font-size: 11px;
+      font-style: italic;
+      color: #635bff;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .b-card-title { color: #1a1a2e; font-weight: 600; }
+
+    /* ============================================
+       方向 C · Apple 现代派
+       ============================================ */
+    .dir-C .dir-stage {
+      background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+      color: #1d1d1f;
+      position: relative;
+    }
+    .dir-C .dir-stage::before {
+      content: '';
+      position: absolute;
+      top: 30%; left: 20%;
+      width: 600px; height: 400px;
+      background:
+        radial-gradient(ellipse at 20% 40%, rgba(99,102,241,0.22) 0px, transparent 50%),
+        radial-gradient(ellipse at 70% 60%, rgba(6,182,212,0.20) 0px, transparent 50%),
+        radial-gradient(ellipse at 50% 90%, rgba(139,92,246,0.18) 0px, transparent 50%);
+      filter: blur(60px);
+      z-index: -1;
+      animation: c-orb-drift 12s ease-in-out infinite;
+    }
+    @keyframes c-orb-drift {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50%      { transform: translate(60px,-30px) scale(1.1); }
+    }
+    .c-eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: #6e6e73;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .c-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 72px;
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.045em;
+      color: #1d1d1f;
+      margin-bottom: 20px;
+    }
+    .c-title-line {
+      display: block;
+      background: linear-gradient(120deg, #6366f1 0%, #8b5cf6 40%, #06b6d4 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 100%;
+      animation: c-gradient-flow 6s ease-in-out infinite;
+    }
+    @keyframes c-gradient-flow {
+      0%, 100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+    .c-sub {
+      font-size: 17px;
+      color: #6e6e73;
+      line-height: 1.5;
+      margin-bottom: 32px;
+      max-width: 38ch;
+    }
+    .c-cta-row { display: flex; gap: 12px; align-items: center; }
+    .c-btn-primary {
+      padding: 14px 28px;
+      background: #1d1d1f;
+      color: #fff;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .c-btn-primary:hover {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      box-shadow: 0 12px 32px rgba(99,102,241,0.4);
+    }
+    .c-btn-ghost {
+      padding: 14px 24px;
+      background: transparent;
+      color: #1d1d1f;
+      border: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .c-card-row {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .c-card {
+      padding: 16px;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0,0,0,0.04);
+      border-radius: 18px;
+      font-size: 12px;
+      box-shadow: 0 8px 24px rgba(99,102,241,0.06);
+    }
+    .c-card-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #6366f1;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .c-card-title { color: #1d1d1f; font-weight: 600; font-size: 13px; }
+
+    /* ============ 底部说明 ============ */
+    .pv-foot {
+      max-width: 980px;
+      margin: 48px auto 0;
+      padding: 24px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e0e0e3;
+    }
+    .pv-foot h3 { font-size: 16px; margin-bottom: 12px; }
+    .pv-foot ul { list-style: none; padding: 0; }
+    .pv-foot li {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f0f0f3;
+      font-size: 14px;
+      color: #444;
+    }
+    .pv-foot li:last-child { border-bottom: none; }
+    .pv-foot li strong { color: #1a1a1a; }
+    .pv-foot li code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #f4f4f7;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ============ 响应式 ============ */
+    @media (max-width: 840px) {
+      .dir-body { grid-template-columns: 1fr; }
+      .dir-stage { padding: 32px 24px; }
+      .dir-meta { padding: 24px; }
+      .a-title { font-size: 36px; }
+      .b-title { font-size: 40px; }
+      .c-title { font-size: 48px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="pv-head">
+    <div class="pv-eyebrow">STYLE PREVIEW</div>
+    <h1 class="pv-title">浅色科技风 · 3 个方向对比</h1>
+    <p class="pv-sub">
+      都是<strong>浅色 + 科技感 + 简约</strong>，但"性格"截然不同。
+      每张样板都是一个 mini hero + 3 张卡片 + token 摘要，
+      看你被哪个"勾住"了。
+    </p>
+    <div class="pv-instr">
+      告诉我 <code>A</code> 或 <code>B</code> 或 <code>C</code>，或者 <code>混搭：A 的字体 + C 的渐变</code>
+    </div>
+  </header>
+
+
+  <!-- ============ 方向 A ============ -->
+  <article class="dir dir-A">
+    <header class="dir-header">
+      <div class="dir-label">
+        <span class="dir-num">A</span>
+        <span class="dir-name">极简精密派</span>
+        <span class="dir-tag">克制 · 可信 · 工程感</span>
+      </div>
+      <span class="dir-cite">参考：Linear · Vercel · Notion</span>
+    </header>
+
+    <div class="dir-body">
+      <div class="dir-stage">
+        <div class="a-eyebrow">2026 · 写给 AI 产品经理</div>
+        <h2 class="a-title">包在模型外面的<br>那一整圈代码。</h2>
+        <p class="a-sub">Harness Engineering · 驾驭工程。一份关于该概念的最全参考资料。</p>
+        <div class="a-cta-row">
+          <button class="a-btn-primary">开始阅读 →</button>
+          <button class="a-btn-ghost">全部板块</button>
+        </div>
+        <div class="a-card-row">
+          <div class="a-card"><div class="a-card-num">01</div><div class="a-card-title">它是什么</div></div>
+          <div class="a-card"><div class="a-card-num">02</div><div class="a-card-title">它从哪来</div></div>
+          <div class="a-card"><div class="a-card-num">03</div><div class="a-card-title">解剖学</div></div>
+        </div>
+      </div>
+
+      <aside class="dir-meta">
+        <div class="dir-meta-row"><span class="dir-meta-label">配色</span>
+          <span class="swatch-row">
+            <span class="swatch" style="background:#ffffff;border-color:#444;"></span>
+            <span class="swatch" style="background:#fafafa;"></span>
+            <span class="swatch" style="background:#ececec;"></span>
+            <span class="swatch" style="background:#0a0a0a;"></span>
+            <span class="swatch" style="background:#5e6ad2;"></span>
+          </span>
+        </div>
+        <div class="dir-meta-row"><span class="dir-meta-label">主色</span>
+          <span class="dir-meta-val">柔黑 + Linear indigo · 不引第二色</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">字体</span>
+          <span class="dir-meta-val">Inter 500/600/700 · 无衬线</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">圆角</span>
+          <span class="dir-meta-val">6–10px · 偏直</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">阴影</span>
+          <span class="dir-meta-val">几乎无 · 靠 border 划界</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">动效</span>
+          <span class="dir-meta-val">L1+ 微 hover · 大字 mask reveal · 鼠标光斑</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">装饰</span>
+          <span class="dir-meta-val">点状网格背景 · 仅一处 accent glow</span></div>
+
+        <div class="dir-mood">
+          <strong>调性</strong>
+          白纸上的工程蓝图。靠字号、留白和精密对齐说话，
+          炫酷不靠堆装饰，靠"一寸都不浪费"的版式精度。
+          最显"专业感"，最容易获得面试官信任。
+        </div>
+      </aside>
+    </div>
+  </article>
+
+
+  <!-- ============ 方向 B ============ -->
+  <article class="dir dir-B">
+    <header class="dir-header">
+      <div class="dir-label">
+        <span class="dir-num">B</span>
+        <span class="dir-name">学术杂志派</span>
+        <span class="dir-tag">温暖 · 权威 · 高品质</span>
+      </div>
+      <span class="dir-cite">参考：Stripe · Anthropic · Vercel Blog</span>
+    </header>
+
+    <div class="dir-body">
+      <div class="dir-stage">
+        <div class="b-eyebrow">A field guide · 2026</div>
+        <h2 class="b-title">Harness <span class="accent">Engineering</span></h2>
+        <div class="b-zh">驾驭工程 · 写给 AI 产品经理的最全参考</div>
+        <p class="b-sub">包在模型外面的那一整圈代码与结构。把被动的模型变成能干活的 agent。</p>
+        <div class="b-cta-row">
+          <button class="b-btn-primary">Start Reading</button>
+          <a class="b-arrow">View all 10 chapters →</a>
+        </div>
+        <div class="b-card-row">
+          <div class="b-card"><div class="b-card-num">Chapter 01</div><div class="b-card-title">What it is</div></div>
+          <div class="b-card"><div class="b-card-num">Chapter 02</div><div class="b-card-title">Origin</div></div>
+          <div class="b-card"><div class="b-card-num">Chapter 03</div><div class="b-card-title">Anatomy</div></div>
+        </div>
+      </div>
+
+      <aside class="dir-meta">
+        <div class="dir-meta-row"><span class="dir-meta-label">配色</span>
+          <span class="swatch-row">
+            <span class="swatch" style="background:#faf9f6;"></span>
+            <span class="swatch" style="background:#f5f3ee;"></span>
+            <span class="swatch" style="background:#1a1a2e;"></span>
+            <span class="swatch" style="background:#635bff;"></span>
+            <span class="swatch" style="background:#00d4ff;"></span>
+          </span>
+        </div>
+        <div class="dir-meta-row"><span class="dir-meta-label">主色</span>
+          <span class="dir-meta-val">墨黑 + 紫蓝渐变 · 暖底色温</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">字体</span>
+          <span class="dir-meta-val">Source Serif Pro（标题）+ Inter（正文）</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">圆角</span>
+          <span class="dir-meta-val">10–14px · 中等</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">阴影</span>
+          <span class="dir-meta-val">柔和彩色阴影（蓝紫调）</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">动效</span>
+          <span class="dir-meta-val">L2 滚动 reveal · 卡片浮起 · hero 渐变光斑</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">装饰</span>
+          <span class="dir-meta-val">右上角渐变光晕 · 衬线 italic 强调</span></div>
+
+        <div class="dir-mood">
+          <strong>调性</strong>
+          高品质工程博客 + 学术 paper 的精致感。
+          暖白底让阅读不刺眼，衬线字让"它是一份认真的指南"。
+          看起来"有钱有品味"，权威感最强。
+        </div>
+      </aside>
+    </div>
+  </article>
+
+
+  <!-- ============ 方向 C ============ -->
+  <article class="dir dir-C">
+    <header class="dir-header">
+      <div class="dir-label">
+        <span class="dir-num">C</span>
+        <span class="dir-name">Apple 现代派</span>
+        <span class="dir-tag">炫酷 · 产品感 · 大字 · 渐变</span>
+      </div>
+      <span class="dir-cite">参考：Apple · Framer · OpenAI</span>
+    </header>
+
+    <div class="dir-body">
+      <div class="dir-stage">
+        <div class="c-eyebrow">HARNESS ENGINEERING · 2026</div>
+        <h2 class="c-title">
+          <span class="c-title-line">驾驭</span>
+          <span>大模型。</span>
+        </h2>
+        <p class="c-sub">包在模型外面的那一整圈代码 —— 写给 AI 产品经理的最全参考。</p>
+        <div class="c-cta-row">
+          <button class="c-btn-primary">开始阅读</button>
+          <button class="c-btn-ghost">查看全部 →</button>
+        </div>
+        <div class="c-card-row">
+          <div class="c-card"><div class="c-card-num">01 · 入门</div><div class="c-card-title">它是什么</div></div>
+          <div class="c-card"><div class="c-card-num">02 · 入门</div><div class="c-card-title">它从哪来</div></div>
+          <div class="c-card"><div class="c-card-num">03 · 深入</div><div class="c-card-title">解剖学</div></div>
+        </div>
+      </div>
+
+      <aside class="dir-meta">
+        <div class="dir-meta-row"><span class="dir-meta-label">配色</span>
+          <span class="swatch-row">
+            <span class="swatch" style="background:#ffffff;border-color:#444;"></span>
+            <span class="swatch" style="background:#f5f5f7;"></span>
+            <span class="swatch" style="background:#1d1d1f;"></span>
+            <span class="swatch" style="background:linear-gradient(135deg,#6366f1,#06b6d4);"></span>
+            <span class="swatch" style="background:#8b5cf6;"></span>
+          </span>
+        </div>
+        <div class="dir-meta-row"><span class="dir-meta-label">主色</span>
+          <span class="dir-meta-val">苹果黑 + 紫蓝青渐变 · 雾灰底</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">字体</span>
+          <span class="dir-meta-val">Inter Display 800（巨字）+ Inter 400</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">圆角</span>
+          <span class="dir-meta-val">18–24px · 偏圆，柔和</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">阴影</span>
+          <span class="dir-meta-val">蓝紫调淡光 · 玻璃质感卡</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">动效</span>
+          <span class="dir-meta-val">L2-L3 巨字 reveal · 渐变流动 · 鼠标 spotlight · 卡片 3D tilt</span></div>
+        <div class="dir-meta-row"><span class="dir-meta-label">装饰</span>
+          <span class="dir-meta-val">浮动彩色光球 · 渐变流动文字 · glassmorphism</span></div>
+
+        <div class="dir-mood">
+          <strong>调性</strong>
+          打开就是"卧槽"的视觉冲击。
+          巨型大字 + 渐变流动 + 鼠标光斑 + 玻璃卡片。
+          最炫酷、最"产品发布会"感、最适合做教育市场的传播物料。
+        </div>
+      </aside>
+    </div>
+  </article>
+
+
+  <!-- ============ 底部说明 ============ -->
+  <section class="pv-foot">
+    <h3>怎么挑（写给思敏）</h3>
+    <ul>
+      <li>🅰️ <strong>选 A</strong>：如果目标是"让面试官 / HR / 工程师一眼觉得你专业"。最克制，最像 Linear / Vercel 的官方文档。</li>
+      <li>🅱️ <strong>选 B</strong>：如果想要"高品质 + 有温度"，像 Anthropic / Stripe 的工程博客。衬线字会显得"是一份认真的研究"。</li>
+      <li>🅲 <strong>选 C</strong>：如果想要<strong>最炫酷</strong>，符合"AI 产品经理课程发布物"的传播效果。Hero 一秒抓眼球。</li>
+      <li>🔀 <strong>混搭也行</strong>：例如 <code>C 的炫酷 hero + A 的克制内页</code>（首页爆点 + 内页可读性），或 <code>C 的渐变 + B 的衬线标题</code>。</li>
+    </ul>
+  </section>
+
+</body>
+</html>

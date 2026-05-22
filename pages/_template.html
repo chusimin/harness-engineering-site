@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--
+  ┌──────────────────────────────────────────────────────────────┐
+  │ 板块页面模板 — 未来扩展用                                      │
+  │                                                              │
+  │ 加一个新板块（或新实战案例）的步骤：                            │
+  │ 1. 复制本文件，重命名为 NN-slug.html（如 10-eval.html）        │
+  │ 2. 改 <title> / .page-eyebrow / .page-title / .page-lead       │
+  │ 3. 在 ../assets/js/layout.js 的 SECTIONS 数组里加一条          │
+  │    （新页面自动出现在 nav 下拉、首页卡片、footer 链接里）        │
+  │ 4. 把主内容写在 <main class="page-body"> 里                    │
+  └──────────────────────────────────────────────────────────────┘
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>板块标题 · Harness Engineering</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/page.css">
+</head>
+<body>
+
+  <header class="page-hero">
+    <div class="he-container-narrow">
+      <a href="../index.html" class="page-back">← 返回首页</a>
+      <div class="page-eyebrow">
+        <span class="page-eyebrow-num">板块 NN</span>
+        <span class="page-eyebrow-group">分组</span>
+      </div>
+      <h1 class="he-h1 page-title">板块标题</h1>
+      <p class="he-lead page-lead">板块一句话导语 —— 这块讲清楚什么。</p>
+    </div>
+  </header>
+
+  <main class="page-body he-container-narrow">
+
+    <!-- 在这里写板块主内容 -->
+    <p>板块内容写在这里。可以用 .he-h2 / .he-h3 / .he-h4 标题，普通 &lt;p&gt; 段落自动样式。</p>
+
+  </main>
+
+  <script src="../assets/js/layout.js"></script>
+</body>
+</html>

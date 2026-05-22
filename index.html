@@ -450,6 +450,147 @@
       margin-right: 8px;
     }
 
+    /* ======== FLOW (6-component loop diagram) ======== */
+    .flow-wrap {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 24px;
+      align-items: stretch;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px;
+      background: var(--bg-card);
+      border: 1px solid rgba(222, 219, 200, 0.08);
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .flow-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(800px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.06) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .flow-wrap:hover::before { opacity: 1; }
+
+    /* Left vertical "return" tag */
+    .flow-loop-tag {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--cream);
+      padding: 12px 8px;
+      border-left: 1px dashed rgba(222, 219, 200, 0.3);
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Steps column */
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+      position: relative;
+      z-index: 1;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      background: rgba(222, 219, 200, 0.025);
+      border: 1px solid rgba(222, 219, 200, 0.08);
+      border-radius: 14px;
+      transition: all 0.4s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .flow-step::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(222, 219, 200, 0.1) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .flow-step:hover::before { opacity: 1; }
+    .flow-step:hover {
+      border-color: rgba(222, 219, 200, 0.25);
+      transform: translateX(4px);
+    }
+    .flow-step-num {
+      flex-shrink: 0;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--cream);
+      color: #000;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .flow-step-body { flex: 1; min-width: 0; position: relative; z-index: 1; }
+    .flow-step-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--cream-text);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .flow-step-desc {
+      font-size: 13px;
+      color: var(--cream-dim);
+      line-height: 1.5;
+    }
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 6px 0;
+      color: var(--gray-600);
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+    .flow-arrow span {
+      color: var(--gray-500);
+      font-size: 11px;
+    }
+
+    /* Right rail: observability sidebar */
+    .flow-side-rail {
+      writing-mode: vertical-rl;
+      padding: 16px 12px;
+      background: rgba(222, 219, 200, 0.02);
+      border: 1px dashed rgba(222, 219, 200, 0.15);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: stretch;
+    }
+    .flow-side-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--cream-dim);
+      font-weight: 500;
+    }
+
     /* ======== RESPONSIVE ======== */
     @media (max-width: 1024px) {
       .hero-content { grid-template-columns: 1fr; gap: 24px; padding: 32px; }
@@ -459,6 +600,8 @@
       .what-wrap { grid-template-columns: 1fr; gap: 48px; }
       .boards-grid { grid-template-columns: 1fr 1fr; }
       .section { padding: 80px 24px; }
+      .flow-wrap { grid-template-columns: 1fr; padding: 24px; }
+      .flow-loop-tag, .flow-side-rail { writing-mode: horizontal-tb; transform: none; border: 1px dashed rgba(222,219,200,0.2); border-radius: 10px; padding: 10px; text-align: center; }
     }
     @media (max-width: 768px) {
       .hero { padding: 8px; }
@@ -484,11 +627,11 @@
       <span class="topnav-brand-text">驾驭工程</span>
     </a>
     <a href="pages/what.html" class="topnav-link">是什么</a>
+    <a href="pages/history.html" class="topnav-link">谱系</a>
     <a href="pages/why.html" class="topnav-link">为什么</a>
     <a href="pages/anatomy.html" class="topnav-link">解剖</a>
     <a href="pages/vendors.html" class="topnav-link">厂商</a>
     <a href="pages/method.html" class="topnav-link">方法</a>
-    <a href="pages/history.html" class="topnav-link">谱系</a>
     <a href="pages/resources.html" class="topnav-link">资源</a>
   </nav>
 
@@ -526,7 +669,157 @@
     </div>
   </section>
 
-  <!-- WHY (为什么需要 harness) -->
+  <!-- ============================================
+       NEW ORDER: WHAT (是什么) → FLOW (六大组件) → WHY (为什么) → BOARDS
+       ============================================ -->
+
+  <!-- WHAT (是什么) — MOVED FIRST -->
+  <section class="section" id="what" style="background: linear-gradient(180deg, transparent, rgba(222,219,200,0.015), transparent);">
+    <div class="section-inner">
+      <div class="section-header">
+        <div class="eyebrow reveal"><span class="eyebrow-dot"></span> WHAT · 是什么</div>
+        <h2 class="section-title reveal reveal-d1">一句话<br>讲<em>清楚</em></h2>
+        <p class="section-subtitle reveal reveal-d2">
+          Agent = Model + Harness。模型负责"想"，harness 负责让它"能干活"。
+        </p>
+      </div>
+
+      <div class="what-wrap">
+        <div class="what-left">
+          <div class="formula reveal reveal-d1">
+            <div class="formula-row">
+              <span class="formula-chip">Agent</span>
+              <span class="formula-op">=</span>
+              <span class="formula-chip">Model</span>
+              <span class="formula-op">+</span>
+              <span class="formula-chip">Harness</span>
+            </div>
+          </div>
+
+          <div class="what-text reveal reveal-d2">
+            <p>
+              <strong>Harness（驾驭套件）</strong>= 包在模型外面、把被动模型变成能干活 Agent 的那一整圈代码与结构。
+            </p>
+            <p>
+              它有三个尺度 —— <strong>组件级</strong>（裹一次模型调用）⊂ <strong>任务级</strong>（编排多 Agent 干成一件有终点的事）⊂ <strong>组织级</strong>（罩一支 Agent 队伍 + 一个长期产品）。
+            </p>
+            <p style="font-size: 14px; color: var(--gray-500); margin-top: 24px;">
+              三个尺度的定义不冲突，只是站在"尺度尺"的不同刻度上。
+              <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
+              <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler</a>
+            </p>
+          </div>
+
+          <div style="margin-top: 32px;" class="reveal reveal-d3">
+            <a href="pages/what.html" class="btn btn-primary">
+              点开看 3 个生成式 UI 演示
+              <span class="btn-primary-arrow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E1E0CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div class="what-right reveal reveal-d3">
+          <div class="rings">
+            <div class="ring ring-org">
+              <span class="ring-label">组织级 · ORGANIZATIONAL</span>
+            </div>
+            <div class="ring ring-task">
+              <span class="ring-label">任务级 · TASK</span>
+            </div>
+            <div class="ring ring-comp">
+              <span class="ring-label">组件级<br>COMPONENT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOW (六大组件 — 一轮循环) -->
+  <section class="section" id="flow">
+    <div class="section-inner">
+      <div class="section-header">
+        <div class="eyebrow reveal"><span class="eyebrow-dot"></span> COMPONENTS · 六大组件</div>
+        <h2 class="section-title reveal reveal-d1">运行时 ·<br><em>一轮循环</em></h2>
+        <p class="section-subtitle reveal reveal-d2">
+          一个 harness 内部其实是这 6 个部件按顺序在跑，跑完一圈、判断要不要再跑一圈。
+        </p>
+      </div>
+
+      <div class="flow-wrap reveal reveal-d3" data-glow>
+        <!-- Left side: loop indicator -->
+        <div class="flow-loop-tag">结果回流 · 下一圈 ↻</div>
+
+        <!-- Steps stack -->
+        <div class="flow-steps">
+          <div class="flow-step" data-glow>
+            <div class="flow-step-num">1</div>
+            <div class="flow-step-body">
+              <div class="flow-step-title">上下文管理</div>
+              <div class="flow-step-desc">装桌面：system prompt + 对话历史 + 工具列表 → 模型此刻看见的一切</div>
+            </div>
+          </div>
+          <div class="flow-arrow">↓ <span>查记忆，补进桌面</span></div>
+
+          <div class="flow-step" data-glow>
+            <div class="flow-step-num">2</div>
+            <div class="flow-step-body">
+              <div class="flow-step-title">记忆系统</div>
+              <div class="flow-step-desc">从记忆库调取长期事实（用户偏好、历史决策…）补入上下文</div>
+            </div>
+          </div>
+          <div class="flow-arrow">↓ <span>桌面装好，交给模型</span></div>
+
+          <div class="flow-step" data-glow>
+            <div class="flow-step-num">3</div>
+            <div class="flow-step-body">
+              <div class="flow-step-title">Agent 循环</div>
+              <div class="flow-step-desc">模型思考，决定下一步：输出一个 tool call 或最终回答</div>
+            </div>
+          </div>
+          <div class="flow-arrow">↓ <span>tool call 先过安检</span></div>
+
+          <div class="flow-step" data-glow>
+            <div class="flow-step-num">4</div>
+            <div class="flow-step-body">
+              <div class="flow-step-title">执行边界</div>
+              <div class="flow-step-desc">沙箱检查 → 审批策略 → Hook：放行 / 拦截 / 问人</div>
+            </div>
+          </div>
+          <div class="flow-arrow">↓ <span>放行后，真正执行</span></div>
+
+          <div class="flow-step" data-glow>
+            <div class="flow-step-num">5</div>
+            <div class="flow-step-body">
+              <div class="flow-step-title">工具生态</div>
+              <div class="flow-step-desc">调用 API / 读写文件 / 发消息… → 拿到结果</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right side: observability rail -->
+        <div class="flow-side-rail">
+          <span class="flow-side-label">⑥ 评测 + 全程可观测 · Trace · 成本 · 告警</span>
+        </div>
+      </div>
+
+      <div class="flow-summary reveal" style="margin-top: 40px;">
+        <p style="font-family: var(--font-mono); font-size: 14px; color: var(--cream-text); text-align: center; letter-spacing: 0.04em;">
+          装桌面 → 补记忆 → 模型想 → 过安检 → 动手做 → 结果回流 → <span style="color: var(--cream);">再来一圈</span>
+        </p>
+        <p style="text-align: center; font-size: 14px; color: var(--gray-500); margin-top: 12px;">
+          任务没完，循环继续；任务完成或触发缰绳，循环停。<br>
+          <span style="font-size: 13px;">评测 + 可观测全程在外围记录、监控、告警。</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY (为什么需要 harness) — MOVED AFTER WHAT -->
   <section class="section" id="why">
     <div class="section-inner">
       <div class="section-header">
@@ -614,67 +907,6 @@
           <a class="cite" href="https://openai.com/index/harness-engineering/" target="_blank">OpenAI 2026</a>
           先后定义了这个领域。
         </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHAT (是什么) -->
-  <section class="section" id="what" style="background: linear-gradient(180deg, transparent, rgba(222,219,200,0.015), transparent);">
-    <div class="section-inner">
-      <div class="section-header">
-        <div class="eyebrow reveal"><span class="eyebrow-dot"></span> WHAT · 是什么</div>
-        <h2 class="section-title reveal reveal-d1">一句话<br>讲<em>清楚</em></h2>
-        <p class="section-subtitle reveal reveal-d2">
-          Agent = Model + Harness。模型负责"想"，harness 负责让它"能干活"。
-        </p>
-      </div>
-
-      <div class="what-wrap">
-        <div class="what-left">
-          <div class="formula reveal reveal-d1">
-            <div class="formula-row">
-              <span class="formula-chip">Agent</span>
-              <span class="formula-op">=</span>
-              <span class="formula-chip">Model</span>
-              <span class="formula-op">+</span>
-              <span class="formula-chip">Harness</span>
-            </div>
-          </div>
-
-          <div class="what-text reveal reveal-d2">
-            <p>
-              <strong>Harness（驾驭套件）</strong>= 包在模型外面、把被动模型变成能干活 Agent 的那一整圈代码与结构。
-            </p>
-            <p>
-              它有三个尺度 —— <strong>组件级</strong>（裹一次模型调用）⊂ <strong>任务级</strong>（编排多 Agent 干成一件有终点的事）⊂ <strong>组织级</strong>（罩一支 Agent 队伍 + 一个长期产品）。
-            </p>
-            <p style="font-size: 14px; color: var(--gray-500); margin-top: 24px;">
-              三个尺度的定义不冲突，只是站在"尺度尺"的不同刻度上。
-              <a class="cite" href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">LangChain</a>
-              <a class="cite" href="https://martinfowler.com/articles/harness-engineering.html" target="_blank">Martin Fowler</a>
-            </p>
-          </div>
-
-          <div style="margin-top: 32px;" class="reveal reveal-d3">
-            <a href="pages/what.html" class="btn btn-ghost">
-              进入是什么板块 →
-            </a>
-          </div>
-        </div>
-
-        <div class="what-right reveal reveal-d3">
-          <div class="rings">
-            <div class="ring ring-org">
-              <span class="ring-label">组织级 · ORGANIZATIONAL</span>
-            </div>
-            <div class="ring ring-task">
-              <span class="ring-label">任务级 · TASK</span>
-            </div>
-            <div class="ring ring-comp">
-              <span class="ring-label">组件级<br>COMPONENT</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </section>

@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⑧ 职业 & 面试 · Harness Engineering</title>
+  <meta name="description" content="AIPM 薪资地图、职业阶梯、8 道高频面试题、简历改造 —— 把 harness 知识变成求职竞争力">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/page.css">
+
+  <style>
+    /* ============================================
+       本页可视化专用样式（仅 ⑧ 职业 & 面试 用）
+       ============================================ */
+
+    /* ---- Viz 1: AI PM 能力栈（5 层） ---- */
+    .v-stack {
+      display: grid;
+      gap: var(--sp-2);
+    }
+    .v-stack-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 100px 100px;
+      gap: var(--sp-3);
+      align-items: center;
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .v-stack-row:hover {
+      border-color: var(--he-accent);
+      transform: translateX(4px);
+    }
+    .v-stack-row.is-highlight {
+      border-color: transparent;
+      background: var(--he-bg);
+      box-shadow: 0 0 0 1px var(--c-indigo-a24), 0 8px 32px var(--c-indigo-a16);
+      animation: v-stack-pulse 3s ease-in-out infinite;
+    }
+    @keyframes v-stack-pulse {
+      0%, 100% { box-shadow: 0 0 0 1px var(--c-indigo-a24), 0 8px 32px var(--c-indigo-a16); }
+      50%      { box-shadow: 0 0 0 1px rgba(94,106,210,.4), 0 16px 48px var(--c-indigo-a24); }
+    }
+    .v-stack-level {
+      font-family: var(--he-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-stack-name {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+    }
+    .v-stack-pop, .v-stack-premium {
+      font-size: var(--he-text-xs);
+      text-align: center;
+      padding: 4px 8px;
+      border-radius: var(--he-radius-sm);
+    }
+    .v-stack-pop {
+      background: var(--he-bg-subtle);
+      color: var(--he-text-muted);
+    }
+    .v-stack-premium {
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-stack-premium.is-none { background: var(--he-bg-muted); color: var(--he-text-subtle); }
+    .v-stack-premium.is-low { background: rgba(94,106,210,0.08); color: var(--he-text-muted); }
+    .v-stack-premium.is-high { background: rgba(94,106,210,0.18); color: var(--he-accent); }
+    .v-stack-header {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-subtle);
+      padding: 0 var(--sp-5);
+      display: grid;
+      grid-template-columns: 120px 1fr 100px 100px;
+      gap: var(--sp-3);
+    }
+
+    /* ---- Viz 2: 薪资段地图 ---- */
+    .v-salary {
+      display: grid;
+      gap: var(--sp-3);
+    }
+    .v-salary-tier {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: var(--sp-4);
+      align-items: start;
+      padding: var(--sp-5) var(--sp-6);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+    }
+    .v-salary-tier:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-salary-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+    .v-salary-range {
+      font-family: var(--he-font-mono);
+      font-size: 22px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-display);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .v-salary-label {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      text-align: center;
+    }
+    .v-salary-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--he-bg-muted);
+      width: 100%;
+      margin-top: var(--sp-1);
+      overflow: hidden;
+    }
+    .v-salary-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--he-accent);
+      transition: width 1.2s var(--he-ease-out);
+    }
+    .v-salary-right {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .v-salary-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .v-salary-skill {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      background: var(--he-bg-subtle);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-sm);
+      color: var(--he-text-body);
+      transition: all var(--he-dur-fast);
+    }
+    .v-salary-skill.is-key {
+      background: var(--he-accent-soft);
+      border-color: var(--c-indigo-a24);
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-salary-resume {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .v-salary-jump {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-md);
+      font-size: var(--he-text-sm);
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-salary-jump svg { flex-shrink: 0; }
+
+    /* ---- Viz 3: 职业阶梯 ---- */
+    .v-ladder {
+      position: relative;
+      display: grid;
+      gap: 0;
+    }
+    .v-ladder-step {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: var(--sp-4);
+      padding: var(--sp-5) 0;
+      position: relative;
+    }
+    .v-ladder-step:not(:last-child) {
+      border-bottom: 1px dashed var(--he-border);
+    }
+    .v-ladder-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-1);
+    }
+    .v-ladder-dot {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--he-bg);
+      border: 2px solid var(--he-border);
+      display: grid;
+      place-items: center;
+      font-family: var(--he-font-mono);
+      font-size: 13px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-text-muted);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+      position: relative;
+      z-index: 1;
+    }
+    .v-ladder-step:hover .v-ladder-dot {
+      border-color: var(--he-accent);
+      color: var(--he-accent);
+      box-shadow: 0 0 0 4px var(--he-accent-soft);
+    }
+    .v-ladder-step.is-active .v-ladder-dot {
+      background: var(--he-accent);
+      border-color: var(--he-accent);
+      color: #fff;
+      box-shadow: 0 0 0 6px var(--he-accent-soft);
+    }
+    .v-ladder-line {
+      width: 2px;
+      flex-grow: 1;
+      background: var(--he-border);
+      margin: 4px auto 0;
+    }
+    .v-ladder-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .v-ladder-title {
+      font-size: var(--he-text-h4);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      letter-spacing: -0.01em;
+    }
+    .v-ladder-desc {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-snug);
+    }
+    .v-ladder-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: var(--sp-1);
+    }
+    .v-ladder-tag {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      background: var(--he-accent-soft);
+      border-radius: var(--he-radius-sm);
+      color: var(--he-accent);
+    }
+
+    /* ---- Viz 4: 面试题卡片（翻转） ---- */
+    .v-interview {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-4);
+    }
+    .v-interview-card {
+      perspective: 800px;
+      min-height: 260px;
+      cursor: pointer;
+    }
+    .v-interview-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      transition: transform 0.6s var(--he-ease-out);
+      transform-style: preserve-3d;
+    }
+    .v-interview-card.is-flipped .v-interview-inner {
+      transform: rotateY(180deg);
+    }
+    .v-interview-front,
+    .v-interview-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: var(--he-radius-md);
+      padding: var(--sp-5);
+      display: flex;
+      flex-direction: column;
+    }
+    .v-interview-front {
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      transition: border-color var(--he-dur-base);
+    }
+    .v-interview-card:hover .v-interview-front {
+      border-color: var(--he-accent);
+    }
+    .v-interview-back {
+      background: var(--he-text-display);
+      color: var(--he-text-inverse);
+      transform: rotateY(180deg);
+      overflow-y: auto;
+    }
+    .v-interview-num {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+      margin-bottom: var(--sp-2);
+    }
+    .v-interview-q {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      line-height: var(--he-leading-snug);
+      flex-grow: 1;
+    }
+    .v-interview-weak {
+      margin-top: var(--sp-3);
+      padding: var(--sp-3);
+      background: var(--he-bg-subtle);
+      border-radius: var(--he-radius-sm);
+      font-size: var(--he-text-xs);
+      color: var(--he-text-muted);
+      line-height: 1.5;
+    }
+    .v-interview-weak-label {
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-subtle);
+      margin-bottom: 2px;
+    }
+    .v-interview-flip-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: var(--sp-3);
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--he-accent);
+      opacity: 0.7;
+    }
+    .v-interview-back-num {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: var(--sp-2);
+    }
+    .v-interview-back-label {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: var(--sp-2);
+    }
+    .v-interview-a {
+      font-size: var(--he-text-sm);
+      color: rgba(255,255,255,0.92);
+      line-height: var(--he-leading-relaxed);
+      flex-grow: 1;
+    }
+    .v-interview-a strong { color: #fff; }
+    .v-interview-bonus {
+      margin-top: var(--sp-3);
+      padding-top: var(--sp-3);
+      border-top: 1px solid rgba(255,255,255,0.15);
+      font-size: var(--he-text-xs);
+      color: rgba(255,255,255,0.6);
+      line-height: 1.5;
+    }
+    .v-interview-bonus-label {
+      display: block;
+      font-family: var(--he-font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ---- Viz 5: 简历对比（Before / After） ---- */
+    .v-resume {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+    .v-resume-col {
+      padding: var(--sp-5);
+      border-radius: var(--he-radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+    .v-resume-before {
+      background: var(--he-bg);
+      border: 1px dashed rgba(220,60,60,0.3);
+    }
+    .v-resume-after {
+      background: var(--he-bg);
+      border: 1px solid var(--c-indigo-a24);
+      box-shadow: 0 4px 24px var(--c-indigo-a8);
+    }
+    .v-resume-tag {
+      display: inline-flex;
+      align-self: flex-start;
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: var(--he-radius-sm);
+      font-weight: var(--he-weight-semibold);
+    }
+    .v-resume-before .v-resume-tag {
+      background: rgba(220,60,60,0.08);
+      color: rgba(220,60,60,0.7);
+    }
+    .v-resume-after .v-resume-tag {
+      background: var(--he-accent-soft);
+      color: var(--he-accent);
+    }
+    .v-resume-text {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-body);
+      line-height: var(--he-leading-relaxed);
+    }
+    .v-resume-text strong { color: var(--he-text-display); }
+    .v-resume-text .v-strike {
+      text-decoration: line-through;
+      color: var(--he-text-subtle);
+    }
+    .v-resume-rules {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+      margin-top: var(--sp-4);
+    }
+    .v-resume-rule {
+      padding: var(--sp-4);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      text-align: center;
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-resume-rule:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-resume-rule-num {
+      font-family: var(--he-font-mono);
+      font-size: 20px;
+      font-weight: var(--he-weight-bold);
+      color: var(--he-accent);
+      margin-bottom: var(--sp-2);
+    }
+    .v-resume-rule-old {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-subtle);
+      text-decoration: line-through;
+      margin-bottom: 4px;
+    }
+    .v-resume-rule-arrow {
+      font-family: var(--he-font-mono);
+      font-size: 14px;
+      color: var(--he-accent);
+      margin-bottom: 4px;
+    }
+    .v-resume-rule-new {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-strong);
+      font-weight: var(--he-weight-semibold);
+      line-height: 1.4;
+    }
+
+    /* ---- Viz 6: 技能雷达/矩阵 ---- */
+    .v-radar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp-2);
+    }
+    .v-radar-header {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-text-subtle);
+      padding: var(--sp-2) var(--sp-3);
+      text-align: center;
+    }
+    .v-radar-header:first-child {
+      text-align: left;
+    }
+    .v-radar-skill {
+      padding: var(--sp-3);
+      font-size: var(--he-text-xs);
+      font-weight: var(--he-weight-medium);
+      color: var(--he-text-body);
+      display: flex;
+      align-items: center;
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-sm);
+    }
+    .v-radar-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-3);
+      border-radius: var(--he-radius-sm);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-radar-cell:hover {
+      transform: scale(1.08);
+    }
+    .v-radar-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      transition: transform var(--he-dur-base);
+    }
+    .v-radar-cell:hover .v-radar-dot {
+      transform: scale(1.4);
+    }
+    .v-radar-dot.is-0 { background: var(--he-bg-muted); width: 8px; height: 8px; }
+    .v-radar-dot.is-1 { background: rgba(94,106,210,0.25); }
+    .v-radar-dot.is-2 { background: rgba(94,106,210,0.55); width: 12px; height: 12px; }
+    .v-radar-dot.is-3 { background: var(--he-accent); width: 16px; height: 16px; box-shadow: 0 0 8px var(--c-indigo-a24); }
+
+    /* ---- Viz 7: 反建议卡片 ---- */
+    .v-anti {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-anti-card {
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-anti-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-anti-num {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--he-accent);
+      font-weight: var(--he-weight-semibold);
+      margin-bottom: var(--sp-2);
+    }
+    .v-anti-dont {
+      font-size: var(--he-text-sm);
+      color: var(--he-text-subtle);
+      text-decoration: line-through;
+      margin-bottom: var(--sp-2);
+      line-height: var(--he-leading-snug);
+    }
+    .v-anti-do {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-strong);
+      line-height: var(--he-leading-snug);
+    }
+    .v-anti-do::before {
+      content: '-> ';
+      font-family: var(--he-font-mono);
+      color: var(--he-accent);
+    }
+
+    /* ---- Viz 8: 讲法结构 ---- */
+    .v-story {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-3);
+    }
+    .v-story-card {
+      padding: var(--sp-5);
+      background: var(--he-bg);
+      border: 1px solid var(--he-border);
+      border-radius: var(--he-radius-md);
+      transition: all var(--he-dur-base) var(--he-ease-out);
+    }
+    .v-story-card:hover {
+      border-color: var(--he-accent);
+      transform: translateY(-2px);
+    }
+    .v-story-tag {
+      font-family: var(--he-font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--he-accent);
+      margin-bottom: var(--sp-2);
+    }
+    .v-story-title {
+      font-size: var(--he-text-sm);
+      font-weight: var(--he-weight-semibold);
+      color: var(--he-text-display);
+      margin-bottom: var(--sp-2);
+    }
+    .v-story-items {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .v-story-items li {
+      font-size: var(--he-text-xs);
+      color: var(--he-text-body);
+      line-height: 1.5;
+      padding-left: 16px;
+      position: relative;
+    }
+    .v-story-items li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 7px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--he-accent);
+      opacity: 0.5;
+    }
+
+    /* ---- 通用小组件 ---- */
+    .callout {
+      padding: var(--sp-5);
+      background: var(--he-accent-soft);
+      border-left: 3px solid var(--he-accent);
+      border-radius: 0 var(--he-radius-md) var(--he-radius-md) 0;
+      margin: var(--sp-6) 0;
+      font-size: var(--he-text-sm);
+      line-height: var(--he-leading-relaxed);
+    }
+    .callout strong { color: var(--he-text-display); }
+
+    /* ---- 响应式 ---- */
+    @media (max-width: 1024px) {
+      .v-interview { grid-template-columns: 1fr; }
+      .v-radar { grid-template-columns: repeat(4, 1fr); font-size: 10px; }
+    }
+    @media (max-width: 768px) {
+      .v-stack-row { grid-template-columns: 80px 1fr; }
+      .v-stack-pop, .v-stack-premium { display: none; }
+      .v-stack-header { display: none; }
+      .v-salary-tier { grid-template-columns: 1fr; }
+      .v-salary-left { align-items: flex-start; flex-direction: row; gap: var(--sp-3); }
+      .v-salary-bar { max-width: 120px; }
+      .v-resume { grid-template-columns: 1fr; }
+      .v-resume-rules { grid-template-columns: 1fr; }
+      .v-anti { grid-template-columns: 1fr; }
+      .v-story { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .v-interview-card { min-height: 220px; }
+      .v-interview-inner { min-height: 220px; }
+      .v-ladder-step { grid-template-columns: 48px 1fr; }
+      .v-ladder-dot { width: 32px; height: 32px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ Page Hero ============ -->
+  <header class="page-hero">
+    <div class="page-hero-inner">
+      <a class="page-back" href="resources.html">← 资源</a>
+      <div class="page-eyebrow">
+        <span class="page-eyebrow-num">板块 08</span>
+        <span class="page-eyebrow-group">资源 · RESOURCES</span>
+      </div>
+      <h1 class="he-h1 page-title">职业 & <span class="he-text-accent">面试</span>。</h1>
+      <p class="he-lead page-lead">
+        把前 7 个板块学到的 harness 知识，变成一套<strong>可以背、可以讲、可以放在 GitHub 上</strong>的求职打法。
+      </p>
+      <div class="page-meta">
+        <span class="page-meta-item">20 分钟阅读</span>
+        <span class="page-meta-item">8 个小节</span>
+        <span class="page-meta-item">8 个可视化</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Page Layout ============ -->
+  <div class="page-layout">
+    <!-- aside.page-side 自动注入 -->
+    <main class="page-main">
+
+
+      <!-- ===== §1 harness 在简历上的位置 ===== -->
+      <section class="page-section he-reveal" id="sec-1" data-toc="harness 在哪一层">
+        <div class="page-section-eyebrow">§1 · 能力栈</div>
+        <h2>AI PM 简历上，<br>harness 在<span class="he-text-accent">哪一层</span>？</h2>
+
+        <p>
+          2025-2026 的 AI PM 招聘市场，有一个被严重低估的杠杆 ——
+          <strong>会用 AI 工具是地板；能讲清 harness 工程是溢价。</strong>
+          地板上挤满了人，溢价那一层几乎没人。
+        </p>
+
+        <!-- Viz #1: 能力栈 5 层 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 01 · skill stack</div>
+            <h3 class="viz-title">AI PM 能力栈 · 5 层</h3>
+            <p class="viz-sub">越往上，越少人会，招聘溢价越大。多数候选人卡在前两层。</p>
+          </div>
+
+          <div class="viz-stage v-stack">
+            <div class="v-stack-header">
+              <span></span>
+              <span>内容</span>
+              <span style="text-align:center">PM 普及度</span>
+              <span style="text-align:center">招聘溢价</span>
+            </div>
+
+            <div class="v-stack-row">
+              <div class="v-stack-level">L1 · 基本功</div>
+              <div class="v-stack-name">用户研究 / PRD / 数据 / 协作</div>
+              <div class="v-stack-pop">极高</div>
+              <div class="v-stack-premium is-none">无</div>
+            </div>
+
+            <div class="v-stack-row">
+              <div class="v-stack-level">L2 · Prompt</div>
+              <div class="v-stack-name">写 prompt 的技巧</div>
+              <div class="v-stack-pop">极高</div>
+              <div class="v-stack-premium is-none">几乎无</div>
+            </div>
+
+            <div class="v-stack-row">
+              <div class="v-stack-level">L3 · Context</div>
+              <div class="v-stack-name">管理上下文窗口 / RAG / 压缩</div>
+              <div class="v-stack-pop">中</div>
+              <div class="v-stack-premium is-low">小</div>
+            </div>
+
+            <div class="v-stack-row is-highlight">
+              <div class="v-stack-level">L4 · Harness</div>
+              <div class="v-stack-name">设计 agent 的应用层 harness</div>
+              <div class="v-stack-pop">低</div>
+              <div class="v-stack-premium is-high">大</div>
+            </div>
+
+            <div class="v-stack-row is-highlight">
+              <div class="v-stack-level">L5 · Evals</div>
+              <div class="v-stack-name">系统化评测 + 独立 Reviewer</div>
+              <div class="v-stack-pop">极低</div>
+              <div class="v-stack-premium is-high">大</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>规律</strong>：PM 圈普及度 vs 招聘溢价<strong>反相关</strong> ——
+            越多人会的越没溢价，越少人会的溢价越大。
+            本课程重点训练 L4 + L5 = 差异化最大的两层。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §2 薪资段地图 ===== -->
+      <section class="page-section he-reveal" id="sec-2" data-toc="薪资段地图">
+        <div class="page-section-eyebrow">§2 · 薪资</div>
+        <h2>你该卡<span class="he-text-accent">哪个段</span>？</h2>
+
+        <p>
+          薪资段和能力层一一对应。看清楚自己在哪，才知道要补什么。
+        </p>
+
+        <!-- Viz #2: 薪资段地图 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 02 · salary map</div>
+            <h3 class="viz-title">AIPM 薪资段 vs 能力 vs 简历表达</h3>
+            <p class="viz-sub">一线城市参考值。实际 ±30%，看公司类型。条形表示相对市场竞争力。</p>
+          </div>
+
+          <div class="viz-stage v-salary">
+            <div class="v-salary-tier">
+              <div class="v-salary-left">
+                <div class="v-salary-range">15-25K</div>
+                <div class="v-salary-label">初级 AI PM</div>
+                <div class="v-salary-bar"><div class="v-salary-fill" style="width:25%"></div></div>
+              </div>
+              <div class="v-salary-right">
+                <div class="v-salary-skills">
+                  <span class="v-salary-skill">ChatGPT</span>
+                  <span class="v-salary-skill">Claude</span>
+                  <span class="v-salary-skill">Prompt 基础</span>
+                </div>
+                <div class="v-salary-resume">简历写："AI 工具用户"</div>
+              </div>
+            </div>
+
+            <div class="v-salary-jump">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3m0 0L3 7m4-4l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              杠杆：学会 Context Engineering
+            </div>
+
+            <div class="v-salary-tier">
+              <div class="v-salary-left">
+                <div class="v-salary-range">25-40K</div>
+                <div class="v-salary-label">中级 AI PM</div>
+                <div class="v-salary-bar"><div class="v-salary-fill" style="width:50%"></div></div>
+              </div>
+              <div class="v-salary-right">
+                <div class="v-salary-skills">
+                  <span class="v-salary-skill">Cursor</span>
+                  <span class="v-salary-skill">Claude Code</span>
+                  <span class="v-salary-skill is-key">Context Eng</span>
+                  <span class="v-salary-skill">跟工程讨论 Agent 设计</span>
+                </div>
+                <div class="v-salary-resume">简历写："AI 产品迭代经验"</div>
+              </div>
+            </div>
+
+            <div class="v-salary-jump">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3m0 0L3 7m4-4l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              杠杆：Harness 全栈 + GitHub 作品 ← 跨度最大的一跳
+            </div>
+
+            <div class="v-salary-tier" style="border-color:transparent;box-shadow:0 0 0 1px var(--c-indigo-a24), 0 8px 32px var(--c-indigo-a16);">
+              <div class="v-salary-left">
+                <div class="v-salary-range">40-60K</div>
+                <div class="v-salary-label">高级 AI PM</div>
+                <div class="v-salary-bar"><div class="v-salary-fill" style="width:75%"></div></div>
+              </div>
+              <div class="v-salary-right">
+                <div class="v-salary-skills">
+                  <span class="v-salary-skill is-key">独立设计应用层 Harness</span>
+                  <span class="v-salary-skill is-key">Production Agent Ship</span>
+                  <span class="v-salary-skill is-key">完整 6 零件</span>
+                  <span class="v-salary-skill">Evals 体系</span>
+                </div>
+                <div class="v-salary-resume">简历写："独立设计 agent 产品的 harness"</div>
+              </div>
+            </div>
+
+            <div class="v-salary-jump">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3m0 0L3 7m4-4l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              杠杆：跨团队 harness 顾问 + 技术品牌
+            </div>
+
+            <div class="v-salary-tier">
+              <div class="v-salary-left">
+                <div class="v-salary-range">60-100K+</div>
+                <div class="v-salary-label">资深 / Staff</div>
+                <div class="v-salary-bar"><div class="v-salary-fill" style="width:100%"></div></div>
+              </div>
+              <div class="v-salary-right">
+                <div class="v-salary-skills">
+                  <span class="v-salary-skill is-key">组织级 Harness 设计</span>
+                  <span class="v-salary-skill is-key">公司标准定义</span>
+                  <span class="v-salary-skill">公开演讲 / 技术品牌</span>
+                  <span class="v-salary-skill">跨产品 / 跨团队顾问</span>
+                </div>
+                <div class="v-salary-resume">简历写："组织级 harness 设计能力"</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>多数人卡在 25 → 40K 那一跳</strong>。这门课就是为这一跳准备的。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §3 职业阶梯 ===== -->
+      <section class="page-section he-reveal" id="sec-3" data-toc="职业阶梯">
+        <div class="page-section-eyebrow">§3 · 路径</div>
+        <h2>从 PM 到 Founder，<br>每一步<span class="he-text-accent">积累什么</span>？</h2>
+
+        <p>
+          职业路径不是一条线，但每一步需要积累的东西是确定的。
+        </p>
+
+        <!-- Viz #3: 职业阶梯 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 03 · career ladder</div>
+            <h3 class="viz-title">AIPM 职业阶梯 · 关键里程碑</h3>
+            <p class="viz-sub">每级列出对应的 harness 工程积累。当前课程覆盖第一到第二级。</p>
+          </div>
+
+          <div class="viz-stage v-ladder">
+            <div class="v-ladder-step is-active">
+              <div class="v-ladder-marker">
+                <div class="v-ladder-dot">1</div>
+                <div class="v-ladder-line"></div>
+              </div>
+              <div class="v-ladder-body">
+                <div class="v-ladder-title">PM -> AI PM</div>
+                <div class="v-ladder-desc">
+                  第一个 AI 产品 ship 经验 + GitHub 上的 harness scaffold。<strong>本课程的产物就是这一步的门票。</strong>
+                </div>
+                <div class="v-ladder-tags">
+                  <span class="v-ladder-tag">CLAUDE.md</span>
+                  <span class="v-ladder-tag">Skills x4</span>
+                  <span class="v-ladder-tag">pm-docs-harness</span>
+                  <span class="v-ladder-tag">GitHub fork</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="v-ladder-step">
+              <div class="v-ladder-marker">
+                <div class="v-ladder-dot">2</div>
+                <div class="v-ladder-line"></div>
+              </div>
+              <div class="v-ladder-body">
+                <div class="v-ladder-title">AI PM -> Senior AI PM</div>
+                <div class="v-ladder-desc">
+                  跨多个场景的 harness 经验 + 团队 mentorship + 在公司内被认作"agent 产品的去问的人"。
+                </div>
+                <div class="v-ladder-tags">
+                  <span class="v-ladder-tag">多场景 harness</span>
+                  <span class="v-ladder-tag">团队指导</span>
+                  <span class="v-ladder-tag">内部 expert</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="v-ladder-step">
+              <div class="v-ladder-marker">
+                <div class="v-ladder-dot">3</div>
+                <div class="v-ladder-line"></div>
+              </div>
+              <div class="v-ladder-body">
+                <div class="v-ladder-title">Senior -> Staff AI PM</div>
+                <div class="v-ladder-desc">
+                  能定义组织级 harness 标准 + 跨团队影响力 + 公开技术品牌（博客 / 演讲 / 开源贡献）。
+                </div>
+                <div class="v-ladder-tags">
+                  <span class="v-ladder-tag">组织级标准</span>
+                  <span class="v-ladder-tag">跨团队影响力</span>
+                  <span class="v-ladder-tag">技术品牌</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="v-ladder-step">
+              <div class="v-ladder-marker">
+                <div class="v-ladder-dot">4</div>
+              </div>
+              <div class="v-ladder-body">
+                <div class="v-ladder-title">Staff -> Founder / Architect</div>
+                <div class="v-ladder-desc">
+                  能从零设计一个 agent 产品的全栈 harness（应用层 + 部分平台层定制）+ 深厚的业务理解。
+                </div>
+                <div class="v-ladder-tags">
+                  <span class="v-ladder-tag">全栈 harness 设计</span>
+                  <span class="v-ladder-tag">业务深度</span>
+                  <span class="v-ladder-tag">从零到一</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>非线性路径同样成立</strong> ——
+            工程师转 AI PM（技术背景 + 学产品）、咨询师转 AI PM（行业视角 + 学技术）、
+            副业先行（做开源 harness 项目积累 -> 半年后转全职）。
+            GitHub 上 100+ stars 的 harness 项目 = 简历上比 985/211 学位更值钱的东西。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §4 面试题 8 张卡片 ===== -->
+      <section class="page-section he-reveal" id="sec-4" data-toc="8 道面试题">
+        <div class="page-section-eyebrow">§4 · 面试</div>
+        <h2><span class="he-text-accent">8 道高频题</span>，<br>弱答 vs 强答。</h2>
+
+        <p>
+          这 8 道题覆盖 80% 的 AI PM 面试。
+          <strong>点击卡片翻转查看强答模板。</strong>
+          每张正面是题目 + 弱答（多数人的答法），背面是强答 + 加分点。
+        </p>
+
+        <!-- Viz #4: 面试题翻转卡片 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 04 · interview cards</div>
+            <h3 class="viz-title">8 道高频面试题 · 点击翻转</h3>
+            <p class="viz-sub">正面 = 题目 + 弱答。背面 = 强答模板 + 加分点。把强答背熟。</p>
+          </div>
+
+          <div class="viz-stage v-interview">
+
+            <!-- Q1 -->
+            <div class="v-interview-card" onclick="this.classList.toggle('is-flipped')">
+              <div class="v-interview-inner">
+                <div class="v-interview-front">
+                  <div class="v-interview-num">Q1</div>
+                  <div class="v-interview-q">"你怎么看 AI 编程时代 PM 的角色变化？"</div>
+                  <div class="v-interview-weak">
+                    <span class="v-interview-weak-label">弱答</span>
+                    "PM 要会用 AI 工具，把效率提上来。"
+                  </div>
+                  <div class="v-interview-flip-hint">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    点击查看强答
+                  </div>
+                </div>
+                <div class="v-interview-back">
+                  <div class="v-interview-back-num">Q1 · 强答</div>
+                  <div class="v-interview-back-label">STRONG ANSWER</div>
+                  <div class="v-interview-a">
+                    PM 的工作从"写 PRD 给开发"变成了<strong>为 agent 搭好 harness</strong>。核心工作是设计 agent 的环境：它能动什么、记什么、怎么自检。我做过 pm-docs-harness 这个模板，把这套落到 Claude Code 上。
+                  </div>
+                  <div class="v-interview-bonus">
+                    <span class="v-interview-bonus-label">加分点</span>
+                    能引用 OpenAI / Anthropic 原文；能展示 GitHub 上的作品链接。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="v-interview-card" onclick="this.classList.toggle('is-flipped')">
+              <div class="v-interview-inner">
+                <div class="v-interview-front">
+                  <div class="v-interview-num">Q2</div>
+                  <div class="v-interview-q">"你怎么看 SDD？"</div>
+                  <div class="v-interview-weak">
+                    <span class="v-interview-weak-label">弱答</span>
+                    "SDD 是新一代标准" 或 "SDD 是废话文学"（任一极端站队）
+                  </div>
+                  <div class="v-interview-flip-hint">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    点击查看强答
+                  </div>
+                </div>
+                <div class="v-interview-back">
+                  <div class="v-interview-back-num">Q2 · 强答</div>
+                  <div class="v-interview-back-label">STRONG ANSWER</div>
+                  <div class="v-interview-a">
+                    SDD 跟 Harness 不是对立，它们是<strong>"指定多少"这条光谱上的不同位置</strong>。消费级 / 创业期走 harness 轻量端；to-G、合规重、大型协作走 SDD 强 spec。<strong>看场景选，不站队。</strong>
+                  </div>
+                  <div class="v-interview-bonus">
+                    <span class="v-interview-bonus-label">加分点</span>
+                    能举一个"我用 harness"和一个"我会选 SDD"的具体场景。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="v-interview-card" onclick="this.classList.toggle('is-flipped')">
+              <div class="v-interview-inner">
+                <div class="v-interview-front">
+                  <div class="v-interview-num">Q3</div>
+                  <div class="v-interview-q">"如何评估一个 agent 产品的好坏？"</div>
+                  <div class="v-interview-weak">
+                    <span class="v-interview-weak-label">弱答</span>
+                    "看用户满意度 / NPS。"
+                  </div>
+                  <div class="v-interview-flip-hint">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    点击查看强答
+                  </div>
+                </div>
+                <div class="v-interview-back">
+                  <div class="v-interview-back-num">Q3 · 强答</div>
+                  <div class="v-interview-back-label">STRONG ANSWER</div>
+                  <div class="v-interview-a">
+                    从<strong>三层</strong>看 ——
+                    <strong>在线指标</strong>：用户接受率、重试率、放弃率、单位成本。
+                    <strong>离线评测</strong>：Golden set + Rubric + 独立 Reviewer Project。
+                    <strong>单位经济</strong>：成本归因 dashboard，per-user/per-feature token 消耗。
+                  </div>
+                  <div class="v-interview-bonus">
+                    <span class="v-interview-bonus-label">加分点</span>
+                    能讲出自己跑过 golden set 的具体数据。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="v-interview-card" onclick="this.classList.toggle('is-flipped')">
+              <div class="v-interview-inner">
+                <div class="v-interview-front">
+                  <div class="v-interview-num">Q4</div>
+                  <div class="v-interview-q">"假设你做一个 [X] agent 产品，你会怎么设计？"</div>
+                  <div class="v-interview-weak">
+                    <span class="v-interview-weak-label">弱答</span>
+                    直接列产品功能。
+                  </div>
+                  <div class="v-interview-flip-hint">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    点击查看强答
+                  </div>
+                </div>
+                <div class="v-interview-back">
+                  <div class="v-interview-back-num">Q4 · 强答</div>
+                  <div class="v-interview-back-label">STRONG ANSWER</div>
+                  <div class="v-interview-a">
+                    用<strong>三步法</strong> ——
+                    <strong>选尺度</strong>（组件级 / 任务级 / 组织级）->
+                    <strong>按 MVP 顺序搭 6 零件</strong>（主循环 -> 工具 -> 上下文 -> hook -> 记忆 -> 评测）->
+                    <strong>灰度 + 观察期</strong>（1-5% 流量 24-48h，再观察 7-14 天）。
+                  </div>
+                  <div class="v-interview-bonus">
+                    <span class="v-interview-bonus-label">加分点</span>
+                    能用具体 case 走一遍，展示思考过程而非公式。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q5 -->
+            <div class="v-interview-card" onclick="this.classList.toggle('is-flipped')">
+              <div class="v-interview-inner">
+                <div class="v-interview-front">
+                  <div class="v-interview-num">Q5</div>
+                  <div class="v-interview-q">"你具体用过哪些 AI 工具？讲讲怎么用的"</div>
+                  <div class="v-interview-weak">
+                    <span class="v-interview-weak-label">弱答</span>
+                    "用过 ChatGPT、Claude、Cursor。"
+                  </div>
+                  <div class="v-interview-flip-hint">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    点击查看强答
+                  </div>
+                </div>
+                <div class="v-interview-back">
+                  <div class="v-interview-back-num">Q5 · 强答</div>
+                  <div class="v-interview-back-label">STRONG ANSWER</div>
+                  <div class="v-interview-a">
+                    讲<strong>具体的 harness 配置</strong>：CLAUDE.md 里写了身份 + 原则 + 硬规则；Knowledge files 含产品背景 + 用户画像；配了 4 个 Skills 串成 mrd->brd->prd->design 工作链；hook 拦截危险操作；10 个 golden set 做发版回归。
+                  </div>
+                  <div class="v-interview-bonus">
+                    <span class="v-interview-bonus-label">加分点</span>
+                    打开你的 GitHub 让面试官看实物。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q6 -->
+            <div class="v-interview-card" onclick="this.classList.toggle('is-flipped')">
+              <div class="v-interview-inner">
+                <div class="v-interview-front">
+                  <div class="v-interview-num">Q6</div>
+                  <div class="v-interview-q">"升级底层模型（如 GPT-4 -> Claude）怎么做？"</div>
+                  <div class="v-interview-weak">
+                    <span class="v-interview-weak-label">弱答</span>
+                    "先小范围试一下看效果。"
+                  </div>
+                  <div class="v-interview-flip-hint">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    点击查看强答
+                  </div>
+                </div>
+                <div class="v-interview-back">
+                  <div class="v-interview-back-num">Q6 · 强答</div>
+                  <div class="v-interview-back-label">STRONG ANSWER</div>
+                  <div class="v-interview-a">
+                    <strong>敢切，是因为能撤</strong> —— 四件套：
+                    <strong>Golden set 基准</strong>（旧版跑一遍存分）->
+                    <strong>成本归因 dashboard</strong>（弱模型可能多次重试反而更贵）->
+                    <strong>灰度发布</strong>（1-5% 流量 24-48h）->
+                    <strong>观察期 7-14 天</strong>。
+                  </div>
+                  <div class="v-interview-bonus">
+                    <span class="v-interview-bonus-label">加分点</span>
+                    能强调"敢切是因为能撤"这句金句。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q7 -->
+            <div class="v-interview-card" onclick="this.classList.toggle('is-flipped')">
+              <div class="v-interview-inner">
+                <div class="v-interview-front">
+                  <div class="v-interview-num">Q7</div>
+                  <div class="v-interview-q">"什么是 hallucination？你怎么减少它？"</div>
+                  <div class="v-interview-weak">
+                    <span class="v-interview-weak-label">弱答</span>
+                    只讲 prompt 技巧（"在 prompt 里写'请基于事实回答'……"）
+                  </div>
+                  <div class="v-interview-flip-hint">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    点击查看强答
+                  </div>
+                </div>
+                <div class="v-interview-back">
+                  <div class="v-interview-back-num">Q7 · 强答</div>
+                  <div class="v-interview-back-label">STRONG ANSWER</div>
+                  <div class="v-interview-a">
+                    <strong>分层处理</strong> ——
+                    <strong>prompt 层</strong>（明确角色 + 要求引用）->
+                    <strong>context 层</strong>（RAG 增强）->
+                    <strong>harness 层</strong>（hook 拦截 + 工具反馈闭环 + golden set 回归）->
+                    <strong>模型层</strong>（选合适模型 + thinking 模式）->
+                    <strong>产品层</strong>（plan mode / 不可逆操作前 confirm）。五层缺一层都消不干净。
+                  </div>
+                  <div class="v-interview-bonus">
+                    <span class="v-interview-bonus-label">加分点</span>
+                    能引用 lost in the middle / context anxiety / context reset。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q8 -->
+            <div class="v-interview-card" onclick="this.classList.toggle('is-flipped')">
+              <div class="v-interview-inner">
+                <div class="v-interview-front">
+                  <div class="v-interview-num">Q8</div>
+                  <div class="v-interview-q">"你怎么用 AI 提升团队产出？"</div>
+                  <div class="v-interview-weak">
+                    <span class="v-interview-weak-label">弱答</span>
+                    "教大家写 prompt / 推 ChatGPT 工作流。"
+                  </div>
+                  <div class="v-interview-flip-hint">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7a4 4 0 1 1-1.17-2.83M11 2v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    点击查看强答
+                  </div>
+                </div>
+                <div class="v-interview-back">
+                  <div class="v-interview-back-num">Q8 · 强答</div>
+                  <div class="v-interview-back-label">STRONG ANSWER</div>
+                  <div class="v-interview-a">
+                    做的不是教每个人写 prompt —— 那个沉淀不下来。做的是搭<strong>共享 harness 模板</strong>：团队级 CLAUDE.md + Skills 库 + evals 体系。新员工 fork 一小时上手；有人发明新流程 -> 沉淀成 Skill，全队受益。这是<strong>组织级 harness</strong>。
+                  </div>
+                  <div class="v-interview-bonus">
+                    <span class="v-interview-bonus-label">加分点</span>
+                    能区分"个人级 harness"vs"组织级 harness"，展示尺度感。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="viz-caption">
+            <strong>背熟强答模板</strong>，然后用自己的话讲出来。
+            死记硬背面试官一听就知道，<strong>关键是理解逻辑后自然表达</strong>。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §5 简历改造 ===== -->
+      <section class="page-section he-reveal" id="sec-5" data-toc="简历改造">
+        <div class="page-section-eyebrow">§5 · 简历</div>
+        <h2>把简历从"求职信"<br>改成<span class="he-text-accent">作品集</span>。</h2>
+
+        <p>
+          同样的经历，弱版写完面试官不想约你，强版写完面试官想见你。差别在三条规则。
+        </p>
+
+        <!-- Viz #5: 简历 Before / After -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 05 · resume rewrite</div>
+            <h3 class="viz-title">简历 Before vs After</h3>
+            <p class="viz-sub">左边是一年级写法，右边是 harness 工程师的写法。</p>
+          </div>
+
+          <div class="viz-stage">
+            <div class="v-resume">
+              <div class="v-resume-col v-resume-before">
+                <div class="v-resume-tag">BEFORE</div>
+                <div class="v-resume-text">
+                  <span class="v-strike">熟练使用 Claude / GPT。</span><br><br>
+                  <span class="v-strike">优化产品 PRD 起草流程，使用 AI 工具提升效率 30%。</span>
+                </div>
+              </div>
+              <div class="v-resume-col v-resume-after">
+                <div class="v-resume-tag">AFTER</div>
+                <div class="v-resume-text">
+                  <strong>设计并开发一套 PM 文档工作流 harness 模板</strong>（GitHub: 链接），覆盖 BRD / MRD / PRD / 设计规范全链路：<br>
+                  - 基于 Claude Code 应用层 harness 思路，搭 <strong>CLAUDE.md + Skills(4 个串成工作链) + Hooks + 独立 Reviewer Project</strong><br>
+                  - 配套 <strong>10 个 golden set 任务</strong>作为发版回归基线<br>
+                  - 关键技术栈：Skills 工作流编排 / PreToolUse hook / Mini-eval 评测
+                </div>
+              </div>
+            </div>
+
+            <div class="v-resume-rules">
+              <div class="v-resume-rule">
+                <div class="v-resume-rule-num">01</div>
+                <div class="v-resume-rule-old">不写"会用 X"</div>
+                <div class="v-resume-rule-arrow">-></div>
+                <div class="v-resume-rule-new">写"设计了基于 X 的[系统]"</div>
+              </div>
+              <div class="v-resume-rule">
+                <div class="v-resume-rule-num">02</div>
+                <div class="v-resume-rule-old">不写"提升效率 30%"</div>
+                <div class="v-resume-rule-arrow">-></div>
+                <div class="v-resume-rule-new">写"[指标]从 X 降到 Y"（真数据）</div>
+              </div>
+              <div class="v-resume-rule">
+                <div class="v-resume-rule-num">03</div>
+                <div class="v-resume-rule-old">不写"熟悉 prompt engineering"</div>
+                <div class="v-resume-rule-arrow">-></div>
+                <div class="v-resume-rule-new">写"应用层 harness 设计经验：[三件事]"</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>三条改完，你的简历从"求职信"变成"作品集"</strong>。
+            底气来自实物 —— pm-docs-harness 模板 fork 在 GitHub 上，就是真做过。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §6 技能矩阵 ===== -->
+      <section class="page-section he-reveal" id="sec-6" data-toc="技能矩阵">
+        <div class="page-section-eyebrow">§6 · 矩阵</div>
+        <h2>哪些 harness 技能<br>对应<span class="he-text-accent">哪个级别</span>？</h2>
+
+        <p>
+          不同职级需要掌握的 harness 技能不同。
+          圆点越大 = 该级别越需要这项技能。
+        </p>
+
+        <!-- Viz #6: 技能矩阵 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 06 · skill matrix</div>
+            <h3 class="viz-title">Harness 技能 x 职级 矩阵</h3>
+            <p class="viz-sub">圆点大小 = 重要程度。空心 = 不要求，小圆 = 了解，中圆 = 熟练，大圆 = 精通且能教别人。</p>
+          </div>
+
+          <div class="viz-stage v-radar">
+            <!-- Header row -->
+            <div class="v-radar-header">技能</div>
+            <div class="v-radar-header">初级</div>
+            <div class="v-radar-header">中高级</div>
+            <div class="v-radar-header">Staff+</div>
+
+            <!-- Prompt Engineering -->
+            <div class="v-radar-skill">Prompt Engineering</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-2"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-2"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-2"></div></div>
+
+            <!-- Context Engineering -->
+            <div class="v-radar-skill">Context Engineering</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-1"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+
+            <!-- CLAUDE.md / 系统配置 -->
+            <div class="v-radar-skill">CLAUDE.md 设计</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-1"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+
+            <!-- Skills 编排 -->
+            <div class="v-radar-skill">Skills 工作流编排</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-0"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-2"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+
+            <!-- Hooks / 执行边界 -->
+            <div class="v-radar-skill">Hooks / 执行边界</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-0"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-2"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+
+            <!-- Golden Set / Evals -->
+            <div class="v-radar-skill">Golden Set / Evals</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-0"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-2"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+
+            <!-- 三尺度判断 -->
+            <div class="v-radar-skill">三尺度判断</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-0"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-1"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+
+            <!-- 组织级 harness -->
+            <div class="v-radar-skill">组织级 Harness 设计</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-0"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-1"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+
+            <!-- 成本归因 -->
+            <div class="v-radar-skill">成本归因 Dashboard</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-0"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-2"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+
+            <!-- 灰度发布 -->
+            <div class="v-radar-skill">灰度发布策略</div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-0"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-2"></div></div>
+            <div class="v-radar-cell"><div class="v-radar-dot is-3"></div></div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>初级只需 Prompt + 了解 Context</strong>。
+            <strong>中高级核心是 CLAUDE.md + Skills + Hooks + Evals 这四件事</strong>。
+            Staff 级需要全部精通且能带人 + 定标准。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §7 讲法模板 ===== -->
+      <section class="page-section he-reveal" id="sec-7" data-toc="讲法模板">
+        <div class="page-section-eyebrow">§7 · 讲法</div>
+        <h2>"我做过 harness 产品"<br>怎么<span class="he-text-accent">三句话讲完</span>？</h2>
+
+        <p>
+          面试官问"还有别的吗"，你能再讲一个就直接拉开梯次。
+          每个 Sample 都用相同的<strong>"知 -> 做 -> 检"三句话结构</strong>。
+        </p>
+
+        <!-- Viz #7: 讲法三段式 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 07 · story structure</div>
+            <h3 class="viz-title">三个场景 · 同一个结构</h3>
+            <p class="viz-sub">每个场景按"知 -> 做 -> 检"三句话讲完。面试官立刻看到你的系统化。</p>
+          </div>
+
+          <div class="viz-stage v-story">
+            <div class="v-story-card">
+              <div class="v-story-tag">SAMPLE A</div>
+              <div class="v-story-title">PM 文档工作链</div>
+              <ul class="v-story-items">
+                <li><strong>知</strong>：CLAUDE.md 写产品背景 + 5 条原则 + 硬规则；Knowledge files 含用户画像 + 历史决策</li>
+                <li><strong>做</strong>：4 个 Skills 串成 mrd->brd->prd->design 工作链；hook 拦截 rm -rf / git push --force</li>
+                <li><strong>检</strong>：10 个 golden set 任务 + 独立 Reviewer Project 做发版回归</li>
+              </ul>
+            </div>
+
+            <div class="v-story-card">
+              <div class="v-story-tag">SAMPLE B</div>
+              <div class="v-story-title">客服 Agent（B 端 SaaS）</div>
+              <ul class="v-story-items">
+                <li><strong>知</strong>：CLAUDE.md 写常见问题 + 不能讨论的话题；docs/ 放产品手册 + 历史工单</li>
+                <li><strong>做</strong>：工具白名单只允许订单/库存查询；hook 拦截"承诺退款/改账单"必须转人工</li>
+                <li><strong>检</strong>：每周抽 100 对话，独立 Reviewer 按 5 维度打分，质量 8/10 以上保持</li>
+              </ul>
+            </div>
+
+            <div class="v-story-card">
+              <div class="v-story-tag">SAMPLE C</div>
+              <div class="v-story-title">数据 PM 助手</div>
+              <ul class="v-story-items">
+                <li><strong>知</strong>：CLAUDE.md 写数据敏感原则；Knowledge files 含指标体系 + 维度树 + 数据字典</li>
+                <li><strong>做</strong>：工具只开 SQL preview（只读）+ Slack 推送；hook 拦截 INSERT / DELETE / DROP</li>
+                <li><strong>检</strong>：5 个 golden set 任务（如"定义留存率指标"），独立 Reviewer 按合规 + 准确度评分</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>统一结构的好处</strong>：面试官问第二个、第三个场景时，你用同样的"知->做->检"讲，
+            他立刻感受到你有<strong>方法论</strong>而不是东讲一句西讲一句。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §8 反建议 ===== -->
+      <section class="page-section he-reveal" id="sec-8" data-toc="7 条反建议">
+        <div class="page-section-eyebrow">§8 · 避坑</div>
+        <h2><span class="he-text-accent">7 条反建议</span>。<br>别踩这些坑。</h2>
+
+        <p>
+          面试和简历里最常见的 7 个坑。每条都是"不要做 X -> 应该做 Y"。
+        </p>
+
+        <!-- Viz #8: 反建议卡片 -->
+        <figure class="viz">
+          <div class="viz-head">
+            <div class="viz-tag">Visualization 08 · anti-patterns</div>
+            <h3 class="viz-title">7 条反建议 · 从"用户"跳到"设计者"</h3>
+            <p class="viz-sub">划线 = 不要这样。箭头后面 = 应该这样。</p>
+          </div>
+
+          <div class="viz-stage v-anti">
+            <div class="v-anti-card">
+              <div class="v-anti-num">01</div>
+              <div class="v-anti-dont">在简历上写"精通 prompt engineering"</div>
+              <div class="v-anti-do">改写"应用层 harness 设计经验"</div>
+            </div>
+
+            <div class="v-anti-card">
+              <div class="v-anti-num">02</div>
+              <div class="v-anti-dont">泛泛说"我用过 AI"</div>
+              <div class="v-anti-do">讲具体的 harness 配置（参考 Q5 强答）</div>
+            </div>
+
+            <div class="v-anti-card">
+              <div class="v-anti-num">03</div>
+              <div class="v-anti-dont">只讲"用 X 工具"</div>
+              <div class="v-anti-do">讲"建过 X harness" —— 从用户跳到设计者</div>
+            </div>
+
+            <div class="v-anti-card">
+              <div class="v-anti-num">04</div>
+              <div class="v-anti-dont">被"哪家模型更好"带偏</div>
+              <div class="v-anti-do">拉回 harness："模型是引擎，harness 才是产品差异"</div>
+            </div>
+
+            <div class="v-anti-card">
+              <div class="v-anti-num">05</div>
+              <div class="v-anti-dont">为了显得懂乱用术语</div>
+              <div class="v-anti-do">用了任何术语，就要能讲清它跟其他词的区别</div>
+            </div>
+
+            <div class="v-anti-card">
+              <div class="v-anti-num">06</div>
+              <div class="v-anti-dont">承诺自己没做过的事</div>
+              <div class="v-anti-do">GitHub 上有 fork = 真做过。底气来自实物。</div>
+            </div>
+
+            <div class="v-anti-card" style="grid-column: 1 / -1;">
+              <div class="v-anti-num">07</div>
+              <div class="v-anti-dont">鄙视 SDD / 鄙视任何方法论</div>
+              <div class="v-anti-do">站队是初级表现。面试官要的是能讲清不同路径差异 + 各自场景的人。</div>
+            </div>
+          </div>
+
+          <p class="viz-caption">
+            <strong>更深一层</strong> ——
+            不要相信"AI 会让 PM 失业"这种焦虑营销。
+            多数 agent 产品的失败原因是 PM 做错了 harness 决策，不是模型不行。
+            <strong>你的工作不是被 AI 替代，是被"会用 AI 的 PM"替代</strong>。
+          </p>
+        </figure>
+      </section>
+
+
+      <!-- ===== §9 一句话总结 ===== -->
+      <section class="page-section he-reveal" id="sec-9" data-toc="一句话总结">
+        <div class="page-section-eyebrow">§9 · 一句话总结</div>
+        <blockquote>
+          <strong>AI PM 求职市场 2025-2026 最大的差异化</strong> ——
+          不是会用 AI 工具，是<strong>能讲清 harness 工程</strong>。
+          多数候选人卡在 prompt 层或 context 层；
+          能讲清完整的 harness 视角，你就有了不可替代的 <strong>5-10K 月薪溢价</strong>。
+        </blockquote>
+
+        <div class="callout">
+          <strong>配套实物</strong> ——
+          本课程 + 你 fork 的 <code>pm-docs-harness</code> 模板 + 板块⑥/⑧ 的话术
+          = 够你在 80% 的 AI PM 面试里脱颖而出。
+          剩下的 20%，靠你的行业深度 + 业务理解 —— 那是本课程之外的事。
+        </div>
+
+        <h3>一手来源（本板块所有论断的出处）</h3>
+        <ul>
+          <li>OpenAI《Harness engineering》— <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noreferrer">openai.com</a></li>
+          <li>Anthropic《Harness design for long-running application development》— <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noreferrer">anthropic.com</a></li>
+          <li>LangChain《The Anatomy of an Agent Harness》— <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noreferrer">langchain.com</a></li>
+        </ul>
+      </section>
+
+
+      <!-- ===== 上一篇 / 下一篇 ===== -->
+      <nav class="page-nav" aria-label="板块导航">
+        <a href="resources.html" class="page-nav-link">
+          <span class="page-nav-meta">↩ 返回</span>
+          <span class="page-nav-title">资源 · 本组总览</span>
+        </a>
+        <a href="00-glossary.html" class="page-nav-link is-next">
+          <span class="page-nav-meta">下一篇 →</span>
+          <span class="page-nav-title">⓪ 术语表</span>
+        </a>
+      </nav>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/spotlight.js"></script>
+</body>
+</html>
